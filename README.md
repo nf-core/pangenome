@@ -2,6 +2,10 @@
 
 **The pangenome graph construction pipeline renders a collection of sequences into a pangenome graph. Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs**.
 
+> As a first step, the aim is to create a Nextflow DSL2 version of the pangenome graph builder [`pggb`](https://github.com/pangenome/pggb) pipeline.
+
+> This pipeline is still under heavy development! The code is likely to change and the documentation is imperfectly realized. An overview of the implementation planning is given in the [`nf-core Pangenome Pipeline Planning Phase`](https://docs.google.com/presentation/d/1DzHy_fqs_YH6nMIwxzAPLAaz2CQIlR-k7Y-nQKtn6k8/edit#slide=id.p) presentation.
+
 [![GitHub Actions CI Status](https://github.com/nf-core/pangenome/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/pangenome/actions)
 [![GitHub Actions Linting Status](https://github.com/nf-core/pangenome/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/pangenome/actions)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
