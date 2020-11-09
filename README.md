@@ -50,7 +50,17 @@ The nf-core/pangenome pipeline comes with documentation about the pipeline which
 
 ## Credits
 
-nf-core/pangenome was originally written by Simon Heumos, Michael L Heuer.
+nf-core/pangenome was originally adapted from the pangenome graph builder [`pggb`](https://github.com/pangenome/pggb) pipeline by Simon Heumos, Michael Heuer.
+
+Many thanks to all who have helped out and contributed along the way, including (but not limited to)\*:
+
+| Name                                                      | Affiliation                                                                           |
+|-----------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [Michael Heuer](https://github.com/heuermh)               | [UC Berkeley, USA](https://https://rise.cs.berkeley.edu)                              |
+| [Simon Heumos](https://github.com/subwaystation)          | [QBiC, University of Tübingen, Germany](https://portal.qbic.uni-tuebingen.de/portal/) |
+
+> \* Listed in alphabetical order
+
 
 ## Contributions and Support
 
