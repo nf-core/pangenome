@@ -20,7 +20,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 ## Quick Start
 
- **Warning:** We are currently relaying on an external docker image ghcr.io/pangenome/pggb:latest and the Dockerfile action is not running, yet. Therefore, make sure you always have the latest image. Another caveat is that you need to clone the repository before you can execute the pipeline. Once we have an automated docker image build on `nf-core`, these inconvenience will be gone.
+ **Warning:** We are currently depending on an external docker image ghcr.io/pangenome/pggb:latest and the Dockerfile action is not running, yet. Therefore, make sure you always have the latest image. Another caveat is that you need to clone the repository before you can execute the pipeline. Once we have an automated docker image build on `nf-core`, these inconvenience will be gone.
 
 1. Install [`nextflow`](https://nf-co.re/usage/installation)
 
