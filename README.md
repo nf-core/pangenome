@@ -20,15 +20,20 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 ## Quick Start
 
+ **Warning:** We are currently depending on an external docker image ghcr.io/pangenome/pggb:latest and the Dockerfile action is not running, yet. Therefore, make sure you always have the latest image. Another caveat is that you need to clone the repository before you can execute the pipeline. Once we have an automated docker image build on `nf-core`, these inconvenience will be gone.
+
 1. Install [`nextflow`](https://nf-co.re/usage/installation)
 
 2. Install either [`Docker`](https://docs.docker.com/engine/installation/) or [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) for full pipeline reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
 
-3. Download the pipeline and test it on a minimal dataset with a single command:
+3. Download the current docker image, and test it on a minimal dataset with a single command:
 
     ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>
+    docker pull ghcr.io/pangenome/pggb:latest
+    nextflow run nf-core/pangenome -profile test,docker
     ```
+
+    [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
 
     > Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
 
@@ -37,7 +42,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
     <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
 
     ```bash
-    nextflow run nf-core/pangenome -profile <docker/singularity/conda/institute> --input samplesheet.csv --genome GRCh37
+    docker pull ghcr.io/pangenome/pggb:latest
+    nextflow run nf-core/pangenome -profile docker --input myfasta.fa.gz
     ```
 
 See [usage docs](docs/usage.md) for all of the available options when running the pipeline.
