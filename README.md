@@ -56,7 +56,21 @@ The nf-core/pangenome pipeline comes with documentation about the pipeline which
 
 ## Credits
 
-nf-core/pangenome was originally written by Simon Heumos, Michael L Heuer.
+nf-core/pangenome was originally adapted from the pangenome graph builder [`pggb`](https://github.com/pangenome/pggb) pipeline by Simon Heumos, Michael Heuer.
+
+Many thanks to all who have helped out and contributed along the way, including (but not limited to)\*:
+
+| Name                                                      | Affiliation                                                                           |
+|-----------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [Philipp Ehmele](https://github.com/imipenem)             | [University of Hamburg, Hamburg, Germany](https://www.uni-hamburg.de/en.html)         |                                         
+| [Erik Garisson](https://github.com/ekg)                   | [Genomics Institute, University of California, Santa Cruz, Santa Cruz, CA, USA](https://ucscgenomics.soe.ucsc.edu/)  [Biomolecular Engineering and Bioinformatics, University of California Santa Cruz, Santa Cruz, CA, USA](https://admissions.sa.ucsc.edu/majors/beb)             |                                                                                 
+| [Andrea Guarracino](https://github.com/AndreaGuarracino ) | [University of Rome Tor Vergata, Rome, Italy](http://www.scienze.uniroma2.it/)       |
+| [Michael Heuer](https://github.com/heuermh)               | [UC Berkeley, USA](https://https://rise.cs.berkeley.edu)                              |
+| [Lukas Heumos](https://github.com/zethson)                | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) |
+| [Simon Heumos](https://github.com/subwaystation)          | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) |
+
+> \* Listed in alphabetical order
+
 
 ## Contributions and Support
 
