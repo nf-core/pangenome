@@ -57,11 +57,11 @@ Many thanks to all who have helped out and contributed along the way, including 
 | Name                                                      | Affiliation                                                                           |
 |-----------------------------------------------------------|---------------------------------------------------------------------------------------|
 | [Philipp Ehmele](https://github.com/imipenem)             | [University of Hamburg, Hamburg, Germany](https://www.uni-hamburg.de/en.html)         |                                         
-| [Erik Garisson](https://github.com/ekg)                   | [Genomics Institute, University of California, Santa Cruz, Santa Cruz, CA, USA, Biomolecular Engineering and Bioinformatics, University of California Santa Cruz, Santa Cruz, CA, USA](http://hypervolu.me/~erik/erik_garrison.html)             |                                                                                 
+| [Erik Garisson](https://github.com/ekg)                   | [Genomics Institute, University of California, Santa Cruz, Santa Cruz, CA, USA](https://ucscgenomics.soe.ucsc.edu/)  [Biomolecular Engineering and Bioinformatics, University of California Santa Cruz, Santa Cruz, CA, USA](https://admissions.sa.ucsc.edu/majors/beb)             |                                                                                 
 | [Andrea Guarracino](https://github.com/AndreaGuarracino ) | [University of Rome Tor Vergata, Rome, Italy](http://www.scienze.uniroma2.it/)       |
 | [Michael Heuer](https://github.com/heuermh)               | [UC Berkeley, USA](https://https://rise.cs.berkeley.edu)                              |
-| [Lukas Heumos](https://github.com/zethson)                | [QBiC, University of Tübingen, Germany](https://portal.qbic.uni-tuebingen.de/portal/) |
-| [Simon Heumos](https://github.com/subwaystation)          | [QBiC, University of Tübingen, Germany](https://portal.qbic.uni-tuebingen.de/portal/) |
+| [Lukas Heumos](https://github.com/zethson)                | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) |
+| [Simon Heumos](https://github.com/subwaystation)          | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) |
 
 > \* Listed in alphabetical order
 
