@@ -26,13 +26,11 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 2. Install either [`Docker`](https://docs.docker.com/engine/installation/) or [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) for full pipeline reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
 
-3. Download the current docker image, clone the pipeline and test it on a minimal dataset with a single command:
+3. Download the current docker image, and test it on a minimal dataset with a single command:
 
     ```bash
     docker pull ghcr.io/pangenome/pggb:latest
-    git clone https://github.com/nf-core/pangenome
-    cd pangenome
-    nextflow run ./main.nf -profile test,docker
+    nextflow run nf-core/pangenome -profile test,docker
     ```
 
     [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
@@ -45,7 +43,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
     ```bash
     docker pull ghcr.io/pangenome/pggb:latest
-    nextflow run ./main.nf -profile docker --input_fasta ~/git/test-datasets/data/DRB1-3123/DRB1-3123.fa.gz
+    nextflow run nf-core/pangenome -profile docker --input_fasta ~/git/test-datasets/data/DRB1-3123/DRB1-3123.fa.gz
     ```
 
 See [usage docs](docs/usage.md) for all of the available options when running the pipeline.
