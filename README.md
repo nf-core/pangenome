@@ -57,8 +57,8 @@ Many thanks to all who have helped out and contributed along the way, including 
 | Name                                                      | Affiliation                                                                           |
 |-----------------------------------------------------------|---------------------------------------------------------------------------------------|
 | [Philipp Ehmele](https://github.com/imipenem)             | [University of Hamburg, Hamburg, Germany](https://www.uni-hamburg.de/en.html)         |                                         
-| [Erik Garisson](https://github.com/ekg)                   | [3Genomics Institute, University of California, Santa Cruz, Santa Cruz, CA, USA, 4Biomolecular Engineering and Bioinformatics, University of California Santa Cruz, Santa Cruz, CA, USA](http://hypervolu.me/~erik/erik_garrison.html)             |                                                                                 
-| [Andrea Guarracino](https://github.com/AndreaGuarracino ) | [2University of Rome Tor Vergata, Rome, Italy](http://www.scienze.uniroma2.it/)       |
+| [Erik Garisson](https://github.com/ekg)                   | [Genomics Institute, University of California, Santa Cruz, Santa Cruz, CA, USA, 4Biomolecular Engineering and Bioinformatics, University of California Santa Cruz, Santa Cruz, CA, USA](http://hypervolu.me/~erik/erik_garrison.html)             |                                                                                 
+| [Andrea Guarracino](https://github.com/AndreaGuarracino ) | [University of Rome Tor Vergata, Rome, Italy](http://www.scienze.uniroma2.it/)       |
 | [Michael Heuer](https://github.com/heuermh)               | [UC Berkeley, USA](https://https://rise.cs.berkeley.edu)                              |
 | [Simon Heumos](https://github.com/subwaystation)          | [QBiC, University of Tübingen, Germany](https://portal.qbic.uni-tuebingen.de/portal/) |
 | [Lukas Heumos](https://github.com/zethson)                | [QBiC, University of Tübingen, Germany](https://portal.qbic.uni-tuebingen.de/portal/) |
