@@ -11,7 +11,7 @@
 
 nextflow.preview.dsl = 2
 
-params.input_fasta="${baseDir}/**.fa.gz"
+params.input="${baseDir}/**.fa.gz"
 params.map_pct_id=90//false
 params.align_pct_id=90// false
 params.n_secondary=10//false
@@ -40,7 +40,7 @@ W${params.min_subpath}-\
 e${params.max_edge_jump}\
 """ }
 
-fasta = Channel.fromPath("${params.input_fasta}").map { f -> tuple(makeBaseName(f), f) }
+fasta = Channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
 
 process edyeet {
   input:

@@ -43,7 +43,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
     ```bash
     docker pull ghcr.io/pangenome/pggb:latest
-    nextflow run nf-core/pangenome -profile docker --input_fasta ~/git/test-datasets/data/DRB1-3123/DRB1-3123.fa.gz
+    nextflow run nf-core/pangenome -profile docker --input myfasta.fa.gz
     ```
 
 See [usage docs](docs/usage.md) for all of the available options when running the pipeline.
