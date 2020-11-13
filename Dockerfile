@@ -9,21 +9,25 @@ RUN apt-get update \
                           procps \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-# Install Miniconda
-RUN wget -O ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-py37_4.8.2-Linux-x86_64.sh \
- && chmod +x ~/miniconda.sh \
- && ~/miniconda.sh -b -p ~/miniconda \
- && rm ~/miniconda.sh
-ENV PATH "$PATH:/root/miniconda/bin"
-RUN echo "export PATH=$PATH" > /etc/profile
-ENV CONDA_AUTO_UPDATE_CONDA=false
+# Install miniconda
+RUN wget \
+    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && mkdir /root/.conda \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b \
+    && rm -f Miniconda3-latest-Linux-x86_64.sh
+
+# Add conda to the path
+ENV PATH /root/miniconda3/bin:$PATH
 
 # Install the conda environment
 COPY environment.yml /
 RUN conda env create --quiet -f /environment.yml && conda clean -a
 
-# Add conda installation dir to runtime PATH (instead of doing 'conda activate')
+# Add conda installation dir to PATH (instead of doing 'conda activate')
 ENV PATH /opt/conda/envs/nf-core-pangenome-1.0dev/bin:$PATH
+
+# Set path for all users
+RUN echo "export PATH=$PATH" > /etc/profile
 
 # Dump the details of the conda-installed packages to a file for posterity
 RUN conda env export --name nf-core-pangenome-1.0dev > nf-core-pangenome-1.0dev.yml
