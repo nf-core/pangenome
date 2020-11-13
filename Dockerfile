@@ -13,7 +13,6 @@ ENV PATH "$PATH:/root/miniconda/bin"
 RUN echo "export PATH=$PATH" > /etc/profile
 ENV CONDA_AUTO_UPDATE_CONDA=false
 
-
 # Install the conda environment
 COPY environment.yml /
 RUN conda env create --quiet -f /environment.yml && conda clean -a
