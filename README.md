@@ -2,13 +2,9 @@
 
 **The pangenome graph construction pipeline renders a collection of sequences into a pangenome graph. Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs**.
 
-> As a first step, the aim is to create a Nextflow DSL2 version of the pangenome graph builder [`pggb`](https://github.com/pangenome/pggb) pipeline.
-
-> This pipeline is still under heavy development! The code is likely to change and the documentation is imperfectly realized. An overview of the implementation planning is given in the [`nf-core Pangenome Pipeline Planning Phase`](https://docs.google.com/presentation/d/1DzHy_fqs_YH6nMIwxzAPLAaz2CQIlR-k7Y-nQKtn6k8/edit#slide=id.p) presentation.
-
 [![GitHub Actions CI Status](https://github.com/nf-core/pangenome/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/pangenome/actions)
 [![GitHub Actions Linting Status](https://github.com/nf-core/pangenome/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/pangenome/actions)
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.04.0-brightgreen.svg)](https://www.nextflow.io/)
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/pangenome.svg)](https://hub.docker.com/r/nfcore/pangenome)
@@ -22,12 +18,12 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 1. Install [`nextflow`](https://nf-co.re/usage/installation)
 
-2. Install either [`Docker`](https://docs.docker.com/engine/installation/) or [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) for full pipeline reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
+2. Install any of [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) or [`Podman`](https://podman.io/) for full pipeline reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
 
 3. Download the pipeline and test it on a minimal dataset with a single command:
 
     ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>
+    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/conda/institute>
     ```
 
     > Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
@@ -37,14 +33,14 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
     <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
 
     ```bash
-    nextflow run nf-core/pangenome -profile <docker/singularity/conda/institute> --input samplesheet.csv --genome GRCh37
+    nextflow run nf-core/pangenome -profile <docker/singularity/podman/conda/institute> --input '*_R{1,2}.fastq.gz' --genome GRCh37
     ```
 
-See [usage docs](docs/usage.md) for all of the available options when running the pipeline.
+See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
 
 ## Documentation
 
-The nf-core/pangenome pipeline comes with documentation about the pipeline which you can read at [https://nf-core/pangenome/docs](https://nf-core/pangenome/docs) or find in the [`docs/` directory](docs).
+The nf-core/pangenome pipeline comes with documentation about the pipeline: [usage](https://nf-co.re/pangenome/usage) and [output](https://nf-co.re/pangenome/output).
 
 <!-- TODO nf-core: Add a brief overview of what the pipeline does and how it works -->
 
