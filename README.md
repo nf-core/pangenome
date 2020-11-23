@@ -69,7 +69,6 @@ Many thanks to all who have helped out and contributed along the way, including 
 
 > \* Listed in alphabetical order
 
-
 ## Contributions and Support
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).

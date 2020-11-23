@@ -15,7 +15,7 @@ Initial release of nf-core/pangenome, created with the [nf-core](https://nf-co.r
 
 ### `Added`
 
-- `main.nf`: Copied the DSL2 pggb workflow from https://github.com/pangenome/pggb/pull/20 into this one. Currently we are ignoring the `nf-core` way to handle input parameters, software versions, etc. This will change in the future.
+- `main.nf`: Copied the DSL2 pggb workflow from [https://github.com/pangenome/pggb/pull/20](https://github.com/pangenome/pggb/pull/20) into this one. Currently we are ignoring the `nf-core` way to handle input parameters, software versions, etc. This will change in the future.
 
 ### `Fixed`
 
