@@ -26,7 +26,7 @@ params.max_poa_length=10000
 params.do_viz=false
 params.do_layout=false
 params.do_stats=false
-params.consensus_jump_max="10"
+params.consensus_jump_max="10,100,1000,10000"
 
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
@@ -199,12 +199,15 @@ workflow {
     edyeet(fasta)
     seqwish(edyeet.out)
     smoothxg(seqwish.out)
-    odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth))
-    if (params.do_stats) {
-      odgiStats(odgiBuild.out)    
+    if (params.do_stats) { 
+      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten())) 
+      odgiStats(odgiBuild.out)  
     }
-    odgiViz(odgiBuild.out)
-    odgiChop(odgiBuild.out)
+    else {
+      odgiBuild(smoothxg.out.gfa_smooth)
+    }
+    odgiViz(odgiBuild.out.filter(~".*smooth.*"))
+    odgiChop(odgiBuild.out.filter(~".*smooth.*"))
     odgiLayout(odgiChop.out)
     odgiDraw(odgiLayout.out)
 }
