@@ -9,7 +9,7 @@
 ----------------------------------------------------------------------------------------
 */
 
-nextflow.preview.dsl = 2
+nextflow.enable.dsl = 2
 
 params.input="${baseDir}/**.fa.gz"
 params.map_pct_id=90//false
