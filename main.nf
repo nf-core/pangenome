@@ -26,6 +26,7 @@ params.max_poa_length=10000
 params.do_viz=false
 params.do_layout=false
 params.do_stats=false
+params.consensus_jump_max="10"
 
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
@@ -69,16 +70,17 @@ process seqwish {
   tuple val(f), path(fasta), path(alignment)
 
   output:
-  tuple val(f), path("${f}.seqwish.gfa")
+    tuple val(f), path("${f}.seqwish.gfa")
 
-  """
-  seqwish \
-    -t ${task.cpus} \
-    -s $fasta \
-    -p $alignment \
-    -k ${params.min_match_length} \
-    -g ${f}.seqwish.gfa -P
-  """
+  script:
+    """
+    seqwish \
+      -t ${task.cpus} \
+      -s $fasta \
+      -p $alignment \
+      -k ${params.min_match_length} \
+      -g ${f}.seqwish.gfa -P
+    """
 }
 
 process smoothxg {
@@ -87,7 +89,8 @@ process smoothxg {
 
   output:
     // val(f), emit: failure
-    path("${f}.smooth.gfa"), emit: gfa_smooth // TODO, file("${f}*.consensus*.gfa")
+    path("${f}.smooth.gfa"), emit: gfa_smooth
+    path("${f}*.consensus*.gfa"), emit: consensus_smooth
 
   script:
     """
@@ -102,7 +105,7 @@ process smoothxg {
       -m ${f}.smooth.maf \
       -s ${f}.consensus \
       -a \
-      -C 5000
+      -C ${params.consensus_jump_max}
     """  
 }
 
@@ -192,11 +195,14 @@ process odgiDraw {
 }
 
 workflow {
+  main:
     edyeet(fasta)
     seqwish(edyeet.out)
     smoothxg(seqwish.out)
-    odgiBuild(smoothxg.out.gfa_smooth)
-    odgiStats(odgiBuild.out)
+    odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth))
+    if (params.do_stats) {
+      odgiStats(odgiBuild.out)    
+    }
     odgiViz(odgiBuild.out)
     odgiChop(odgiBuild.out)
     odgiLayout(odgiChop.out)
