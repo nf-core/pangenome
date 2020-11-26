@@ -25,6 +25,8 @@ params.max_edge_jump=5000
 params.max_poa_length=10000
 params.do_viz=false
 params.do_layout=false
+params.do_stats=false
+params.consensus_jump_max="10,100,1000,10000"
 
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
@@ -40,14 +42,14 @@ W${params.min_subpath}-\
 e${params.max_edge_jump}\
 """ }
 
-fasta = Channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
+fasta = channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
 
 process edyeet {
   input:
-  tuple val(f), file(fasta)
+  tuple val(f), path(fasta)
 
   output:
-  tuple val(f), file(fasta), file("${f}.paf")
+  tuple val(f), path(fasta), path("${f}.paf")
 
   """
   edyeet -X \
@@ -65,121 +67,147 @@ process edyeet {
 
 process seqwish {
   input:
-  tuple val(f), file(fasta), file(alignment)
+  tuple val(f), path(fasta), path(alignment)
 
   output:
-  tuple val(f), file("${f}.seqwish.gfa")
+    tuple val(f), path("${f}.seqwish.gfa")
 
-  """
-  seqwish \
-    -t ${task.cpus} \
-    -s $fasta \
-    -p $alignment \
-    -k ${params.min_match_length} \
-    -g ${f}.seqwish.gfa -P
-  """
+  script:
+    """
+    seqwish \
+      -t ${task.cpus} \
+      -s $fasta \
+      -p $alignment \
+      -k ${params.min_match_length} \
+      -g ${f}.seqwish.gfa -P
+    """
 }
 
 process smoothxg {
   input:
-  tuple val(f), file(graph)
+    tuple val(f), path(graph)
 
   output:
-  tuple val(f), file("${f}.smooth.gfa")
+    // val(f), emit: failure
+    path("${f}.smooth.gfa"), emit: gfa_smooth
+    path("${f}*.consensus*.gfa"), emit: consensus_smooth
 
-  """
-  smoothxg \
-    -t ${task.cpus} \
-    -g $graph \
-    -w ${params.max_block_weight} \
-    -j ${params.max_path_jump} \
-    -e ${params.max_edge_jump} \
-    -l ${params.max_poa_length} \
-    -o ${f}.smooth.gfa \
-    -m ${f}.smooth.maf \
-    -s ${f}.consensus \
-    -a \
-    -C 5000 \
-  """
+  script:
+    """
+    smoothxg \
+      -t ${task.cpus} \
+      -g $graph \
+      -w ${params.max_block_weight} \
+      -j ${params.max_path_jump} \
+      -e ${params.max_edge_jump} \
+      -l ${params.max_poa_length} \
+      -o ${f}.smooth.gfa \
+      -m ${f}.smooth.maf \
+      -s ${f}.consensus \
+      -a \
+      -C ${params.consensus_jump_max}
+    """  
 }
 
 process odgiBuild {
   input:
-  tuple val(f), file(graph)
+  // tuple val(f), file(graph), file(consensus_graphs)
+  path(graph)
 
   output:
-  tuple val(f), file("${f}.smooth.og")
+  path("${graph}.og")
 
   """
-  odgi build -g $graph -o ${f}.smooth.og
+  odgi build -g $graph -o ${graph}.og
+  """
+}
+
+process odgiStats {
+  publishDir "${params.outdir}/odgiStats", mode: 'copy'
+
+  input: 
+  path(graph)
+
+  output:
+  path("${graph}.stats")
+
+  """
+  odgi stats -i $graph -S -s -d -l > "${graph}.stats"
   """
 }
 
 process odgiViz {
   input:
-  tuple val(f), file(graph)
+  path(graph)
 
   output:
-  tuple val(f), file("${f}.smooth.og.viz.png")
+  path("${graph}.viz.png")
 
   """
   odgi viz \
     -i $graph \
-    -o ${f}.smooth.og.viz.png \
+    -o ${graph}.viz.png \
     -x 1500 -y 500 -P 5
   """
 }
 
 process odgiChop {
   input:
-  tuple val(f), file(graph)
+  path(graph)
 
   output:
-  tuple val(f), file("${f}.smooth.chop.og")
+  path("${graph}.chop.og")
 
   """
-  odgi chop -i $graph -c 100 -o ${f}.smooth.chop.og
+  odgi chop -i $graph -c 100 -o ${graph}.chop.og
   """
 }
 
 process odgiLayout {
   input:
-  tuple val(f), file(graph)
+  path(graph)
 
   output:
-  tuple val(f), file(graph), file("${f}.smooth.chop.og.lay")
+  tuple path(graph), path("${graph}.lay")
 
   """
   odgi layout \
     -i $graph \
-    -o ${f}.smooth.chop.og.lay \
+    -o ${graph}.lay \
     -t ${task.cpus} -P
   """
 }
 
 process odgiDraw {
   input:
-  tuple val(f), file(graph), file(layoutGraph)
+  tuple path(graph), path(layoutGraph)
 
   output:
-  tuple val(f), file("${f}.smooth.chop.og.lay.png")
+  path("${layoutGraph}.png")
 
   """
   odgi draw \
     -i $graph \
     -c $layoutGraph \
-    -p ${f}.smooth.chop.og.lay.png \
+    -p ${layoutGraph}.png \
     -H 1000 -t ${task.cpus}
   """
 }
 
 workflow {
+  main:
     edyeet(fasta)
     seqwish(edyeet.out)
     smoothxg(seqwish.out)
-    odgiBuild(smoothxg.out)
-    odgiViz(odgiBuild.out)
-    odgiChop(odgiBuild.out)
+    if (params.do_stats) { 
+      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten())) 
+      odgiStats(odgiBuild.out)  
+    }
+    else {
+      odgiBuild(smoothxg.out.gfa_smooth)
+    }
+    odgiViz(odgiBuild.out.filter(~".*smooth.*"))
+    odgiChop(odgiBuild.out.filter(~".*smooth.*"))
     odgiLayout(odgiChop.out)
     odgiDraw(odgiLayout.out)
 }
