@@ -11,23 +11,6 @@
 
 nextflow.enable.dsl = 2
 
-params.input="${baseDir}/**.fa.gz"
-params.map_pct_id=90//false
-params.align_pct_id=90// false
-params.n_secondary=10//false
-params.segment_length=1000//false
-params.mash_kmer=16
-params.min_match_length=8
-params.max_block_weight=10000
-params.max_path_jump=5000
-params.min_subpath=0
-params.max_edge_jump=5000
-params.max_poa_length=10000
-params.do_viz=false
-params.do_layout=false
-params.do_stats=false
-params.consensus_jump_max="10,100,1000,10000"
-
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
 s${params.segment_length}-\
