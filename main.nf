@@ -11,35 +11,18 @@
 
 nextflow.enable.dsl = 2
 
-params.input="${baseDir}/**.fa.gz"
-params.map_pct_id=90//false
-params.align_pct_id=90// false
-params.n_secondary=10//false
-params.segment_length=1000//false
-params.mash_kmer=16
-params.min_match_length=8
-params.max_block_weight=10000
-params.max_path_jump=5000
-params.min_subpath=0
-params.max_edge_jump=5000
-params.max_poa_length=10000
-params.do_viz=false
-params.do_layout=false
-params.do_stats=false
-params.consensus_jump_max="10,100,1000,10000"
-
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
-s${params.segment_length}-\
-p${params.map_pct_id}-\
-n${params.n_secondary}-\
-a${params.align_pct_id}-\
-K${params.mash_kmer}-\
-k${params.min_match_length}-\
-w${params.max_block_weight}-\
-j${params.max_path_jump}-\
-W${params.min_subpath}-\
-e${params.max_edge_jump}\
+s${params.edyeet_segment_length}-\
+p${params.edyeet_map_pct_id}-\
+n${params.edyeet_n_secondary}-\
+a${params.edyeet_align_pct_id}-\
+K${params.edyeet_mash_kmer}-\
+k${params.seqwish_min_match_length}-\
+w${params.smoothxg_max_block_weight}-\
+j${params.smoothxg_max_path_jump}-\
+W${params.smoothxg_min_subpath}-\
+e${params.smoothxg_max_edge_jump}\
 """ }
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
@@ -53,11 +36,11 @@ process edyeet {
 
   """
   edyeet -X \
-     -s ${params.segment_length} \
-     -p ${params.map_pct_id} \
-     -n ${params.n_secondary} \
-     -a ${params.align_pct_id} \
-     -k ${params.mash_kmer} \
+     -s ${params.edyeet_segment_length} \
+     -p ${params.edyeet_map_pct_id} \
+     -n ${params.edyeet_n_secondary} \
+     -a ${params.edyeet_align_pct_id} \
+     -k ${params.edyeet_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}.paf 
@@ -78,7 +61,7 @@ process seqwish {
       -t ${task.cpus} \
       -s $fasta \
       -p $alignment \
-      -k ${params.min_match_length} \
+      -k ${params.seqwish_min_match_length} \
       -g ${f}.seqwish.gfa -P
     """
 }
@@ -97,15 +80,15 @@ process smoothxg {
     smoothxg \
       -t ${task.cpus} \
       -g $graph \
-      -w ${params.max_block_weight} \
-      -j ${params.max_path_jump} \
-      -e ${params.max_edge_jump} \
-      -l ${params.max_poa_length} \
+      -w ${params.smoothxg_max_block_weight} \
+      -j ${params.smoothxg_max_path_jump} \
+      -e ${params.smoothxg_max_edge_jump} \
+      -l ${params.smoothxg_max_poa_length} \
       -o ${f}.smooth.gfa \
       -m ${f}.smooth.maf \
       -s ${f}.consensus \
       -a \
-      -C ${params.consensus_jump_max}
+      -C ${params.smoothxg_consensus_jump_max}
     """  
 }
 
