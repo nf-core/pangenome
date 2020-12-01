@@ -115,21 +115,23 @@ process odgiStats {
   path("${graph}.stats")
 
   """
-  odgi stats -i $graph -S -s -d -l > "${graph}.stats"
+  odgi stats -i $graph -S -s -d -l > "${graph}.stats" 2>&1
   """
 }
 
 process odgiViz {
+  publishDir "${params.outdir}/odgiViz", mode: 'copy'
+
   input:
   path(graph)
 
   output:
-  path("${graph}.viz.png")
+  path("${graph}.viz_mqc.png")
 
   """
   odgi viz \
     -i $graph \
-    -o ${graph}.viz.png \
+    -o ${graph}.viz_mqc.png \
     -x 1500 -y 500 -P 5
   """
 }
@@ -162,17 +164,20 @@ process odgiLayout {
 }
 
 process odgiDraw {
+  publishDir "${params.outdir}/odgiDraw", mode: 'copy'
+
   input:
   tuple path(graph), path(layoutGraph)
 
   output:
-  path("${layoutGraph}.png")
+  path("${layoutGraph}.draw_mqc.png")
 
   """
   odgi draw \
     -i $graph \
     -c $layoutGraph \
-    -p ${layoutGraph}.png \
+    -p ${layoutGraph}.draw_mqc.png \
+    -C \
     -H 1000 -t ${task.cpus}
   """
 }
