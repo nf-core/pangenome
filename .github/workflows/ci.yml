@@ -62,7 +62,7 @@ jobs:
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
   edyeet:
       name: Test edyeet with workflow parameters
-      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/rnaseq') }}
+      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
       runs-on: ubuntu-latest
       env:
         NXF_VER: ${{ matrix.nxf_ver }}
@@ -91,7 +91,7 @@ jobs:
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
   seqwish:
       name: Test seqwish with workflow parameters
-      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/rnaseq') }}
+      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
       runs-on: ubuntu-latest
       env:
         NXF_VER: ${{ matrix.nxf_ver }}
@@ -116,7 +116,7 @@ jobs:
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
   smoothxg:
       name: Test smoothxg with workflow parameters
-      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/rnaseq') }}
+      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
       runs-on: ubuntu-latest
       env:
         NXF_VER: ${{ matrix.nxf_ver }}
@@ -144,4 +144,3 @@ jobs:
         - name: Run pipeline with smoothxg and various parameters
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}                        
-            
