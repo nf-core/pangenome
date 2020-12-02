@@ -21,6 +21,10 @@ jobs:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
         nxf_ver: ['20.10.0', '']
+        parameters:
+          - '--do_viz'
+          - '--do_layout'
+          - '--do_stats'
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -53,5 +57,91 @@ jobs:
         # TODO nf-core: You can customise CI pipeline run tests as required
         # For example: adding multiple test runs with different parameters
         # Remember that you can parallelise this by using strategy.matrix
+        # We also test basic visualization and reporting options here
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
+  edyeet:
+      name: Test edyeet with workflow parameters
+      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/rnaseq') }}
+      runs-on: ubuntu-latest
+      env:
+        NXF_VER: ${{ matrix.nxf_ver }}
+        NXF_ANSI_LOG: false
+      strategy:
+        matrix:
+          # Nextflow versions: check pipeline minimum and current latest
+          nxf_ver: ['20.10.0', '']
+          parameters: 
+            - '--edyeet_map_pct_id 70'
+            - '--edyeet_align_pct_id 70'
+            - '--edyeet_n_secondary 2'
+            - '--edyeet_segment_length 5000'
+            - '--edyeet_merge_segments'
+            - '--edyeet_no_splits'
+      steps:
+        - name: Check out pipeline code
+          uses: actions/checkout@v2
+
+        - name: Install Nextflow
+          run: |
+            wget -qO- get.nextflow.io | bash
+            sudo mv nextflow /usr/local/bin/
+        - name: Run pipeline with edyeet and various parameters
+          run: |
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
+  seqwish:
+      name: Test seqwish with workflow parameters
+      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/rnaseq') }}
+      runs-on: ubuntu-latest
+      env:
+        NXF_VER: ${{ matrix.nxf_ver }}
+        NXF_ANSI_LOG: false
+      strategy:
+        matrix:
+          # Nextflow versions: check pipeline minimum and current latest
+          nxf_ver: ['20.10.0', '']
+          parameters: 
+            - '--seqwish_min_match_length 13'
+            - '--seqwish_transclose_batch 1000'
+      steps:
+        - name: Check out pipeline code
+          uses: actions/checkout@v2
+
+        - name: Install Nextflow
+          run: |
+            wget -qO- get.nextflow.io | bash
+            sudo mv nextflow /usr/local/bin/
+        - name: Run pipeline with seqwish and various parameters
+          run: |
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
+  smoothxg:
+      name: Test smoothxg with workflow parameters
+      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/rnaseq') }}
+      runs-on: ubuntu-latest
+      env:
+        NXF_VER: ${{ matrix.nxf_ver }}
+        NXF_ANSI_LOG: false
+      strategy:
+        matrix:
+          # Nextflow versions: check pipeline minimum and current latest
+          nxf_ver: ['20.10.0', '']
+          parameters: 
+            - '--smoothxg_max_block_weight 20000'
+            - '--smoothxg_max_path_jump 10000'
+            - '--smoothxg_min_subpath 0'
+            - '--smoothxg_max_edge_jump 6000'
+            - '--smoothxg_max_poa_length 11111'
+            - '--smoothxg_consensus_jump_max 11,111,1111,11111'
+            - '--smoothxg_block_id_min 0.7'
+      steps:
+        - name: Check out pipeline code
+          uses: actions/checkout@v2
+
+        - name: Install Nextflow
+          run: |
+            wget -qO- get.nextflow.io | bash
+            sudo mv nextflow /usr/local/bin/
+        - name: Run pipeline with smoothxg and various parameters
+          run: |
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}                        
+            
