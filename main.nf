@@ -11,18 +11,17 @@
 
 nextflow.enable.dsl = 2
 
-//def edyeet_merge_cmd=params.edyeet_merge_cmd
-//def edyeet_exclude_cmd=params.edyeet_exclude_cmd
-//def edyeet_split_cmd=params.edyeet_split_cmd
+// We can't change global parameters inside this scope, so we build the ones we need locally
+def edyeet_merge_cmd=params.edyeet_merge_cmd
+def edyeet_exclude_cmd=params.edyeet_exclude_cmd
+def edyeet_split_cmd=params.edyeet_split_cmd
 
 if (params.edyeet_merge_segments) {
   edyeet_merge_cmd="-M"
-  println edyeet_merge_cmd
 }
 
 if (params.edyeet_no_splits) {
   edyeet_split_cmd="-N"
-  println edyeet_split_cmd
 }
 
 if (params.edyeet_exclude_delim) {
