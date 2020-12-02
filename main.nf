@@ -11,18 +11,34 @@
 
 nextflow.enable.dsl = 2
 
+if (params.edyeet_merge_segments) {
+  params.edyeet_merge_cmd="-M"
+}
+
+if (params.edyeet_no_splits) {
+  params.edyeet_split_cmd="-N"
+}
+
+if (params.edyeet_exclude_delim) {
+  params.edyeet_exclude_cmd="-Y${params.edyeet_exclude_delim}"
+}
+
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
 s${params.edyeet_segment_length}-\
 p${params.edyeet_map_pct_id}-\
 n${params.edyeet_n_secondary}-\
 a${params.edyeet_align_pct_id}-\
-K${params.edyeet_mash_kmer}-\
+K${params.edyeet_mash_kmer}\
+${params.edyeet_merge_cmd}\
+${params.edyeet_split_cmd}\
+${params.edyeet_exclude_cmd}-\
 k${params.seqwish_min_match_length}-\
 w${params.smoothxg_max_block_weight}-\
 j${params.smoothxg_max_path_jump}-\
 W${params.smoothxg_min_subpath}-\
-e${params.smoothxg_max_edge_jump}\
+e${params.smoothxg_max_edge_jump}-\
+I${params.smoothxg_block_id_min}\
 """ }
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
@@ -35,8 +51,10 @@ process edyeet {
   tuple val(f), path(fasta), path("${f}.paf")
 
   """
-  edyeet -X \
+  edyeet ${params.edyeet_exclude_cmd} \
      -s ${params.edyeet_segment_length} \
+     ${params.edyeet_merge_cmd} \
+     ${params.edyeet_split_cmd} \
      -p ${params.edyeet_map_pct_id} \
      -n ${params.edyeet_n_secondary} \
      -a ${params.edyeet_align_pct_id} \
@@ -62,7 +80,8 @@ process seqwish {
       -s $fasta \
       -p $alignment \
       -k ${params.seqwish_min_match_length} \
-      -g ${f}.seqwish.gfa -P
+      -g ${f}.seqwish.gfa -P \
+      -B ${params.seqwish_transclose_batch}
     """
 }
 
@@ -71,7 +90,6 @@ process smoothxg {
     tuple val(f), path(graph)
 
   output:
-    // val(f), emit: failure
     path("${f}.smooth.gfa"), emit: gfa_smooth
     path("${f}*.consensus*.gfa"), emit: consensus_smooth
 
@@ -94,7 +112,6 @@ process smoothxg {
 
 process odgiBuild {
   input:
-  // tuple val(f), file(graph), file(consensus_graphs)
   path(graph)
 
   output:
