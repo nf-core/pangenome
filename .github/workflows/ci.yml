@@ -144,3 +144,4 @@ jobs:
         - name: Run pipeline with smoothxg and various parameters
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}                        
+
