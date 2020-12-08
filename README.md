@@ -81,11 +81,6 @@ Many thanks to all who have helped out and contributed along the way, including 
 
 > \* Listed in alphabetical order
 
-We thank the following people for their extensive assistance in the development
-of this pipeline:
-
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
-
 ## Contributions and Support
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
