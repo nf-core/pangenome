@@ -1,7 +1,5 @@
 # ![nf-core/pangenome](docs/images/nf-core-pangenome_logo.png)
 
-**The pangenome graph construction pipeline renders a collection of sequences into a pangenome graph. Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs**.
-
 [![GitHub Actions CI Status](https://github.com/nf-core/pangenome/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/pangenome/actions)
 [![GitHub Actions Linting Status](https://github.com/nf-core/pangenome/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/pangenome/actions)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.10.0-brightgreen.svg)](https://www.nextflow.io/)
@@ -13,7 +11,8 @@
 ## Introduction
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
-**nf-core/pangenome** is a bioinformatics best-practise analysis pipeline for
+**nf-core/pangenome** is a bioinformatics best-practise analysis pipeline for the rendering of a collection of sequences into a pangenome graph.
+Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs**.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
 
@@ -51,12 +50,7 @@ See [usage docs](https://nf-co.re/pangenome/usage) for all of the available opti
 
 ## Pipeline Summary
 
-By default, the pipeline currently performs the following:
-
-<!-- TODO nf-core: Fill in short bullet-pointed list of default steps of pipeline -->
-
-* Sequencing quality control (`FastQC`)
-* Overall pipeline run summaries (`MultiQC`)
+<!-- TODO nf-core: Add a brief summary of what the pipeline does and how it works -->
 
 ## Documentation
 
