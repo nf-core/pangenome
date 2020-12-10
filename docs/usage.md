@@ -13,7 +13,7 @@
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/pangenome --input 'data/*.fa.gz' -profile docker
+nextflow run nf-core/pangenome --input '*.fa.gz' -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.

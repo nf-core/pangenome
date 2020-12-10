@@ -43,7 +43,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 5. Start running your own analysis!
 
     ```bash
-    nextflow run nf-core/pangenome -profile <docker/singularity/podman/conda/institute> --input 'data/*.fa.gz'
+    nextflow run nf-core/pangenome -profile <docker/singularity/podman/conda/institute> --input '*.fa.gz'
     ```
 
 See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
