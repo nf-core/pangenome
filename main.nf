@@ -204,10 +204,14 @@ workflow {
     else {
       odgiBuild(smoothxg.out.gfa_smooth)
     }
-    odgiViz(odgiBuild.out.filter(~".*smooth.*"))
-    odgiChop(odgiBuild.out.filter(~".*smooth.*"))
-    odgiLayout(odgiChop.out)
-    odgiDraw(odgiLayout.out)
+    if (params.do_viz) {
+      odgiViz(odgiBuild.out.filter(~".*smooth.*"))
+    }
+    if (params.do_layout) {
+      odgiChop(odgiBuild.out.filter(~".*smooth.*"))
+      odgiLayout(odgiChop.out)
+      odgiDraw(odgiLayout.out)
+    }
 }
 
 // /*
