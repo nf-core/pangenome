@@ -46,6 +46,7 @@ process edyeet {
   """
   edyeet ${edyeet_exclude_cmd} \
      -s ${params.edyeet_segment_length} \
+     -l ${params.edyeet_block_length} \
      ${edyeet_merge_cmd} \
      ${edyeet_split_cmd} \
      -p ${params.edyeet_map_pct_id} \
@@ -74,7 +75,8 @@ process seqwish {
       -p $alignment \
       -k ${params.seqwish_min_match_length} \
       -g ${f}.seqwish.gfa -P \
-      -B ${params.seqwish_transclose_batch}
+      -B ${params.seqwish_transclose_batch} \
+      -P
     """
 }
 
@@ -92,14 +94,19 @@ process smoothxg {
       -t ${task.cpus} \
       -g $graph \
       -w ${params.smoothxg_max_block_weight} \
+      -M \
+      -J 0.7 \
+      -K \
+      -G 100 \
+      -I ${params.smoothxg_block_id_min} \
+      -R ${params.smoothxg_ratio_contain} \
       -j ${params.smoothxg_max_path_jump} \
       -e ${params.smoothxg_max_edge_jump} \
       -l ${params.smoothxg_max_poa_length} \
-      -o ${f}.smooth.gfa \
+      -p ${params.smoothxg_poa_params} \
       -m ${f}.smooth.maf \
-      -s ${f}.consensus \
-      -a \
-      -C ${params.smoothxg_consensus_jump_max}
+      -C ${f}.smooth.consensus,${params.smoothxg_consensus_spec} \
+      -o ${f}.smooth.gfa
     """  
 }
 
@@ -111,7 +118,7 @@ process odgiBuild {
   path("${graph}.og")
 
   """
-  odgi build -g $graph -o ${graph}.og
+  odgi build -g $graph -o ${graph}.og -P -t ${task.cpus}
   """
 }
 
@@ -125,7 +132,7 @@ process odgiStats {
   path("${graph}.stats")
 
   """
-  odgi stats -i $graph -S -s -d -l > "${graph}.stats" 2>&1
+  odgi stats -i "${graph}" -S -s -d -l > "${graph}.stats" 2>&1
   """
 }
 
