@@ -12,4 +12,5 @@ dependencies:
   - conda-forge::pygments=2.6.1
 
   ## bioconda packages
-  - bioconda::multiqc=1.9
+  # temporarily using fork https://github.com/Imipenem/MultiQC in upstream Dockerfile
+  #- bioconda::multiqc=1.9
