@@ -49,9 +49,9 @@ process edyeet {
      -l ${params.alignment_block_length} \
      ${alignment_merge_cmd} \
      ${alignment_split_cmd} \
-     -p ${params.edyeet_map_pct_id} \
+     -p ${params.alignment_map_pct_id} \
      -n ${params.alignment_n_secondary} \
-     -a ${params.alignment_align_pct_id} \
+     -a ${params.edyeet_align_pct_id} \
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
