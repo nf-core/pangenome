@@ -15,26 +15,40 @@ nextflow.enable.dsl = 2
 def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : params.alignment_merge_cmd
 def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : params.alignment_exclude_cmd
 def alignment_split_cmd = params.alignment_no_splits ? "-N" : params.alignment_split_cmd
+def aligner = params.wfmash ? "W" : "E"
+def edyeet_align_pct_id_display = params.wfmash ? "" : "a${params.edyeet_align_pct_id}-"
+def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
 
-def makeBaseName = { f -> """\
-${f.getSimpleName()}.pggb-\
+def make_paf_prefix = { f -> """\
+${f.getName()}.pggb-\
+${aligner}-\
 s${params.alignment_segment_length}-\
+l${params.alignment_block_length}-\
 p${params.alignment_map_pct_id}-\
 n${params.alignment_n_secondary}-\
-a${params.edyeet_align_pct_id}-\
+${edyeet_align_pct_id_display}\
 K${params.alignment_mash_kmer}\
 ${alignment_merge_cmd}\
 ${alignment_split_cmd}\
-${alignment_exclude_cmd}-\
-k${params.seqwish_min_match_length}-\
-w${params.smoothxg_max_block_weight}-\
-j${params.smoothxg_max_path_jump}-\
-W${params.smoothxg_min_subpath}-\
-e${params.smoothxg_max_edge_jump}-\
-I${params.smoothxg_block_id_min}\
+${alignment_exclude_cmd}\
 """ }
 
-fasta = channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
+def seqwish_prefix = "\
+.seqwish-\
+k${params.seqwish_min_match_length}-\
+B${params.seqwish_transclose_batch}\
+"
+
+def smoothxg_prefix = "${seqwish_prefix}\
+.smoothxg-\
+w${params.smoothxg_max_block_weight}-\
+j${params.smoothxg_max_path_jump}-\
+e${params.smoothxg_max_edge_jump}-\
+I${params.smoothxg_block_id_min}-\
+p${smoothxg_poa_params_display}-M-J0.7-K-G150\
+"
+
+fasta = channel.fromPath("${params.input}").map { f -> tuple(make_paf_prefix(f), f) }
 
 process edyeet {
   input:
@@ -88,7 +102,7 @@ process seqwish {
   tuple val(f), path(fasta), path(alignment)
 
   output:
-    tuple val(f), path("${f}.seqwish.gfa")
+    tuple val(f), path("${f}${seqwish_prefix}.gfa")
 
   script:
     """
@@ -97,7 +111,7 @@ process seqwish {
       -s $fasta \
       -p $alignment \
       -k ${params.seqwish_min_match_length} \
-      -g ${f}.seqwish.gfa -P \
+      -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
       -P
     """
@@ -110,9 +124,9 @@ process smoothxg {
     tuple val(f), path(graph)
 
   output:
-    path("${f}.smooth.gfa"), emit: gfa_smooth
+    path("${f}${smoothxg_prefix}.gfa"), emit: gfa_smooth
     path("${f}*.consensus*.gfa"), emit: consensus_smooth
-    path("${f}.smooth.maf"), emit: maf_smooth
+    path("${f}${smoothxg_prefix}.maf"), emit: maf_smooth
 
   script:
     """
@@ -130,9 +144,9 @@ process smoothxg {
       -e ${params.smoothxg_max_edge_jump} \
       -l ${params.smoothxg_max_poa_length} \
       -p ${params.smoothxg_poa_params} \
-      -m ${f}.smooth.maf \
-      -C ${f}.smooth.consensus,${params.smoothxg_consensus_spec} \
-      -o ${f}.smooth.gfa
+      -m ${f}${smoothxg_prefix}.maf \
+      -C ${f}${smoothxg_prefix}.consensus,${params.smoothxg_consensus_spec} \
+      -o ${f}${smoothxg_prefix}.gfa
     """  
 }
 
