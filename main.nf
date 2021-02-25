@@ -82,6 +82,8 @@ process wfmash {
 }
 
 process seqwish {
+  publishDir "${params.outdir}/seqwish", mode: 'copy'
+
   input:
   tuple val(f), path(fasta), path(alignment)
 
@@ -102,12 +104,15 @@ process seqwish {
 }
 
 process smoothxg {
+  publishDir "${params.outdir}/smoothxg", mode: 'copy'
+
   input:
     tuple val(f), path(graph)
 
   output:
     path("${f}.smooth.gfa"), emit: gfa_smooth
     path("${f}*.consensus*.gfa"), emit: consensus_smooth
+    path("${f}.smooth.maf"), emit: maf_smooth
 
   script:
     """
@@ -144,7 +149,7 @@ process odgiBuild {
 }
 
 process odgiStats {
-  publishDir "${params.outdir}/odgiStats", mode: 'copy'
+  publishDir "${params.outdir}/odgi_stats", mode: 'copy'
 
   input: 
   path(graph)
@@ -158,7 +163,7 @@ process odgiStats {
 }
 
 process odgiViz {
-  publishDir "${params.outdir}/odgiViz", mode: 'copy'
+  publishDir "${params.outdir}/odgi_viz", mode: 'copy'
 
   input:
   path(graph)
@@ -202,7 +207,7 @@ process odgiLayout {
 }
 
 process odgiDraw {
-  publishDir "${params.outdir}/odgiDraw", mode: 'copy'
+  publishDir "${params.outdir}/odgi_draw", mode: 'copy'
 
   input:
   tuple path(graph), path(layoutGraph)
@@ -216,6 +221,7 @@ process odgiDraw {
     -c $layoutGraph \
     -p ${layoutGraph}.draw_mqc.png \
     -C \
+    -w 50 \
     -H 1000 -t ${task.cpus}
   """
 }
