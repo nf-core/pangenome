@@ -97,7 +97,7 @@ process smoothxg {
       -M \
       -J 0.7 \
       -K \
-      -G 100 \
+      -G 150 \
       -I ${params.smoothxg_block_id_min} \
       -R ${params.smoothxg_ratio_contain} \
       -j ${params.smoothxg_max_path_jump} \

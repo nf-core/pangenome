@@ -81,6 +81,23 @@ jobs:
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
+          
+        - name: Check if Dockerfile or Conda environment changed
+          uses: technote-space/get-diff-action@v4
+          with:
+            FILES: |
+              Dockerfile
+              environment.yml
+
+        - name: Build new docker image
+          if: env.MATCHED_FILES
+          run: docker build --no-cache . -t nfcore/pangenome:dev
+
+        - name: Pull docker image
+          if: ${{ !env.MATCHED_FILES }}
+          run: |
+            docker pull nfcore/pangenome:dev
+            docker tag nfcore/pangenome:dev nfcore/pangenome:dev
 
         - name: Install Nextflow
           run: |
@@ -106,6 +123,23 @@ jobs:
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
+
+        - name: Check if Dockerfile or Conda environment changed
+          uses: technote-space/get-diff-action@v4
+          with:
+            FILES: |
+              Dockerfile
+              environment.yml
+
+        - name: Build new docker image
+          if: env.MATCHED_FILES
+          run: docker build --no-cache . -t nfcore/pangenome:dev
+
+        - name: Pull docker image
+          if: ${{ !env.MATCHED_FILES }}
+          run: |
+            docker pull nfcore/pangenome:dev
+            docker tag nfcore/pangenome:dev nfcore/pangenome:dev
 
         - name: Install Nextflow
           run: |
@@ -137,6 +171,23 @@ jobs:
         - name: Check out pipeline code
           uses: actions/checkout@v2
 
+        - name: Check if Dockerfile or Conda environment changed
+          uses: technote-space/get-diff-action@v4
+          with:
+            FILES: |
+              Dockerfile
+              environment.yml
+
+        - name: Build new docker image
+          if: env.MATCHED_FILES
+          run: docker build --no-cache . -t nfcore/pangenome:dev
+
+        - name: Pull docker image
+          if: ${{ !env.MATCHED_FILES }}
+          run: |
+            docker pull nfcore/pangenome:dev
+            docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
         - name: Install Nextflow
           run: |
             wget -qO- get.nextflow.io | bash
@@ -144,4 +195,3 @@ jobs:
         - name: Run pipeline with smoothxg and various parameters
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}                        
-
