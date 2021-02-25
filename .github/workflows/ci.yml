@@ -78,6 +78,7 @@ jobs:
             - '--alignment_segment_length 5000'
             - '--alignment_merge_segments'
             - '--alignment_no_splits'
+            - '--alingment_block_length 40000'
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
@@ -123,6 +124,7 @@ jobs:
             - '--wfmash --alignment_segment_length 5000'
             - '--wfmash --alignment_merge_segments'
             - '--wfmash --alignment_no_splits'
+            - '--wfmash --alingment_block_length 40000'
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
@@ -164,7 +166,7 @@ jobs:
           nxf_ver: ['20.10.0', '']
           parameters: 
             - '--seqwish_min_match_length 13'
-            - '--seqwish_transclose_batch 1000'
+            - '--seqwish_transclose_batch 10000'
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
@@ -207,11 +209,12 @@ jobs:
           parameters: 
             - '--smoothxg_max_block_weight 20000'
             - '--smoothxg_max_path_jump 10000'
-            - '--smoothxg_min_subpath 0'
             - '--smoothxg_max_edge_jump 6000'
-            - '--smoothxg_max_poa_length 11111'
-            - '--smoothxg_consensus_jump_max 11,111,1111,11111'
+            - '--smoothxg_max_poa_length 20000'
+            - '--smoothxg_consensus_spec 11,111,1111,11111'
             - '--smoothxg_block_id_min 0.7'
+            - '--smoothxg_ratio_contain 0.3'
+            - '--smoothxg_poa_params 2,4,6,2,24,1'
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
