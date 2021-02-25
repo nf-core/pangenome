@@ -355,15 +355,53 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/pangenome --input 'data/*.fa.gz' -profile docker
+    nextflow run nf-core/pangenome --input 'data/input.fa.gz' -profile docker
 
     Mandatory arguments:
-      --input [file]                  Path to input data (must be surrounded with quotes)
+      --input [file]                  Path to input FASTA (must be surrounded with quotes)
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
+    Alignment options:
+      --edyeet_align_pct_id [n]       percent identity in the edyeet edlib alignment step [default: 90]
+      --alignment_map_pct_id [n]      percent identity in the wfmash or edyeet mashmap step [default: 90]
+      --alignment_n_secondary [n]     number of secondary mappings to retain in 'map' filter mode [default: 10]
+      --alignment_segment_length [n]  segment length for mapping [default: 10000]
+      --alignment_block_length [n]    minimum block length filter for mapping [default: 3*alignment_segment_length]
+      --alignment_mash_kmer [n]       kmer size for mashmap [default: 16]
+      --alignment_merge_segments      merge successive mappings [default: OFF]
+      --alignment_no_splits           disable splitting of input sequences during mapping [default: OFF]
+      --alignment_exclude--delim [c]  skip mappings between sequences with the same name prefix before
+                                      the given delimiter character [default: all-vs-all and !self]
+    Seqwish options:
+      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 19]
+      --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 1000000]
+
+    Smoothxg options:
+      --smoothxg_max_block_weight [n] maximum seed sequence in block [default: 10000]
+      --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 5000]
+      --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 5000]
+      --smoothxg_max_popa_length [n]  maximum sequence length to put into POA [default: 10000]
+      --smoothxg_consensus_spec [str] consensus graph specification: write the consensus graph to
+                                      BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter
+                                      (which defines the length of divergences from consensus paths to preserve in the
+                                      output), optionally a file containing reference paths to preserve in the output,
+                                      a flag (y/n) indicating whether we should also use the POA consensus paths, a
+                                      minimum coverage of consensus paths to retain (min_cov), and a maximum allele
+                                      length (max_len, defaults to 1e6); implies -a; example:
+                                      cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000
+                                      [default: 10,100,1000,10000]
+      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: OFF]
+      --smoothxg_ratio_contain [n]    minimum short length / long length ratio to compare sequences for the containment
+                                      metric in the clustering [default: 0]
+      --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
+                                      [default: 1,4,6,2,26,1]                                         
+
+    Visualization options:
+      --do_viz                        Generate 1D visualisations of the built graphs [default: OFF]
+      --do_layout                     Generate 2D visualisations of the built graphs [default: OFF]
 
     Other options:
-      --outdir [file]                 The output directory where the results will be saved
+      --outdir [file]                 The output directory where the results will be saved [default: ./results]
       --publish_dir_mode [str]        Mode for publishing results in the output directory. Available: symlink, rellink, link, copy, copyNoFollow, move (Default: copy)
       --email [email]                 Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       --email_on_fail [email]         Same as --email, except only send mail if the workflow is not successful
