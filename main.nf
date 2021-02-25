@@ -12,20 +12,20 @@
 nextflow.enable.dsl = 2
 
 // We can't change global parameters inside this scope, so we build the ones we need locally
-def edyeet_merge_cmd = params.edyeet_merge_segments ? "-M" : params.edyeet_merge_cmd
-def edyeet_exclude_cmd = params.edyeet_exclude_delim ? "-Y${params.edyeet_exclude_delim}" : params.edyeet_exclude_cmd
-def edyeet_split_cmd = params.edyeet_no_splits ? "-N" : params.edyeet_split_cmd
+def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : params.alignment_merge_cmd
+def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : params.alignment_exclude_cmd
+def alignment_split_cmd = params.alignment_no_splits ? "-N" : params.alignment_split_cmd
 
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
-s${params.edyeet_segment_length}-\
-p${params.edyeet_map_pct_id}-\
-n${params.edyeet_n_secondary}-\
+s${params.alignment_segment_length}-\
+p${params.alignment_map_pct_id}-\
+n${params.alignment_n_secondary}-\
 a${params.edyeet_align_pct_id}-\
-K${params.edyeet_mash_kmer}\
-${edyeet_merge_cmd}\
-${edyeet_split_cmd}\
-${edyeet_exclude_cmd}-\
+K${params.alignment_mash_kmer}\
+${alignment_merge_cmd}\
+${alignment_split_cmd}\
+${alignment_exclude_cmd}-\
 k${params.seqwish_min_match_length}-\
 w${params.smoothxg_max_block_weight}-\
 j${params.smoothxg_max_path_jump}-\
@@ -44,15 +44,15 @@ process edyeet {
   tuple val(f), path(fasta), path("${f}.paf")
 
   """
-  edyeet ${edyeet_exclude_cmd} \
-     -s ${params.edyeet_segment_length} \
-     -l ${params.edyeet_block_length} \
-     ${edyeet_merge_cmd} \
-     ${edyeet_split_cmd} \
+  edyeet ${alignment_exclude_cmd} \
+     -s ${params.alignment_segment_length} \
+     -l ${params.alignment_block_length} \
+     ${alignment_merge_cmd} \
+     ${alignment_split_cmd} \
      -p ${params.edyeet_map_pct_id} \
-     -n ${params.edyeet_n_secondary} \
-     -a ${params.edyeet_align_pct_id} \
-     -k ${params.edyeet_mash_kmer} \
+     -n ${params.alignment_n_secondary} \
+     -a ${params.alignment_align_pct_id} \
+     -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}.paf 
@@ -67,14 +67,14 @@ process wfmash {
   tuple val(f), path(fasta), path("${f}.paf")
 
   """
-  wfmash ${edyeet_exclude_cmd} \
-     -s ${params.edyeet_segment_length} \
-     -l ${params.edyeet_block_length} \
-     ${edyeet_merge_cmd} \
-     ${edyeet_split_cmd} \
-     -p ${params.edyeet_map_pct_id} \
-     -n ${params.edyeet_n_secondary} \
-     -k ${params.edyeet_mash_kmer} \
+  wfmash ${alignment_exclude_cmd} \
+     -s ${params.alignment_segment_length} \
+     -l ${params.alignment_block_length} \
+     ${alignment_merge_cmd} \
+     ${alignment_split_cmd} \
+     -p ${params.alignment_map_pct_id} \
+     -n ${params.alignment_n_secondary} \
+     -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}.paf 
@@ -222,7 +222,7 @@ process odgiDraw {
 
 workflow {
   main:
-    if (params.aligner == "edyeet") {
+    if (params.wfmash == false) {
       edyeet(fasta)
       seqwish(edyeet.out)
     } else {

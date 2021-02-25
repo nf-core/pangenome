@@ -72,12 +72,12 @@ jobs:
           # Nextflow versions: check pipeline minimum and current latest
           nxf_ver: ['20.10.0', '']
           parameters: 
-            - '--edyeet_map_pct_id 70'
+            - '--alignment_map_pct_id 70'
             - '--edyeet_align_pct_id 70'
-            - '--edyeet_n_secondary 2'
-            - '--edyeet_segment_length 5000'
-            - '--edyeet_merge_segments'
-            - '--edyeet_no_splits'
+            - '--alignment_n_secondary 2'
+            - '--alignment_segment_length 5000'
+            - '--alignment_merge_segments'
+            - '--alignment_no_splits'
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
@@ -118,11 +118,11 @@ jobs:
           # Nextflow versions: check pipeline minimum and current latest
           nxf_ver: ['20.10.0', '']
           parameters: 
-            - '--aligner "wfmash" --edyeet_map_pct_id 70'
-            - '--aligner "wfmash" --edyeet_n_secondary 2'
-            - '--aligner "wfmash" --edyeet_segment_length 5000'
-            - '--aligner "wfmash" --edyeet_merge_segments'
-            - '--aligner "wfmash" --edyeet_no_splits'
+            - '--wfmash --alignment_map_pct_id 70'
+            - '--wfmash --alignment_n_secondary 2'
+            - '--wfmash --alignment_segment_length 5000'
+            - '--wfmash --alignment_merge_segments'
+            - '--wfmash --alignment_no_splits'
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
