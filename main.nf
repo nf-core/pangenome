@@ -59,6 +59,27 @@ process edyeet {
   """
 }
 
+process wfmash {
+  input:
+  tuple val(f), path(fasta)
+
+  output:
+  tuple val(f), path(fasta), path("${f}.paf")
+
+  """
+  wfmash ${edyeet_exclude_cmd} \
+     -s ${params.edyeet_segment_length} \
+     -l ${params.edyeet_block_length} \
+     ${edyeet_merge_cmd} \
+     ${edyeet_split_cmd} \
+     -p ${params.edyeet_map_pct_id} \
+     -n ${params.edyeet_n_secondary} \
+     -k ${params.edyeet_mash_kmer} \
+     -t ${task.cpus} \
+     $fasta $fasta \
+     >${f}.paf 
+  """
+}
 
 process seqwish {
   input:
@@ -201,8 +222,13 @@ process odgiDraw {
 
 workflow {
   main:
-    edyeet(fasta)
-    seqwish(edyeet.out)
+    if (params.aligner == "edyeet") {
+      edyeet(fasta)
+      seqwish(edyeet.out)
+    } else {
+      wfmash(fasta)
+      seqwish(wfmash.out)
+    }
     smoothxg(seqwish.out)
     if (params.do_stats) { 
       odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten())) 

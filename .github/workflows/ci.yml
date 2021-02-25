@@ -106,6 +106,51 @@ jobs:
         - name: Run pipeline with edyeet and various parameters
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
+  wfmash:
+      name: Test wfmash with workflow parameters
+      if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
+      runs-on: ubuntu-latest
+      env:
+        NXF_VER: ${{ matrix.nxf_ver }}
+        NXF_ANSI_LOG: false
+      strategy:
+        matrix:
+          # Nextflow versions: check pipeline minimum and current latest
+          nxf_ver: ['20.10.0', '']
+          parameters: 
+            - '--aligner "wfmash" --edyeet_map_pct_id 70'
+            - '--aligner "wfmash" --edyeet_n_secondary 2'
+            - '--aligner "wfmash" --edyeet_segment_length 5000'
+            - '--aligner "wfmash" --edyeet_merge_segments'
+            - '--aligner "wfmash" --edyeet_no_splits'
+      steps:
+        - name: Check out pipeline code
+          uses: actions/checkout@v2
+          
+        - name: Check if Dockerfile or Conda environment changed
+          uses: technote-space/get-diff-action@v4
+          with:
+            FILES: |
+              Dockerfile
+              environment.yml
+
+        - name: Build new docker image
+          if: env.MATCHED_FILES
+          run: docker build --no-cache . -t nfcore/pangenome:dev
+
+        - name: Pull docker image
+          if: ${{ !env.MATCHED_FILES }}
+          run: |
+            docker pull nfcore/pangenome:dev
+            docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
+        - name: Install Nextflow
+          run: |
+            wget -qO- get.nextflow.io | bash
+            sudo mv nextflow /usr/local/bin/
+        - name: Run pipeline with wfmash and various parameters
+          run: |
+            nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}            
   seqwish:
       name: Test seqwish with workflow parameters
       if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
@@ -195,3 +240,4 @@ jobs:
         - name: Run pipeline with smoothxg and various parameters
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}                        
+
