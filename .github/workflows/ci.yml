@@ -79,6 +79,7 @@ jobs:
             - '--alignment_merge_segments'
             - '--alignment_no_splits'
             - '--alingment_block_length 40000'
+        fail-fast: false
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
@@ -125,6 +126,7 @@ jobs:
             - '--wfmash --alignment_merge_segments'
             - '--wfmash --alignment_no_splits'
             - '--wfmash --alingment_block_length 40000'
+        fail-fast: false
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
