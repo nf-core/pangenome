@@ -18,9 +18,20 @@ def alignment_split_cmd = params.alignment_no_splits ? "-N" : params.alignment_s
 def aligner = params.wfmash ? "W" : "E"
 def edyeet_align_pct_id_display = params.wfmash ? "" : "a${params.edyeet_align_pct_id}-"
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
-
-def make_paf_prefix = { f -> """\
-${f.getName()}.pggb-\
+def file_name_prefix_display = ""
+def alignment_prefix = ""
+def seqwish_prefix = ""
+def smoothxg_prefix = ""
+// default case
+if (!params.file_name_prefix) {
+  file_name_prefix_display = ".pggb"
+  alignment_prefix = "-${aligner}"
+  seqwish_prefix = ".seqwish"
+  smoothxg_prefix = ".smoothxg"
+} else if (params.file_name_prefix == "pggb") {
+  // fancy naming scheme
+  file_name_prefix_display = ".pggb"
+  alignment_prefix = """-\
 ${aligner}-\
 s${params.alignment_segment_length}-\
 l${params.alignment_block_length}-\
@@ -31,31 +42,52 @@ K${params.alignment_mash_kmer}\
 ${alignment_merge_cmd}\
 ${alignment_split_cmd}\
 ${alignment_exclude_cmd}\
-""" }
-
-def seqwish_prefix = "\
+"""
+  seqwish_prefix = """\
 .seqwish-\
 k${params.seqwish_min_match_length}-\
 B${params.seqwish_transclose_batch}\
-"
-
-def smoothxg_prefix = "${seqwish_prefix}\
+"""
+  smoothxg_prefix = """${seqwish_prefix}\
 .smoothxg-\
 w${params.smoothxg_max_block_weight}-\
 j${params.smoothxg_max_path_jump}-\
 e${params.smoothxg_max_edge_jump}-\
 I${params.smoothxg_block_id_min}-\
 p${smoothxg_poa_params_display}-M-J0.7-K-G150\
-"
+"""
+} else {
+  // take the given prefix
+  file_name_prefix_display= "${params.file_name_prefix}.pggb"
+  aligment_prefix = "-${aligner}"
+  seqwish_prefix = ".seqwish"
+  smoothxg_prefix = ".smoothxg"
+}
 
-fasta = channel.fromPath("${params.input}").map { f -> tuple(make_paf_prefix(f), f) }
+// TODO update, make_file_prefix
+def make_file_prefix = { f -> """\
+${f.getName()}${file_name_prefix_display}\
+""" }
+
+def make_file_prefix_given = { f -> """\
+${file_name_prefix_display}\
+""" }
+
+if (!params.file_name_prefix || params.file_name_prefix == "pggb") {
+  fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
+} else {
+  fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix_given(f), f) }
+}
+
+println file_name_prefix_display
+println alignment_prefix
 
 process edyeet {
   input:
   tuple val(f), path(fasta)
 
   output:
-  tuple val(f), path(fasta), path("${f}.paf")
+  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
 
   """
   edyeet ${alignment_exclude_cmd} \
@@ -69,7 +101,7 @@ process edyeet {
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}.paf 
+     >${f}${alignment_prefix}.paf 
   """
 }
 
@@ -78,7 +110,7 @@ process wfmash {
   tuple val(f), path(fasta)
 
   output:
-  tuple val(f), path(fasta), path("${f}.paf")
+  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
 
   """
   wfmash ${alignment_exclude_cmd} \
@@ -91,7 +123,7 @@ process wfmash {
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}.paf 
+     >${f}${alignment_prefix}.paf 
   """
 }
 
