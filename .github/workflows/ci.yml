@@ -61,7 +61,7 @@ jobs:
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.parameters }}
   pggb:
-      name: Test edyeet with workflow parameters
+      name: Test pggb pipeline part with workflow parameters
       if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
       runs-on: ubuntu-latest
       env:
@@ -124,16 +124,19 @@ jobs:
           run: |
             wget -qO- get.nextflow.io | bash
             sudo mv nextflow /usr/local/bin/
+
         - name: Run pipeline with various parameters for edyeet
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.edyeet_parameters }}
+
         - name: Run pipeline with various parameters for wfmash
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.wfmash_parameters }}
+
         - name: Run pipeline with various parameters for seqwish
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.seqwish_parameters }}
+
         - name: Run pipeline with various parameters for smoothxg
           run: |
             nextflow run ${GITHUB_WORKSPACE} -profile test,docker ${{ matrix.smoothxg_parameters }}                      
-            
