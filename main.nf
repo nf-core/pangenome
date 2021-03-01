@@ -38,30 +38,30 @@ if (!params.file_name_prefix) {
   // fancy naming scheme
   file_name_prefix_display = ".pggb"
   alignment_prefix = """-\
-${aligner}-\
-s${params.alignment_segment_length}-\
-l${params.alignment_block_length}-\
-p${params.alignment_map_pct_id}-\
-n${params.alignment_n_secondary}-\
-${edyeet_align_pct_id_display}\
-K${params.alignment_mash_kmer}\
-${alignment_merge_cmd}\
-${alignment_split_cmd}\
-${alignment_exclude_cmd}\
-"""
+  ${aligner}-\
+  s${params.alignment_segment_length}-\
+  l${params.alignment_block_length}-\
+  p${params.alignment_map_pct_id}-\
+  n${params.alignment_n_secondary}-\
+  ${edyeet_align_pct_id_display}\
+  K${params.alignment_mash_kmer}\
+  ${alignment_merge_cmd}\
+  ${alignment_split_cmd}\
+  ${alignment_exclude_cmd}\
+  """.stripIndent()
   seqwish_prefix = """\
-.seqwish-\
-k${params.seqwish_min_match_length}-\
-B${params.seqwish_transclose_batch}\
-"""
+  .seqwish-\
+  k${params.seqwish_min_match_length}-\
+  B${params.seqwish_transclose_batch}\
+  """.stripIndent()
   smoothxg_prefix = """${seqwish_prefix}\
-.smoothxg-\
-w${params.smoothxg_max_block_weight}-\
-j${params.smoothxg_max_path_jump}-\
-e${params.smoothxg_max_edge_jump}-\
-I${params.smoothxg_block_id_min}-\
-p${smoothxg_poa_params_display}-M-J0.7-K-G150\
-"""
+  .smoothxg-\
+  w${params.smoothxg_max_block_weight}-\
+  j${params.smoothxg_max_path_jump}-\
+  e${params.smoothxg_max_edge_jump}-\
+  I${params.smoothxg_block_id_min}-\
+  p${smoothxg_poa_params_display}-M-J0.7-K-G150\
+  """.stripIndent()
 } else {
   // take the given prefix
   file_name_prefix_display= "${params.file_name_prefix}.pggb"
@@ -105,7 +105,7 @@ process edyeet {
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}${alignment_prefix}.paf 
-  """
+  """.stripIndent()
 }
 
 process wfmash {
@@ -127,7 +127,7 @@ process wfmash {
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}${alignment_prefix}.paf 
-  """
+  """.stripIndent()
 }
 
 process seqwish {
@@ -149,7 +149,7 @@ process seqwish {
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
       -P
-    """
+    """.stripIndent()
 }
 
 process smoothxg {
@@ -182,7 +182,7 @@ process smoothxg {
       -m ${f}${smoothxg_prefix}.maf \
       -C ${f}${smoothxg_prefix}.consensus,${params.smoothxg_consensus_spec} \
       -o ${f}${smoothxg_prefix}.gfa
-    """  
+    """.stripIndent()
 }
 
 process odgiBuild {
@@ -225,7 +225,7 @@ process odgiViz {
     -i $graph \
     -o ${graph}.viz_mqc.png \
     -x 1500 -y 500 -P 5
-  """
+  """.stripIndent()
 }
 
 process odgiChop {
@@ -252,7 +252,7 @@ process odgiLayout {
     -i $graph \
     -o ${graph}.lay \
     -t ${task.cpus} -P
-  """
+  """.stripIndent()
 }
 
 process odgiDraw {
@@ -272,7 +272,7 @@ process odgiDraw {
     -C \
     -w 50 \
     -H 1000 -t ${task.cpus}
-  """
+  """.stripIndent()
 }
 
 process multiQC {
@@ -290,7 +290,7 @@ process multiQC {
 
   """
   multiqc -s .
-  """
+  """.stripIndent()
 }
 
 workflow {
