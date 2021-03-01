@@ -98,7 +98,6 @@ jobs:
             - '--smoothxg_block_id_min 0.7'
             - '--smoothxg_ratio_contain 0.3'
             - '--smoothxg_poa_params 2,4,6,2,24,1'
-        fail-fast: false
       steps:
         - name: Check out pipeline code
           uses: actions/checkout@v2
