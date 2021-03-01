@@ -70,7 +70,7 @@ Many thanks to all who have helped out and contributed along the way, including 
 | [Erik Garrison](https://github.com/ekg)                  | [The University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)|
 | [Andrea Guarracino](https://github.com/AndreaGuarracino) | [University of Rome Tor Vergata, Rome, Italy](http://www.scienze.uniroma2.it/)        |
 | [Michael Heuer](https://github.com/heuermh)              | [UC Berkeley, USA](https://rise.cs.berkeley.edu)                                      |
-| [Lukas Heumos](https://github.com/zethson)               | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html)<br />[Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html) |
+| [Lukas Heumos](https://github.com/zethson)               | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) \\ [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html) |
 | [Simon Heumos](https://github.com/subwaystation)         | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) |
 
 > \* Listed in alphabetical order
