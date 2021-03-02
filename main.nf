@@ -105,7 +105,7 @@ process edyeet {
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}${alignment_prefix}.paf 
-  """.stripIndent()
+  """
 }
 
 process wfmash {
@@ -127,7 +127,7 @@ process wfmash {
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}${alignment_prefix}.paf 
-  """.stripIndent()
+  """
 }
 
 process seqwish {
@@ -149,7 +149,7 @@ process seqwish {
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
       -P
-    """.stripIndent()
+    """
 }
 
 process smoothxg {
@@ -182,7 +182,7 @@ process smoothxg {
       -m ${f}${smoothxg_prefix}.maf \
       -C ${f}${smoothxg_prefix}.consensus,${params.smoothxg_consensus_spec} \
       -o ${f}${smoothxg_prefix}.gfa
-    """.stripIndent()
+    """
 }
 
 process odgiBuild {
@@ -225,7 +225,7 @@ process odgiViz {
     -i $graph \
     -o ${graph}.viz_mqc.png \
     -x 1500 -y 500 -P 5
-  """.stripIndent()
+  """
 }
 
 process odgiChop {
@@ -252,7 +252,7 @@ process odgiLayout {
     -i $graph \
     -o ${graph}.lay \
     -t ${task.cpus} -P
-  """.stripIndent()
+  """
 }
 
 process odgiDraw {
@@ -272,7 +272,7 @@ process odgiDraw {
     -C \
     -w 50 \
     -H 1000 -t ${task.cpus}
-  """.stripIndent()
+  """
 }
 
 process multiQC {
@@ -290,7 +290,7 @@ process multiQC {
 
   """
   multiqc -s .
-  """.stripIndent()
+  """
 }
 
 workflow {
