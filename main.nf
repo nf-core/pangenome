@@ -11,27 +11,18 @@
 
 nextflow.enable.dsl = 2
 
-// We can't change global parameters inside this scope, so we build the ones we need locally
-def edyeet_merge_cmd = params.edyeet_merge_segments ? "-M" : params.edyeet_merge_cmd
-def edyeet_exclude_cmd = params.edyeet_exclude_delim ? "-Y${params.edyeet_exclude_delim}" : params.edyeet_exclude_cmd
-def edyeet_split_cmd = params.edyeet_no_splits ? "-N" : params.edyeet_split_cmd
-
 def makeBaseName = { f -> """\
 ${f.getSimpleName()}.pggb-\
-s${params.edyeet_segment_length}-\
-p${params.edyeet_map_pct_id}-\
-n${params.edyeet_n_secondary}-\
-a${params.edyeet_align_pct_id}-\
-K${params.edyeet_mash_kmer}\
-${edyeet_merge_cmd}\
-${edyeet_split_cmd}\
-${edyeet_exclude_cmd}-\
-k${params.seqwish_min_match_length}-\
-w${params.smoothxg_max_block_weight}-\
-j${params.smoothxg_max_path_jump}-\
-W${params.smoothxg_min_subpath}-\
-e${params.smoothxg_max_edge_jump}-\
-I${params.smoothxg_block_id_min}\
+s${params.segment_length}-\
+p${params.map_pct_id}-\
+n${params.n_secondary}-\
+a${params.align_pct_id}-\
+K${params.mash_kmer}-\
+k${params.min_match_length}-\
+w${params.max_block_weight}-\
+j${params.max_path_jump}-\
+W${params.min_subpath}-\
+e${params.max_edge_jump}\
 """ }
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
@@ -44,14 +35,12 @@ process edyeet {
   tuple val(f), path(fasta), path("${f}.paf")
 
   """
-  edyeet ${edyeet_exclude_cmd} \
-     -s ${params.edyeet_segment_length} \
-     ${edyeet_merge_cmd} \
-     ${edyeet_split_cmd} \
-     -p ${params.edyeet_map_pct_id} \
-     -n ${params.edyeet_n_secondary} \
-     -a ${params.edyeet_align_pct_id} \
-     -k ${params.edyeet_mash_kmer} \
+  edyeet -X \
+     -s ${params.segment_length} \
+     -p ${params.map_pct_id} \
+     -n ${params.n_secondary} \
+     -a ${params.align_pct_id} \
+     -k ${params.mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}.paf 
@@ -72,9 +61,8 @@ process seqwish {
       -t ${task.cpus} \
       -s $fasta \
       -p $alignment \
-      -k ${params.seqwish_min_match_length} \
-      -g ${f}.seqwish.gfa -P \
-      -B ${params.seqwish_transclose_batch}
+      -k ${params.min_match_length} \
+      -g ${f}.seqwish.gfa -P
     """
 }
 
@@ -83,6 +71,7 @@ process smoothxg {
     tuple val(f), path(graph)
 
   output:
+    // val(f), emit: failure
     path("${f}.smooth.gfa"), emit: gfa_smooth
     path("${f}*.consensus*.gfa"), emit: consensus_smooth
 
@@ -91,20 +80,21 @@ process smoothxg {
     smoothxg \
       -t ${task.cpus} \
       -g $graph \
-      -w ${params.smoothxg_max_block_weight} \
-      -j ${params.smoothxg_max_path_jump} \
-      -e ${params.smoothxg_max_edge_jump} \
-      -l ${params.smoothxg_max_poa_length} \
+      -w ${params.max_block_weight} \
+      -j ${params.max_path_jump} \
+      -e ${params.max_edge_jump} \
+      -l ${params.max_poa_length} \
       -o ${f}.smooth.gfa \
       -m ${f}.smooth.maf \
       -s ${f}.consensus \
       -a \
-      -C ${params.smoothxg_consensus_jump_max}
+      -C ${params.consensus_jump_max}
     """  
 }
 
 process odgiBuild {
   input:
+  // tuple val(f), file(graph), file(consensus_graphs)
   path(graph)
 
   output:
@@ -125,23 +115,21 @@ process odgiStats {
   path("${graph}.stats")
 
   """
-  odgi stats -i $graph -S -s -d -l > "${graph}.stats" 2>&1
+  odgi stats -i $graph -S -s -d -l > "${graph}.stats"
   """
 }
 
 process odgiViz {
-  publishDir "${params.outdir}/odgiViz", mode: 'copy'
-
   input:
   path(graph)
 
   output:
-  path("${graph}.viz_mqc.png")
+  path("${graph}.viz.png")
 
   """
   odgi viz \
     -i $graph \
-    -o ${graph}.viz_mqc.png \
+    -o ${graph}.viz.png \
     -x 1500 -y 500 -P 5
   """
 }
@@ -174,20 +162,17 @@ process odgiLayout {
 }
 
 process odgiDraw {
-  publishDir "${params.outdir}/odgiDraw", mode: 'copy'
-
   input:
   tuple path(graph), path(layoutGraph)
 
   output:
-  path("${layoutGraph}.draw_mqc.png")
+  path("${layoutGraph}.png")
 
   """
   odgi draw \
     -i $graph \
     -c $layoutGraph \
-    -p ${layoutGraph}.draw_mqc.png \
-    -C \
+    -p ${layoutGraph}.png \
     -H 1000 -t ${task.cpus}
   """
 }
