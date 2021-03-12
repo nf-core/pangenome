@@ -11,60 +11,133 @@
 
 nextflow.enable.dsl = 2
 
-// We can't change global parameters inside this scope, so we build the ones we need locally
-def edyeet_merge_cmd = params.edyeet_merge_segments ? "-M" : params.edyeet_merge_cmd
-def edyeet_exclude_cmd = params.edyeet_exclude_delim ? "-Y${params.edyeet_exclude_delim}" : params.edyeet_exclude_cmd
-def edyeet_split_cmd = params.edyeet_no_splits ? "-N" : params.edyeet_split_cmd
+// Show help message
+if (params.help){
+    helpMessage()
+    exit 0
+}
 
-def makeBaseName = { f -> """\
-${f.getSimpleName()}.pggb-\
-s${params.edyeet_segment_length}-\
-p${params.edyeet_map_pct_id}-\
-n${params.edyeet_n_secondary}-\
-a${params.edyeet_align_pct_id}-\
-K${params.edyeet_mash_kmer}\
-${edyeet_merge_cmd}\
-${edyeet_split_cmd}\
-${edyeet_exclude_cmd}-\
-k${params.seqwish_min_match_length}-\
-w${params.smoothxg_max_block_weight}-\
-j${params.smoothxg_max_path_jump}-\
-W${params.smoothxg_min_subpath}-\
-e${params.smoothxg_max_edge_jump}-\
-I${params.smoothxg_block_id_min}\
+// We can't change global parameters inside this scope, so we build the ones we need locally
+def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : params.alignment_merge_cmd
+def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : params.alignment_exclude_cmd
+def alignment_split_cmd = params.alignment_no_splits ? "-N" : params.alignment_split_cmd
+def aligner = params.wfmash ? "W" : "E"
+def edyeet_align_pct_id_display = params.wfmash ? "" : "a${params.edyeet_align_pct_id}-"
+def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
+def file_name_prefix_display = ""
+def alignment_prefix = ""
+def seqwish_prefix = ""
+def smoothxg_prefix = ""
+// default case
+if (!params.file_name_prefix) {
+  file_name_prefix_display = ".pggb"
+  alignment_prefix = "-${aligner}"
+  seqwish_prefix = ".seqwish"
+  smoothxg_prefix = ".smoothxg"
+} else if (params.file_name_prefix == "pggb") {
+  // fancy naming scheme
+  file_name_prefix_display = ".pggb"
+  alignment_prefix = """-\
+  ${aligner}-\
+  s${params.alignment_segment_length}-\
+  l${params.alignment_block_length}-\
+  p${params.alignment_map_pct_id}-\
+  n${params.alignment_n_secondary}-\
+  ${edyeet_align_pct_id_display}\
+  K${params.alignment_mash_kmer}\
+  ${alignment_merge_cmd}\
+  ${alignment_split_cmd}\
+  ${alignment_exclude_cmd}\
+  """.stripIndent()
+  seqwish_prefix = """\
+  .seqwish-\
+  k${params.seqwish_min_match_length}-\
+  B${params.seqwish_transclose_batch}\
+  """.stripIndent()
+  smoothxg_prefix = """${seqwish_prefix}\
+  .smoothxg-\
+  w${params.smoothxg_max_block_weight}-\
+  j${params.smoothxg_max_path_jump}-\
+  e${params.smoothxg_max_edge_jump}-\
+  I${params.smoothxg_block_id_min}-\
+  p${smoothxg_poa_params_display}-M-J0.7-K-G150\
+  """.stripIndent()
+} else {
+  // take the given prefix
+  file_name_prefix_display= "${params.file_name_prefix}.pggb"
+  aligment_prefix = "-${aligner}"
+  seqwish_prefix = ".seqwish"
+  smoothxg_prefix = ".smoothxg"
+}
+
+// TODO update, make_file_prefix
+def make_file_prefix = { f -> """\
+${f.getName()}${file_name_prefix_display}\
 """ }
 
-fasta = channel.fromPath("${params.input}").map { f -> tuple(makeBaseName(f), f) }
+def make_file_prefix_given = { f -> """\
+${file_name_prefix_display}\
+""" }
+
+if (!params.file_name_prefix || params.file_name_prefix == "pggb") {
+  fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
+} else {
+  fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix_given(f), f) }
+}
 
 process edyeet {
   input:
   tuple val(f), path(fasta)
 
   output:
-  tuple val(f), path(fasta), path("${f}.paf")
+  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
 
   """
-  edyeet ${edyeet_exclude_cmd} \
-     -s ${params.edyeet_segment_length} \
-     ${edyeet_merge_cmd} \
-     ${edyeet_split_cmd} \
-     -p ${params.edyeet_map_pct_id} \
-     -n ${params.edyeet_n_secondary} \
+  edyeet ${alignment_exclude_cmd} \
+     -s ${params.alignment_segment_length} \
+     -l ${params.alignment_block_length} \
+     ${alignment_merge_cmd} \
+     ${alignment_split_cmd} \
+     -p ${params.alignment_map_pct_id} \
+     -n ${params.alignment_n_secondary} \
      -a ${params.edyeet_align_pct_id} \
-     -k ${params.edyeet_mash_kmer} \
+     -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}.paf 
+     >${f}${alignment_prefix}.paf 
   """
 }
 
+process wfmash {
+  input:
+  tuple val(f), path(fasta)
+
+  output:
+  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
+
+  """
+  wfmash ${alignment_exclude_cmd} \
+     -s ${params.alignment_segment_length} \
+     -l ${params.alignment_block_length} \
+     ${alignment_merge_cmd} \
+     ${alignment_split_cmd} \
+     -p ${params.alignment_map_pct_id} \
+     -n ${params.alignment_n_secondary} \
+     -k ${params.alignment_mash_kmer} \
+     -t ${task.cpus} \
+     $fasta $fasta \
+     >${f}${alignment_prefix}.paf 
+  """
+}
 
 process seqwish {
+  publishDir "${params.outdir}/seqwish", mode: "${params.publish_dir_mode}"
+
   input:
   tuple val(f), path(fasta), path(alignment)
 
   output:
-    tuple val(f), path("${f}.seqwish.gfa")
+    tuple val(f), path("${f}${seqwish_prefix}.gfa")
 
   script:
     """
@@ -73,18 +146,22 @@ process seqwish {
       -s $fasta \
       -p $alignment \
       -k ${params.seqwish_min_match_length} \
-      -g ${f}.seqwish.gfa -P \
-      -B ${params.seqwish_transclose_batch}
+      -g ${f}${seqwish_prefix}.gfa -P \
+      -B ${params.seqwish_transclose_batch} \
+      -P
     """
 }
 
 process smoothxg {
+  publishDir "${params.outdir}/smoothxg", mode: "${params.publish_dir_mode}"
+
   input:
     tuple val(f), path(graph)
 
   output:
-    path("${f}.smooth.gfa"), emit: gfa_smooth
+    path("${f}${smoothxg_prefix}.gfa"), emit: gfa_smooth
     path("${f}*.consensus*.gfa"), emit: consensus_smooth
+    path("${f}${smoothxg_prefix}.maf"), emit: maf_smooth
 
   script:
     """
@@ -92,15 +169,20 @@ process smoothxg {
       -t ${task.cpus} \
       -g $graph \
       -w ${params.smoothxg_max_block_weight} \
+      -M \
+      -J 0.7 \
+      -K \
+      -G 150 \
+      -I ${params.smoothxg_block_id_min} \
+      -R ${params.smoothxg_ratio_contain} \
       -j ${params.smoothxg_max_path_jump} \
       -e ${params.smoothxg_max_edge_jump} \
       -l ${params.smoothxg_max_poa_length} \
-      -o ${f}.smooth.gfa \
-      -m ${f}.smooth.maf \
-      -s ${f}.consensus \
-      -a \
-      -C ${params.smoothxg_consensus_jump_max}
-    """  
+      -p ${params.smoothxg_poa_params} \
+      -m ${f}${smoothxg_prefix}.maf \
+      -C ${f}${smoothxg_prefix}.consensus,${params.smoothxg_consensus_spec} \
+      -o ${f}${smoothxg_prefix}.gfa
+    """
 }
 
 process odgiBuild {
@@ -111,12 +193,12 @@ process odgiBuild {
   path("${graph}.og")
 
   """
-  odgi build -g $graph -o ${graph}.og
+  odgi build -g $graph -o ${graph}.og -P -t ${task.cpus}
   """
 }
 
 process odgiStats {
-  publishDir "${params.outdir}/odgiStats", mode: 'copy'
+  publishDir "${params.outdir}/odgi_stats", mode: "${params.publish_dir_mode}"
 
   input: 
   path(graph)
@@ -125,12 +207,12 @@ process odgiStats {
   path("${graph}.stats")
 
   """
-  odgi stats -i $graph -S -s -d -l > "${graph}.stats" 2>&1
+  odgi stats -i "${graph}" -S -s -d -l > "${graph}.stats" 2>&1
   """
 }
 
 process odgiViz {
-  publishDir "${params.outdir}/odgiViz", mode: 'copy'
+  publishDir "${params.outdir}/odgi_viz", mode: "${params.publish_dir_mode}"
 
   input:
   path(graph)
@@ -174,7 +256,7 @@ process odgiLayout {
 }
 
 process odgiDraw {
-  publishDir "${params.outdir}/odgiDraw", mode: 'copy'
+  publishDir "${params.outdir}/odgi_draw", mode: "${params.publish_dir_mode}"
 
   input:
   tuple path(graph), path(layoutGraph)
@@ -188,14 +270,38 @@ process odgiDraw {
     -c $layoutGraph \
     -p ${layoutGraph}.draw_mqc.png \
     -C \
+    -w 50 \
     -H 1000 -t ${task.cpus}
+  """
+}
+
+process multiQC {
+  publishDir "${params.outdir}", mode: "${params.publish_dir_mode}"
+
+  input:
+  path odgi_stats
+  path odgi_viz
+  path odgi_draw
+
+  output:
+  path "*multiqc_report.html", emit: report
+  path "*_data"              , emit: data
+  path "*_plots"             , optional:true, emit: plots
+
+  """
+  multiqc -s .
   """
 }
 
 workflow {
   main:
-    edyeet(fasta)
-    seqwish(edyeet.out)
+    if (params.wfmash == false) {
+      edyeet(fasta)
+      seqwish(edyeet.out)
+    } else {
+      wfmash(fasta)
+      seqwish(wfmash.out)
+    }
     smoothxg(seqwish.out)
     if (params.do_stats) { 
       odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten())) 
@@ -204,10 +310,22 @@ workflow {
     else {
       odgiBuild(smoothxg.out.gfa_smooth)
     }
-    odgiViz(odgiBuild.out.filter(~".*smooth.*"))
-    odgiChop(odgiBuild.out.filter(~".*smooth.*"))
-    odgiLayout(odgiChop.out)
-    odgiDraw(odgiLayout.out)
+    odgiVizOut = Channel.empty()
+    if (params.do_viz) {
+      odgiVizOut = odgiViz(odgiBuild.out.filter(~".*smooth.*"))
+    }
+    odgiDrawOut = Channel.empty()
+    if (params.do_layout) {
+      odgiChop(odgiBuild.out.filter(~".*smooth.*"))
+      odgiLayout(odgiChop.out)
+      odgiDrawOut = odgiDraw(odgiLayout.out)
+    }
+
+    multiQC(
+      odgiStats.out.collect().ifEmpty([]),
+      odgiVizOut.collect().ifEmpty([]),
+      odgiDrawOut.collect().ifEmpty([])
+    )
 }
 
 // /*
@@ -298,20 +416,59 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/pangenome --input 'data/*.fa.gz' -profile docker
+    nextflow run nf-core/pangenome --input 'data/input.fa.gz' -profile docker
 
     Mandatory arguments:
-      --input [file]                  Path to input data (must be surrounded with quotes)
+      --input [file]                  Path to input FASTA (must be surrounded with quotes)
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
+    Alignment options:
+      --edyeet_align_pct_id [n]       percent identity in the edyeet edlib alignment step [default: 90]
+      --alignment_map_pct_id [n]      percent identity in the wfmash or edyeet mashmap step [default: 90]
+      --alignment_n_secondary [n]     number of secondary mappings to retain in 'map' filter mode [default: 10]
+      --alignment_segment_length [n]  segment length for mapping [default: 10000]
+      --alignment_block_length [n]    minimum block length filter for mapping [default: 3*alignment_segment_length]
+      --alignment_mash_kmer [n]       kmer size for mashmap [default: 16]
+      --alignment_merge_segments      merge successive mappings [default: OFF]
+      --alignment_no_splits           disable splitting of input sequences during mapping [default: OFF]
+      --alignment_exclude--delim [c]  skip mappings between sequences with the same name prefix before
+                                      the given delimiter character [default: all-vs-all and !self]
+    Seqwish options:
+      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 19]
+      --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 1000000]
+
+    Smoothxg options:
+      --smoothxg_max_block_weight [n] maximum seed sequence in block [default: 10000]
+      --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 5000]
+      --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 5000]
+      --smoothxg_max_popa_length [n]  maximum sequence length to put into POA [default: 10000]
+      --smoothxg_consensus_spec [str] consensus graph specification: write the consensus graph to
+                                      BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter
+                                      (which defines the length of divergences from consensus paths to preserve in the
+                                      output), optionally a file containing reference paths to preserve in the output,
+                                      a flag (y/n) indicating whether we should also use the POA consensus paths, a
+                                      minimum coverage of consensus paths to retain (min_cov), and a maximum allele
+                                      length (max_len, defaults to 1e6); implies -a; example:
+                                      cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000
+                                      [default: 10,100,1000,10000]
+      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: OFF]
+      --smoothxg_ratio_contain [n]    minimum short length / long length ratio to compare sequences for the containment
+                                      metric in the clustering [default: 0]
+      --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
+                                      [default: 1,4,6,2,26,1]                                         
+
+    Visualization options:
+      --do_viz                        Generate 1D visualisations of the built graphs [default: OFF]
+      --do_layout                     Generate 2D visualisations of the built graphs [default: OFF]
 
     Other options:
-      --outdir [file]                 The output directory where the results will be saved
-      --publish_dir_mode [str]        Mode for publishing results in the output directory. Available: symlink, rellink, link, copy, copyNoFollow, move (Default: copy)
+      --outdir [file]                 The output directory where the results will be saved [default: ./results]
+      --publish_dir_mode [str]        Mode for publishing results in the output directory. Available: symlink, rellink, link, copy, copyNoFollow, move (default: copy)
       --email [email]                 Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       --email_on_fail [email]         Same as --email, except only send mail if the workflow is not successful
       --max_multiqc_email_size [str]  Threshold size for MultiQC report to be attached in notification email. If file generated by pipeline exceeds the threshold, it will not be attached (Default: 25MB)
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic
+      --file_name_prefix [str]        Prefix for the output file names. If 'pggb', the file names will be very verbose and contain all parameters for each process. [default: --input]
 
     AWSBatch options:
       --awsqueue [str]                The AWSBatch JobQueue that needs to be set when running on AWSBatch
