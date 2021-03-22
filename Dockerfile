@@ -31,7 +31,3 @@ RUN echo "export PATH=$PATH" > /etc/profile
 
 # Dump the details of the conda-installed packages to a file for posterity
 RUN conda env export --name nf-core-pangenome-1.0dev > nf-core-pangenome-1.0dev.yml
-
-# Instruct R processes to use these empty files instead of clashing with a local version
-RUN touch .Rprofile
-RUN touch .Renviron
