@@ -18,9 +18,9 @@ if (params.help){
 }
 
 // We can't change global parameters inside this scope, so we build the ones we need locally
-def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : params.alignment_merge_cmd
-def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : params.alignment_exclude_cmd
-def alignment_split_cmd = params.alignment_no_splits ? "-N" : params.alignment_split_cmd
+def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : ""
+def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : "-X"
+def alignment_split_cmd = params.alignment_no_splits ? "-N" : ""
 def aligner = params.wfmash ? "W" : "E"
 def edyeet_align_pct_id_display = params.wfmash ? "" : "a${params.edyeet_align_pct_id}-"
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
@@ -415,10 +415,14 @@ def helpMessage() {
 
 // Has the run name been specified by the user?
 // this has the bonus effect of catching both -name and --name
+// TODO INVOKE THIS AGAIN ONCE IT IS CLEAR HOW TO ADD A NAME TO THE RUN 
+// TODO ERROR: You used a core Nextflow option with two hyphens: '--name'. Please resubmit with '-name'
+/*
 custom_runName = params.name
 if (!(workflow.runName ==~ /[a-z]+_[a-z]+/)) {
     custom_runName = workflow.runName
 }
+*/
 
 log.info Headers.nf_core(workflow, params.monochrome_logs)
 
@@ -468,8 +472,10 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
 //   input:
 //   file fasta from ch_fasta
 //
+/*
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 if (params.fasta) { ch_fasta = file(params.fasta, checkIfExists: true) }
+*/
 
 // Check AWS batch settings
 if (workflow.profile.contains('awsbatch')) {
