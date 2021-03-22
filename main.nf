@@ -236,7 +236,7 @@ process odgiChop {
   path("${graph}.chop.og")
 
   """
-  odgi chop -i $graph -c 100 -o ${graph}.chop.og
+  odgi chop -i $graph -c 100 -o ${graph}.chop.og -t ${task.cpus}
   """
 }
 
@@ -275,6 +275,7 @@ process odgiDraw {
   """
 }
 
+// TODO ONCE OUR CUSTOM MULTIQC VERSION IS IN A MULTIQC RELEASE, WE CAN CHANGE THIS
 process multiQC {
   publishDir "${params.outdir}", mode: "${params.publish_dir_mode}"
 
@@ -341,6 +342,7 @@ workflow {
 // include { FASTQC } from './modules/nf-core/fastqc' params(params)
 // include { MULTIQC } from './modules/nf-core/multiqc' params(params)
 
+// TODO REMOVE THIS ONCE WE TOOK CARE OF nextflow_schema.json
 def helpMessage() {
     // TODO nf-core: Add to this help message with new command line parameters
     log.info nfcoreHeader()
