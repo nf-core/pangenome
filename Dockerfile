@@ -1,5 +1,3 @@
-# FIXME Remove this later, this is just to fool the linter
-# FROM nfcore/base:1.13.1
 FROM ghcr.io/pangenome/pggb:20210311083535c7fe1e
 LABEL authors="Simon Heumos, Michael Heuer, Lukas Heumos, Erik Garrison, Andrea Guarracino" \
       description="Docker image containing all software requirements for the nf-core/pangenome pipeline"
