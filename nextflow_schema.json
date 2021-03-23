@@ -38,11 +38,17 @@
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 },
+                "do_compression": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-file-archive",
+                    "description": "Compress output files."
+                },
                 "do_stats": {
                     "type": "boolean",
                     "default": true,
                     "hidden": true,
-                    "fa_icon": "fas fa-file-csv"
+                    "fa_icon": "fas fa-file-csv",
+                    "description": "Perform statistics evaluation."
                 }
             }
         },
@@ -72,26 +78,22 @@
                 "alignment_n_secondary": {
                     "type": "integer",
                     "default": 10,
-                    "description": "Number of secondary mappings to retain in 'map' filter mode.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Number of secondary mappings to retain in 'map' filter mode."
                 },
                 "alignment_segment_length": {
                     "type": "integer",
                     "default": 10000,
-                    "description": "Segment length for mapping.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Segment length for mapping."
                 },
                 "alignment_block_length": {
                     "type": "integer",
                     "default": 30000,
-                    "description": "Minimum block length filter for mapping.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Minimum block length filter for mapping."
                 },
                 "alignment_mash_kmer": {
                     "type": "integer",
                     "default": 16,
-                    "description": "Kmer size for mashmap.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Kmer size for mashmap."
                 },
                 "alignment_merge_segments": {
                     "type": "boolean",
@@ -119,14 +121,12 @@
                 "seqwish_min_match_length": {
                     "type": "integer",
                     "default": 19,
-                    "description": "Ignore exact matches below this length.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Ignore exact matches below this length."
                 },
                 "seqwish_transclose_batch": {
                     "type": "integer",
                     "default": 1000000,
-                    "description": "Number of bp to use for transitive closure batch.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Number of bp to use for transitive closure batch."
                 }
             },
             "fa_icon": "fas fa-dna"
@@ -140,26 +140,22 @@
                 "smoothxg_max_block_weight": {
                     "type": "integer",
                     "default": 10000,
-                    "description": "Maximum seed sequence in block.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Maximum seed sequence in block."
                 },
                 "smoothxg_max_path_jump": {
                     "type": "integer",
                     "default": 5000,
-                    "description": "Maximum path jump to include in block.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Maximum path jump to include in block."
                 },
                 "smoothxg_max_edge_jump": {
                     "type": "integer",
                     "default": 5000,
-                    "description": "Maximum edge jump before breaking.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Maximum edge jump before breaking."
                 },
                 "smoothxg_max_poa_length": {
                     "type": "integer",
                     "default": 10000,
-                    "description": "Maximum sequence length to put into POA.",
-                    "fa_icon": "fab fa-draft2digital"
+                    "description": "Maximum sequence length to put into POA."
                 },
                 "smoothxg_consensus_spec": {
                     "type": "string",

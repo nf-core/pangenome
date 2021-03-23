@@ -37,31 +37,31 @@ if (!params.file_name_prefix) {
 } else if (params.file_name_prefix == "pggb") {
   // fancy naming scheme
   file_name_prefix_display = ".pggb"
-  alignment_prefix = """-\
-  ${aligner}-\
-  s${params.alignment_segment_length}-\
-  l${params.alignment_block_length}-\
-  p${params.alignment_map_pct_id}-\
-  n${params.alignment_n_secondary}-\
-  ${edyeet_align_pct_id_display}\
-  K${params.alignment_mash_kmer}\
-  ${alignment_merge_cmd}\
-  ${alignment_split_cmd}\
-  ${alignment_exclude_cmd}\
-  """.stripIndent()
-  seqwish_prefix = """\
-  .seqwish-\
-  k${params.seqwish_min_match_length}-\
-  B${params.seqwish_transclose_batch}\
-  """.stripIndent()
-  smoothxg_prefix = """${seqwish_prefix}\
-  .smoothxg-\
-  w${params.smoothxg_max_block_weight}-\
-  j${params.smoothxg_max_path_jump}-\
-  e${params.smoothxg_max_edge_jump}-\
-  I${params.smoothxg_block_id_min}-\
-  p${smoothxg_poa_params_display}-M-J0.7-K-G150\
-  """.stripIndent()
+alignment_prefix = """-\
+${aligner}-\
+s${params.alignment_segment_length}-\
+l${params.alignment_block_length}-\
+p${params.alignment_map_pct_id}-\
+n${params.alignment_n_secondary}-\
+${edyeet_align_pct_id_display}\
+K${params.alignment_mash_kmer}\
+${alignment_merge_cmd}\
+${alignment_split_cmd}\
+${alignment_exclude_cmd}\
+"""
+seqwish_prefix = """${alignment_prefix}\
+.seqwish-\
+k${params.seqwish_min_match_length}-\
+B${params.seqwish_transclose_batch}\
+"""
+smoothxg_prefix = """${seqwish_prefix}\
+.smoothxg-\
+w${params.smoothxg_max_block_weight}-\
+j${params.smoothxg_max_path_jump}-\
+e${params.smoothxg_max_edge_jump}-\
+I${params.smoothxg_block_id_min}-\
+p${smoothxg_poa_params_display}-M-J0.7-K-G150\
+"""
 } else {
   // take the given prefix
   file_name_prefix_display= "${params.file_name_prefix}.pggb"
@@ -86,11 +86,13 @@ if (!params.file_name_prefix || params.file_name_prefix == "pggb") {
 }
 
 process edyeet {
+  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
+
   input:
-  tuple val(f), path(fasta)
+    tuple val(f), path(fasta)
 
   output:
-  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
+    tuple val(f), path("${f}${alignment_prefix}.paf")
 
   """
   edyeet ${alignment_exclude_cmd} \
@@ -104,16 +106,18 @@ process edyeet {
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${alignment_prefix}.paf 
+     >${f}${alignment_prefix}.paf
   """
 }
 
 process wfmash {
+  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
+
   input:
-  tuple val(f), path(fasta)
+    tuple val(f), path(fasta)
 
   output:
-  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
+    tuple val(f), path("${f}${alignment_prefix}.paf")
 
   """
   wfmash ${alignment_exclude_cmd} \
@@ -126,7 +130,7 @@ process wfmash {
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${alignment_prefix}.paf 
+     >${f}${alignment_prefix}.paf
   """
 }
 
@@ -134,7 +138,8 @@ process seqwish {
   publishDir "${params.outdir}/seqwish", mode: "${params.publish_dir_mode}"
 
   input:
-  tuple val(f), path(fasta), path(alignment)
+    tuple val(f), path(fasta)
+    path(alignment)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
@@ -186,11 +191,13 @@ process smoothxg {
 }
 
 process odgiBuild {
+  publishDir "${params.outdir}/odgi_build", mode: "${params.publish_dir_mode}"
+
   input:
-  path(graph)
+    path(graph)
 
   output:
-  path("${graph}.og")
+    path("${graph}.og")
 
   """
   odgi build -g $graph -o ${graph}.og -P -t ${task.cpus}
@@ -200,11 +207,11 @@ process odgiBuild {
 process odgiStats {
   publishDir "${params.outdir}/odgi_stats", mode: "${params.publish_dir_mode}"
 
-  input: 
-  path(graph)
+  input:
+    path(graph)
 
   output:
-  path("${graph}.stats")
+    path("${graph}.stats")
 
   """
   odgi stats -i "${graph}" -S -s -d -l > "${graph}.stats" 2>&1
@@ -215,10 +222,10 @@ process odgiViz {
   publishDir "${params.outdir}/odgi_viz", mode: "${params.publish_dir_mode}"
 
   input:
-  path(graph)
+    path(graph)
 
   output:
-  path("${graph}.viz_mqc.png")
+    path("${graph}.viz_mqc.png")
 
   """
   odgi viz \
@@ -275,6 +282,20 @@ process odgiDraw {
   """
 }
 
+process pigzOutputFiles {
+  publishDir "${params.outdir}/compressed_outputs", mode: "${params.publish_dir_mode}"
+
+  input:
+    path(graph)
+
+  output:
+    path("${graph}.gz")
+
+  """
+  pigz -q -p ${task.cpus} $graph -f -k
+  """
+}
+
 // TODO ONCE OUR CUSTOM MULTIQC VERSION IS IN A MULTIQC RELEASE, WE CAN CHANGE THIS
 process multiQC {
   publishDir "${params.outdir}", mode: "${params.publish_dir_mode}"
@@ -298,15 +319,15 @@ workflow {
   main:
     if (params.wfmash == false) {
       edyeet(fasta)
-      seqwish(edyeet.out)
+      seqwish(fasta, edyeet.out.collect{it[1]})
     } else {
       wfmash(fasta)
-      seqwish(wfmash.out)
+      seqwish(fasta, wfmash.out.collect{it[1]})
     }
     smoothxg(seqwish.out)
-    if (params.do_stats) { 
-      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten())) 
-      odgiStats(odgiBuild.out)  
+    if (params.do_stats) {
+      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten()))
+      odgiStats(odgiBuild.out)
     }
     else {
       odgiBuild(smoothxg.out.gfa_smooth)
@@ -320,6 +341,14 @@ workflow {
       odgiChop(odgiBuild.out.filter(~".*smooth.*"))
       odgiLayout(odgiChop.out)
       odgiDrawOut = odgiDraw(odgiLayout.out)
+    }
+
+    if (params.do_compression) {
+        if (params.wfmash == false) {
+            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, edyeet.out.collect{it[1]}))
+        } else {
+            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
+        }
     }
 
     multiQC(
@@ -391,7 +420,7 @@ def helpMessage() {
       --smoothxg_ratio_contain [n]    minimum short length / long length ratio to compare sequences for the containment
                                       metric in the clustering [default: 0]
       --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
-                                      [default: 1,4,6,2,26,1]                                         
+                                      [default: 1,4,6,2,26,1]
 
     Visualization options:
       --do_viz                        Generate 1D visualisations of the built graphs [default: OFF]
@@ -405,6 +434,7 @@ def helpMessage() {
       --max_multiqc_email_size [str]  Threshold size for MultiQC report to be attached in notification email. If file generated by pipeline exceeds the threshold, it will not be attached (Default: 25MB)
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
       --file_name_prefix [str]        Prefix for the output file names. If 'pggb', the file names will be very verbose and contain all parameters for each process. [default: --input]
+      --do_compression                Compress alignment (.paf), graph (.gfa, .og), and MSA (.maf) outputs [default: OFF]
 
     AWSBatch options:
       --awsqueue [str]                The AWSBatch JobQueue that needs to be set when running on AWSBatch
@@ -415,7 +445,7 @@ def helpMessage() {
 
 // Has the run name been specified by the user?
 // this has the bonus effect of catching both -name and --name
-// TODO INVOKE THIS AGAIN ONCE IT IS CLEAR HOW TO ADD A NAME TO THE RUN 
+// TODO INVOKE THIS AGAIN ONCE IT IS CLEAR HOW TO ADD A NAME TO THE RUN
 // TODO ERROR: You used a core Nextflow option with two hyphens: '--name'. Please resubmit with '-name'
 /*
 custom_runName = params.name
@@ -664,11 +694,11 @@ process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: params.publish_dir_mode
 
     input:
-    file output_docs from ch_output_docs
-    file images from ch_output_docs_images
+      file output_docs from ch_output_docs
+      file images from ch_output_docs_images
 
     output:
-    file 'results_description.html'
+      file 'results_description.html'
 
     script:
     """
