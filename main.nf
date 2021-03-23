@@ -191,6 +191,8 @@ process smoothxg {
 }
 
 process odgiBuild {
+  publishDir "${params.outdir}/odgi_build", mode: "${params.publish_dir_mode}"
+
   input:
     path(graph)
 
