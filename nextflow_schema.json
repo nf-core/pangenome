@@ -43,6 +43,12 @@
                     "default": true,
                     "hidden": true,
                     "fa_icon": "fas fa-file-csv"
+                },
+                "do_compression": {
+                    "type": "boolean",
+                    "default": false,
+                    "hidden": false,
+                    "fa_icon": "fas fa-file-csv"
                 }
             }
         },
