@@ -282,7 +282,7 @@ process odgiDraw {
   """
 }
 
-process gzipOutputFiles {
+process pigzOutputFiles {
   publishDir "${params.outdir}/compressed_outputs", mode: "${params.publish_dir_mode}"
 
   input:
