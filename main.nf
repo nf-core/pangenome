@@ -92,7 +92,7 @@ process edyeet {
     tuple val(f), path(fasta)
 
   output:
-  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
+    tuple val(f), path("${f}${alignment_prefix}.paf")
 
   """
   edyeet ${alignment_exclude_cmd} \
@@ -117,7 +117,7 @@ process wfmash {
     tuple val(f), path(fasta)
 
   output:
-    tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
+    tuple val(f), path("${f}${alignment_prefix}.paf")
 
   """
   wfmash ${alignment_exclude_cmd} \
@@ -138,7 +138,8 @@ process seqwish {
   publishDir "${params.outdir}/seqwish", mode: "${params.publish_dir_mode}"
 
   input:
-  tuple val(f), path(fasta), path(alignment)
+    tuple val(f), path(fasta)
+    tuple val(f), path(alignment)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
@@ -279,6 +280,26 @@ process odgiDraw {
   """
 }
 
+process gzipOutputFiles {
+  publishDir "${params.outdir}/odgi_draw", mode: "${params.publish_dir_mode}"
+
+  input:
+  tuple path(graph), path(layoutGraph)
+
+  output:
+  path("${layoutGraph}.draw_mqc.png")
+
+  """
+  odgi draw \
+    -i $graph \
+    -c $layoutGraph \
+    -p ${layoutGraph}.draw_mqc.png \
+    -C \
+    -w 50 \
+    -H 1000 -t ${task.cpus}
+  """
+}
+
 // TODO ONCE OUR CUSTOM MULTIQC VERSION IS IN A MULTIQC RELEASE, WE CAN CHANGE THIS
 process multiQC {
   publishDir "${params.outdir}", mode: "${params.publish_dir_mode}"
@@ -302,15 +323,15 @@ workflow {
   main:
     if (params.wfmash == false) {
       edyeet(fasta)
-      seqwish(edyeet.out)
+      seqwish(fasta, edyeet.out)
     } else {
       wfmash(fasta)
-      seqwish(wfmash.out)
+      seqwish(fasta, wfmash.out)
     }
     smoothxg(seqwish.out)
-    if (params.do_stats) { 
-      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten())) 
-      odgiStats(odgiBuild.out)  
+    if (params.do_stats) {
+      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten()))
+      odgiStats(odgiBuild.out)
     }
     else {
       odgiBuild(smoothxg.out.gfa_smooth)
@@ -395,7 +416,7 @@ def helpMessage() {
       --smoothxg_ratio_contain [n]    minimum short length / long length ratio to compare sequences for the containment
                                       metric in the clustering [default: 0]
       --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
-                                      [default: 1,4,6,2,26,1]                                         
+                                      [default: 1,4,6,2,26,1]
 
     Visualization options:
       --do_viz                        Generate 1D visualisations of the built graphs [default: OFF]
@@ -419,7 +440,7 @@ def helpMessage() {
 
 // Has the run name been specified by the user?
 // this has the bonus effect of catching both -name and --name
-// TODO INVOKE THIS AGAIN ONCE IT IS CLEAR HOW TO ADD A NAME TO THE RUN 
+// TODO INVOKE THIS AGAIN ONCE IT IS CLEAR HOW TO ADD A NAME TO THE RUN
 // TODO ERROR: You used a core Nextflow option with two hyphens: '--name'. Please resubmit with '-name'
 /*
 custom_runName = params.name
@@ -668,11 +689,11 @@ process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: params.publish_dir_mode
 
     input:
-    file output_docs from ch_output_docs
-    file images from ch_output_docs_images
+      file output_docs from ch_output_docs
+      file images from ch_output_docs_images
 
     output:
-    file 'results_description.html'
+      file 'results_description.html'
 
     script:
     """
