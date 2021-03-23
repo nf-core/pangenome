@@ -139,7 +139,7 @@ process seqwish {
 
   input:
     tuple val(f), path(fasta)
-    tuple val(f), path(alignment)
+    path(alignment)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
@@ -319,10 +319,10 @@ workflow {
   main:
     if (params.wfmash == false) {
       edyeet(fasta)
-      seqwish(fasta, edyeet.out)
+      seqwish(fasta, edyeet.out.collect{it[1]})
     } else {
       wfmash(fasta)
-      seqwish(fasta, wfmash.out)
+      seqwish(fasta, wfmash.out.collect{it[1]})
     }
     smoothxg(seqwish.out)
     if (params.do_stats) {
@@ -345,11 +345,10 @@ workflow {
 
     if (params.do_compression) {
         if (params.wfmash == false) {
-            gzipOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, edyeet.out.collect{it[1]}))
+            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, edyeet.out.collect{it[1]}))
         } else {
-            gzipOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
+            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
         }
-
     }
 
     multiQC(
