@@ -86,8 +86,10 @@ if (!params.file_name_prefix || params.file_name_prefix == "pggb") {
 }
 
 process edyeet {
+  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
+
   input:
-  tuple val(f), path(fasta)
+    tuple val(f), path(fasta)
 
   output:
   tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
@@ -104,16 +106,18 @@ process edyeet {
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${alignment_prefix}.paf 
+     >${f}${alignment_prefix}.paf
   """
 }
 
 process wfmash {
+  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
+
   input:
-  tuple val(f), path(fasta)
+    tuple val(f), path(fasta)
 
   output:
-  tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
+    tuple val(f), path(fasta), path("${f}${alignment_prefix}.paf")
 
   """
   wfmash ${alignment_exclude_cmd} \
@@ -126,7 +130,7 @@ process wfmash {
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${alignment_prefix}.paf 
+     >${f}${alignment_prefix}.paf
   """
 }
 
@@ -187,10 +191,10 @@ process smoothxg {
 
 process odgiBuild {
   input:
-  path(graph)
+    path(graph)
 
   output:
-  path("${graph}.og")
+    path("${graph}.og")
 
   """
   odgi build -g $graph -o ${graph}.og -P -t ${task.cpus}
@@ -200,11 +204,11 @@ process odgiBuild {
 process odgiStats {
   publishDir "${params.outdir}/odgi_stats", mode: "${params.publish_dir_mode}"
 
-  input: 
-  path(graph)
+  input:
+    path(graph)
 
   output:
-  path("${graph}.stats")
+    path("${graph}.stats")
 
   """
   odgi stats -i "${graph}" -S -s -d -l > "${graph}.stats" 2>&1
@@ -215,10 +219,10 @@ process odgiViz {
   publishDir "${params.outdir}/odgi_viz", mode: "${params.publish_dir_mode}"
 
   input:
-  path(graph)
+    path(graph)
 
   output:
-  path("${graph}.viz_mqc.png")
+    path("${graph}.viz_mqc.png")
 
   """
   odgi viz \
