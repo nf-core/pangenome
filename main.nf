@@ -190,6 +190,21 @@ process smoothxg {
     """
 }
 
+process removeConsensusPaths {
+    publishDir "${params.outdir}/smoothxg", mode: "${params.publish_dir_mode}"
+
+    input:
+        path(graph)
+
+    output:
+        path("${graph}.no_cons.gfa"), emit: gfa_smooth_no_cons
+
+    script:
+        """
+        grep "Consensus_" "$graph" -v > "${graph}.no_cons.gfa"
+        """
+}
+
 process odgiBuild {
   publishDir "${params.outdir}/odgi_build", mode: "${params.publish_dir_mode}"
 
@@ -227,12 +242,13 @@ process odgiViz {
   output:
     path("${graph}.viz_mqc.png")
 
-  """
-  odgi viz \
+  script:
+    """
+    odgi viz \
     -i $graph \
     -o ${graph}.viz_mqc.png \
     -x 1500 -y 500 -P 10
-  """
+    """
 }
 
 process odgiChop {
@@ -325,16 +341,20 @@ workflow {
       seqwish(fasta, wfmash.out.collect{it[1]})
     }
     smoothxg(seqwish.out)
+
+    removeConsensusPaths(smoothxg.out.gfa_smooth)
     if (params.do_stats) {
-      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten()))
-      odgiStats(odgiBuild.out)
+        odgiBuild(seqwish.out.collect{it[1]}.mix(removeConsensusPaths.out, smoothxg.out.consensus_smooth.flatten()))
+        odgiStats(odgiBuild.out)
     }
     else {
-      odgiBuild(smoothxg.out.gfa_smooth)
+        odgiBuild(seqwish.out.collect{it[1]}.mix(removeConsensusPaths.out, smoothxg.out.gfa_smooth))
     }
+
     odgiVizOut = Channel.empty()
+    removeConsensusPathsOut = Channel.empty()
     if (params.do_viz) {
-      odgiVizOut = odgiViz(odgiBuild.out.filter(~".*smooth.*"))
+        odgiVizOut = odgiViz(odgiBuild.out)
     }
     odgiDrawOut = Channel.empty()
     if (params.do_layout) {
