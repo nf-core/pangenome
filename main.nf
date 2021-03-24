@@ -231,7 +231,7 @@ process odgiViz {
   odgi viz \
     -i $graph \
     -o ${graph}.viz_mqc.png \
-    -x 1500 -y 500 -P 5
+    -x 1500 -y 500 -P 10
   """
 }
 
