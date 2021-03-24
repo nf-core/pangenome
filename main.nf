@@ -350,11 +350,17 @@ workflow {
             pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
         }
     }
+    pggeOut = Channel.empty()
+    if (params.do_pgge) {
+      include { PGGE } from './workflows/pgge'
+      PGGE(fasta, smoothxg.out.consensus_smooth.flatten())
+    }
 
     multiQC(
       odgiStats.out.collect().ifEmpty([]),
       odgiVizOut.collect().ifEmpty([]),
       odgiDrawOut.collect().ifEmpty([])
+      // pggeOut.collect().ifEmpty([]))
     )
 }
 
