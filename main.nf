@@ -293,8 +293,8 @@ process odgiDraw {
     -c $layoutGraph \
     -p ${layoutGraph}.draw_mqc.png \
     -C \
-    -w 50 \
-    -H 1000 -t ${task.cpus}
+    -w 20 \
+    -H 1500 -t ${task.cpus}
   """
 }
 
