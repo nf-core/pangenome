@@ -5,6 +5,7 @@ process graphAligner {
 
   input:
     path(fasta)
+    // TODO find out if this each will execute things in parallel, I FEAR NOT
     each path(graph)
 
   output:
