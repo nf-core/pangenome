@@ -1,4 +1,4 @@
-FROM nfcore/base:1.13.3
+FROM nfcore/base:1.14
 LABEL authors="Simon Heumos, Michael L Heuer" \
       description="Docker image containing all software requirements for the nf-core/pangenome pipeline"
 
