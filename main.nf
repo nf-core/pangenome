@@ -21,54 +21,22 @@ if (params.help){
 def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : ""
 def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : "-X"
 def alignment_split_cmd = params.alignment_no_splits ? "-N" : ""
-def aligner = params.wfmash ? "W" : "E"
-def edyeet_align_pct_id_display = params.wfmash ? "" : "a${params.edyeet_align_pct_id}-"
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
 def file_name_prefix_display = ""
 def alignment_prefix = ""
 def seqwish_prefix = ""
 def smoothxg_prefix = ""
+def n_haps = 0
+def consensus_params = "-V"
+
+// set up the prefixes for the output
 // default case
-if (!params.file_name_prefix) {
-  file_name_prefix_display = ".pggb"
-  alignment_prefix = "-${aligner}"
-  seqwish_prefix = ".seqwish"
-  smoothxg_prefix = ".smoothxg"
-} else if (params.file_name_prefix == "pggb") {
-  // fancy naming scheme
-  file_name_prefix_display = ".pggb"
-alignment_prefix = """-\
-${aligner}-\
-s${params.alignment_segment_length}-\
-l${params.alignment_block_length}-\
-p${params.alignment_map_pct_id}-\
-n${params.alignment_n_secondary}-\
-${edyeet_align_pct_id_display}\
-K${params.alignment_mash_kmer}\
-${alignment_merge_cmd}\
-${alignment_split_cmd}\
-${alignment_exclude_cmd}\
-"""
-seqwish_prefix = """${alignment_prefix}\
-.seqwish-\
-k${params.seqwish_min_match_length}-\
-B${params.seqwish_transclose_batch}\
-"""
-smoothxg_prefix = """${seqwish_prefix}\
-.smoothxg-\
-w${params.smoothxg_max_block_weight}-\
-j${params.smoothxg_max_path_jump}-\
-e${params.smoothxg_max_edge_jump}-\
-I${params.smoothxg_block_id_min}-\
-p${smoothxg_poa_params_display}-M-J0.7-K-G150\
-"""
-} else {
-  // take the given prefix
+if (params.file_name_prefix) {
   file_name_prefix_display= "${params.file_name_prefix}.pggb"
-  aligment_prefix = "-${aligner}"
-  seqwish_prefix = ".seqwish"
-  smoothxg_prefix = ".smoothxg"
 }
+aligment_prefix = "-wfmash"
+seqwish_prefix = ".seqwish"
+smoothxg_prefix = ".smoothxg"
 
 // TODO update, make_file_prefix
 def make_file_prefix = { f -> """\
@@ -79,35 +47,18 @@ def make_file_prefix_given = { f -> """\
 ${file_name_prefix_display}\
 """ }
 
-if (!params.file_name_prefix || params.file_name_prefix == "pggb") {
+if (!params.file_name_prefix) {
   fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
 } else {
   fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix_given(f), f) }
 }
 
-process edyeet {
-  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
+if (!params.num_haps) {
+  n_haps = params.alignment_n_mappings
+}
 
-  input:
-    tuple val(f), path(fasta)
-
-  output:
-    tuple val(f), path("${f}${alignment_prefix}.paf")
-
-  """
-  edyeet ${alignment_exclude_cmd} \
-     -s ${params.alignment_segment_length} \
-     -l ${params.alignment_block_length} \
-     ${alignment_merge_cmd} \
-     ${alignment_split_cmd} \
-     -p ${params.alignment_map_pct_id} \
-     -n ${params.alignment_n_secondary} \
-     -a ${params.edyeet_align_pct_id} \
-     -k ${params.alignment_mash_kmer} \
-     -t ${task.cpus} \
-     $fasta $fasta \
-     >${f}${alignment_prefix}.paf
-  """
+if (params.smoothxg_consensus_spec != false) {
+  consensus_params = "-C ""${smoothxg_prefix}"".cons,""${params.smoothxg_consensus_spec}"
 }
 
 process wfmash {
@@ -126,7 +77,7 @@ process wfmash {
      ${alignment_merge_cmd} \
      ${alignment_split_cmd} \
      -p ${params.alignment_map_pct_id} \
-     -n ${params.alignment_n_secondary} \
+     -n ${params.alignment_n_mappings} \
      -k ${params.alignment_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
@@ -157,6 +108,9 @@ process seqwish {
     """
 }
 
+smoothxg_w = params.smoothxg_poa_length * n_haps
+smoothxg_Y = params.smoothxg_pad_max_depth * n_haps
+
 process smoothxg {
   publishDir "${params.outdir}/smoothxg", mode: "${params.publish_dir_mode}"
 
@@ -165,45 +119,34 @@ process smoothxg {
 
   output:
     path("${f}${smoothxg_prefix}.gfa"), emit: gfa_smooth
-    path("${f}*.consensus*.gfa"), emit: consensus_smooth
-    path("${f}${smoothxg_prefix}.maf"), emit: maf_smooth
+    path("${f}*.consensus*.gfa"), optional: true, emit: consensus_smooth
+    path("${f}${smoothxg_prefix}.maf"), optional: true, emit: maf_smooth
 
   script:
     """
     smoothxg \
       -t ${task.cpus} \
+      -T ${task.cpus} \
       -g $graph \
-      -w ${params.smoothxg_max_block_weight} \
-      -M \
-      -J 0.7 \
+      -w ${smoothxg_w} \
       -K \
-      -G 150 \
+      -X 100 \
       -I ${params.smoothxg_block_id_min} \
-      -R ${params.smoothxg_ratio_contain} \
+      -R ${params.smoothxg_block_ratio_min} \
       -j ${params.smoothxg_max_path_jump} \
       -e ${params.smoothxg_max_edge_jump} \
-      -l ${params.smoothxg_max_poa_length} \
+      -l ${params.smoothxg_poa_length} \
       -p ${params.smoothxg_poa_params} \
-      -m ${f}${smoothxg_prefix}.maf \
-      -C ${f}${smoothxg_prefix}.consensus,${params.smoothxg_consensus_spec} \
+      -O ${params.smoothxg_poa_padding} \
+      -Y ${smoothxg_Y} \
+      -d 0 -D 0 \
+      -Q ${params.smoothxg_consensus_prefix} \
+      ${consensus_params} \
       -o ${f}${smoothxg_prefix}.gfa
     """
 }
 
-process removeConsensusPaths {
-    publishDir "${params.outdir}/smoothxg", mode: "${params.publish_dir_mode}"
-
-    input:
-        path(graph)
-
-    output:
-        path("${graph}.no_cons.gfa"), emit: gfa_smooth_no_cons
-
-    script:
-        """
-        grep "Consensus_" "$graph" -v > "${graph}.no_cons.gfa"
-        """
-}
+// TODO gfaffix
 
 process odgiBuild {
   publishDir "${params.outdir}/odgi_build", mode: "${params.publish_dir_mode}"
@@ -226,10 +169,10 @@ process odgiStats {
     path(graph)
 
   output:
-    path("${graph}.stats")
+    path("${graph}.stats.yaml")
 
   """
-  odgi stats -i "${graph}" -S -s -d -l > "${graph}.stats" 2>&1
+  odgi stats -i "${graph}" -m > "${graph}.stats.yaml" 2>&1
   """
 }
 
@@ -298,6 +241,8 @@ process odgiDraw {
   """
 }
 
+// TODO vg deconstruct
+
 process pigzOutputFiles {
   publishDir "${params.outdir}/compressed_outputs", mode: "${params.publish_dir_mode}"
 
@@ -333,42 +278,31 @@ process multiQC {
 
 workflow {
   main:
-    if (params.wfmash == false) {
-      edyeet(fasta)
-      seqwish(fasta, edyeet.out.collect{it[1]})
-    } else {
-      wfmash(fasta)
-      seqwish(fasta, wfmash.out.collect{it[1]})
-    }
+
+    wfmash(fasta)
+    seqwish(fasta, wfmash.out.collect{it[1]})
     smoothxg(seqwish.out)
 
-    removeConsensusPaths(smoothxg.out.gfa_smooth)
     if (params.do_stats) {
-        odgiBuild(seqwish.out.collect{it[1]}.mix(removeConsensusPaths.out, smoothxg.out.consensus_smooth.flatten()))
+        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), smoothxg.out.gfa_smooth))
         odgiStats(odgiBuild.out)
     }
     else {
-        odgiBuild(seqwish.out.collect{it[1]}.mix(removeConsensusPaths.out, smoothxg.out.gfa_smooth))
+        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth))
     }
 
     odgiVizOut = Channel.empty()
-    removeConsensusPathsOut = Channel.empty()
     if (params.do_viz) {
         odgiVizOut = odgiViz(odgiBuild.out)
     }
     odgiDrawOut = Channel.empty()
     if (params.do_layout) {
-      odgiChop(odgiBuild.out.filter(~".*smooth.*"))
-      odgiLayout(odgiChop.out)
+      odgiLayout(smoothxg.out.gfa_smooth)
       odgiDrawOut = odgiDraw(odgiLayout.out)
     }
 
     if (params.do_compression) {
-        if (params.wfmash == false) {
-            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, edyeet.out.collect{it[1]}))
-        } else {
-            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
-        }
+      pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
     }
 
     multiQC(
@@ -408,8 +342,7 @@ def helpMessage() {
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
     Alignment options:
-      --edyeet_align_pct_id [n]       percent identity in the edyeet edlib alignment step [default: 90]
-      --alignment_map_pct_id [n]      percent identity in the wfmash or edyeet mashmap step [default: 90]
+      --alignment_map_pct_id [n]      percent identity in the wfmash mashmap step [default: 90]
       --alignment_n_secondary [n]     number of secondary mappings to retain in 'map' filter mode [default: 10]
       --alignment_segment_length [n]  segment length for mapping [default: 10000]
       --alignment_block_length [n]    minimum block length filter for mapping [default: 3*alignment_segment_length]
