@@ -108,8 +108,8 @@ process seqwish {
     """
 }
 
-smoothxg_w = params.smoothxg_poa_length * n_haps
-smoothxg_Y = params.smoothxg_pad_max_depth * n_haps
+smoothxg_w = params.smoothxg_poa_length * n_haps // FIXME
+smoothxg_Y = params.smoothxg_pad_max_depth * n_haps // FIXME
 
 process smoothxg {
   publishDir "${params.outdir}/smoothxg", mode: "${params.publish_dir_mode}"
@@ -128,7 +128,7 @@ process smoothxg {
       -t ${task.cpus} \
       -T ${task.cpus} \
       -g $graph \
-      -w ${smoothxg_w} \
+      -w \$(echo "${params.smoothxg_poa_length} * ${n_haps}" | bc) \
       -K \
       -X 100 \
       -I ${params.smoothxg_block_id_min} \
@@ -138,7 +138,7 @@ process smoothxg {
       -l ${params.smoothxg_poa_length} \
       -p ${params.smoothxg_poa_params} \
       -O ${params.smoothxg_poa_padding} \
-      -Y ${smoothxg_Y} \
+      -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
       -d 0 -D 0 \
       -Q ${params.smoothxg_consensus_prefix} \
       ${consensus_params} \
