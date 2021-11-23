@@ -160,8 +160,8 @@ process gfaffix {
 
   """
   gfaffix $graph -o ${graph}.norm.gfa | gzip > ${graph}.norm.affixes.tsv.gz 
-  odgi build -g ${graph}.norm.gfa -o ${graph}.norm.gfa.og -P -t ${task.cpus} -O
-  odgi sort -i ${graph}.norm.gfa.og -o ${graph}.norm.og -t ${task.cpus} -p Ygs 
+  odgi build -g ${graph}.norm.gfa -o ${graph}.norm.gfa.og -P -t ${task.cpus} -O -o - \
+  | odgi sort -i - -o ${graph}.norm.og -t ${task.cpus} -p Ygs 
   odgi view -i ${graph}.norm.og -g > ${graph}.norm.gfa
   """
 }
@@ -259,8 +259,27 @@ process odgiDraw {
   """
 }
 
-// TODO vg deconstruct
+process vg_deconstruct {
+  publishDir "${params.outdir}/vg_deconstruct", mode: "${params.publish_dir_mode}"
 
+  input:
+  path(graph)
+
+  output:
+  path("${graph}.*.vcf")
+
+  """
+  for s in \$(echo "${params.vcf_spec}" | tr ',' ' ');
+  do
+    ref=\$(echo "\$s" | cut -f 1 -d:)
+    delim=\$(echo "\$s" | cut -f 2 -d:)
+    vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
+    vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
+  done
+  """
+}
+
+// not sure we want such a process
 process pigzOutputFiles {
   publishDir "${params.outdir}/compressed_outputs", mode: "${params.publish_dir_mode}"
 
@@ -320,8 +339,13 @@ workflow {
       odgiDrawOut = odgiDraw(odgiLayout.out)
     }
 
+    // do we really want this?
     if (params.do_compression) {
       pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
+    }
+
+    if (params.vcf_spec != false) {
+      vg_deconstruct(gfaffix.out.gfa_norm)
     }
 
     multiQC(
