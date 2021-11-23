@@ -147,6 +147,24 @@ process smoothxg {
 }
 
 // TODO gfaffix
+process gfaffix {
+  publishDir "${params.outdir}/gfaffix", mode: "${params.publish_dir_mode}"
+
+  input:
+    path(graph)
+
+  output:
+    path("${graph}.norm.og"), emit: og_norm
+    path("${graph}.norm.gfa"), emit: gfa_norm
+    path("${graph}.norm.affixes.tsv.gz"), emit: tsv_norm
+
+  """
+  gfaffix $graph -o ${graph}.norm.gfa | gzip > ${graph}.norm.affixes.tsv.gz 
+  odgi build -g ${graph}.norm.gfa -o ${graph}.norm.gfa.og -P -t ${task.cpus} -O
+  odgi sort -i ${graph}.norm.gfa.og -o ${graph}.norm.og -t ${task.cpus} -p Ygs 
+  odgi view -i ${graph}.norm.og -g > ${graph}.norm.gfa
+  """
+}
 
 process odgiBuild {
   publishDir "${params.outdir}/odgi_build", mode: "${params.publish_dir_mode}"
@@ -282,13 +300,14 @@ workflow {
     wfmash(fasta)
     seqwish(fasta, wfmash.out.collect{it[1]})
     smoothxg(seqwish.out)
+    gfaffix(smoothxg.out.gfa_smooth)
 
     if (params.do_stats) {
-        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), smoothxg.out.gfa_smooth))
+        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), gfaffix.out.gfa_norm))
         odgiStats(odgiBuild.out)
     }
     else {
-        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth))
+        odgiBuild(seqwish.out.collect{it[1]}.mix(gfaffix.out.gfa_norm))
     }
 
     odgiVizOut = Channel.empty()
