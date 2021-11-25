@@ -20,11 +20,6 @@
                     "description": "Input FASTA file.",
                     "help_text": "Use this to specify the location of your input FASTA file. For example:\n\n```bash\n--input 'path/to/data/input.fa.gz'\n```\n\n."
                 },
-                "file_name_prefix": {
-                    "type": "string",
-                    "description": "Prefix for the output file names. If 'pggb', the file names will be very verbose and contain all parameters for each process.",
-                    "fa_icon": "fab fa-autoprefixer"
-                },
                 "outdir": {
                     "type": "string",
                     "description": "The output directory where the results will be saved.",
@@ -37,78 +32,58 @@
                     "fa_icon": "fas fa-envelope",
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
-                },
-                "do_compression": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-file-archive",
-                    "description": "Compress output files."
-                },
-                "do_stats": {
-                    "type": "boolean",
-                    "default": true,
-                    "hidden": true,
-                    "fa_icon": "fas fa-file-csv",
-                    "description": "Perform statistics evaluation."
                 }
             }
         },
-        "alignment_options": {
-            "title": "Alignment options",
+        "wfmash_options": {
+            "title": "Wfmash options",
             "type": "object",
-            "fa_icon": "fas fa-dna",
+            "fa_icon": "fas fa-align-center",
             "description": "Options for the all versus all alignment phase.",
             "properties": {
-                "wfmash": {
-                    "type": "boolean",
-                    "description": "Use wfmash instead of edyeet for the alignment phase.",
-                    "fa_icon": "fas fa-ban"
-                },
-                "edyeet_align_pct_id": {
-                    "type": "number",
+                "wfmash_map_pct_id": {
+                    "type": "integer",
                     "default": 90,
-                    "description": "Percent identity in the edyeet edlib alignment step.",
-                    "fa_icon": "fas fa-percentage"
+                    "description": "percent identity in the wfmash mashmap step",
+                    "fa_icon": "fas fa-align-center"
                 },
-                "alignment_map_pct_id": {
-                    "type": "number",
-                    "default": 90,
-                    "description": "Percent identity in the wfmash or edyeet mashmap.",
-                    "fa_icon": "fas fa-percentage"
-                },
-                "alignment_n_secondary": {
+                "wfmash_n_mappings": {
                     "type": "integer",
                     "default": 10,
-                    "description": "Number of secondary mappings to retain in 'map' filter mode."
+                    "description": "number of secondary mappings to retain in 'map' filter mode",
+                    "fa_icon": "fas fa-align-center"
                 },
-                "alignment_segment_length": {
+                "wfmash_segment_length": {
                     "type": "integer",
-                    "default": 10000,
-                    "description": "Segment length for mapping."
+                    "default": 3000,
+                    "description": "segment length for mapping",
+                    "fa_icon": "fas fa-align-center"
                 },
-                "alignment_block_length": {
+                "wfmash_block_length": {
                     "type": "integer",
-                    "default": 30000,
-                    "description": "Minimum block length filter for mapping."
+                    "description": "minimum block length filter for mapping",
+                    "fa_icon": "fas fa-align-center"
                 },
-                "alignment_mash_kmer": {
+                "wfmash_mash_kmer": {
                     "type": "integer",
                     "default": 16,
-                    "description": "Kmer size for mashmap."
+                    "description": "kmer size for mashmap",
+                    "fa_icon": "fas fa-align-center"
                 },
-                "alignment_merge_segments": {
+                "wfmash_merge_segments": {
                     "type": "boolean",
-                    "description": "Merge successive mappings.",
-                    "fa_icon": "fas fa-ban"
+                    "description": "merge successive mappings",
+                    "fa_icon": "fas fa-align-center"
                 },
-                "alignment_no_splits": {
+                "wfmash_no_splits": {
                     "type": "boolean",
-                    "description": "Disable splitting of input sequences during mapping.",
-                    "fa_icon": "fas fa-ban"
+                    "description": "disable splitting of input sequences during mapping",
+                    "fa_icon": "fas fa-align-center"
                 },
-                "alignment_exclude_delim": {
-                    "type": "boolean",
-                    "description": "Skip mappings between sequences with the same name prefix before the given delimiter character. [DEFAULT: all-vs-all and !self].",
-                    "fa_icon": "fas fa-ban"
+                "wfmash_exclude_delim": {
+                    "type": "string",
+                    "description": "skip mappings between sequences with the same name prefix before the given delimiter character",
+                    "fa_icon": "fas fa-align-center"
                 }
             }
         },
@@ -121,15 +96,17 @@
                 "seqwish_min_match_length": {
                     "type": "integer",
                     "default": 19,
-                    "description": "Ignore exact matches below this length."
+                    "description": "Ignore exact matches below this length.",
+                    "fa_icon": "fas fa-project-diagram"
                 },
                 "seqwish_transclose_batch": {
                     "type": "integer",
                     "default": 1000000,
-                    "description": "Number of bp to use for transitive closure batch."
+                    "description": "Number of bp to use for transitive closure batch.",
+                    "fa_icon": "fas fa-project-diagram"
                 }
             },
-            "fa_icon": "fas fa-dna"
+            "fa_icon": "fas fa-project-diagram"
         },
         "smoothxg_options": {
             "title": "Smoothxg options",
@@ -137,69 +114,95 @@
             "description": "Options for graph smoothing phase.",
             "default": "",
             "properties": {
-                "smoothxg_max_block_weight": {
-                    "type": "integer",
-                    "default": 10000,
-                    "description": "Maximum seed sequence in block."
+                "smoothxg_num_haps": {
+                    "type": "string",
+                    "default": "wfmash_n_mappings",
+                    "description": "number of haplotypes in the given FASTA"
                 },
                 "smoothxg_max_path_jump": {
                     "type": "integer",
-                    "default": 5000,
+                    "default": 0,
                     "description": "Maximum path jump to include in block."
                 },
                 "smoothxg_max_edge_jump": {
                     "type": "integer",
-                    "default": 5000,
+                    "default": 0,
                     "description": "Maximum edge jump before breaking."
                 },
-                "smoothxg_max_poa_length": {
-                    "type": "integer",
-                    "default": 10000,
-                    "description": "Maximum sequence length to put into POA."
+                "smoothxg_poa_length": {
+                    "type": "string",
+                    "default": "4001,4507",
+                    "description": "maximum sequence length to put into POA, can be a comma-separated list; for each element smoothxg will be executed once"
                 },
                 "smoothxg_consensus_spec": {
                     "type": "string",
-                    "default": "10,100,1000,10000",
                     "description": "Consensus graph specification: write the consensus graph to BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter (which defines the length of divergences from consensus paths to preserve in the output), optionally a file containing reference paths to preserve in the output, a flag (y/n) indicating whether we should also use the POA consensus paths, a minimum coverage of consensus paths to retain (min_cov), and a maximum allele length (max_len, defaults to 1e6); implies -a; example: cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000.",
                     "fa_icon": "fab fa-superpowers"
+                },
+                "smoothxg_consensus_prefix": {
+                    "type": "string",
+                    "default": "Consensus_",
+                    "description": "use this prefix for consensus path names"
+                },
+                "smoothxg_block_ratio_min": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "minimum small / large length ratio to cluster in a block"
                 },
                 "smoothxg_block_id_min": {
                     "type": "number",
                     "description": "Split blocks into groups connected by this identity threshold.",
-                    "fa_icon": "fas fa-percentage"
+                    "fa_icon": "fas fa-percentage",
+                    "default": 0.95
                 },
-                "smoothxg_ratio_contain": {
+                "smoothxg_pad_max_depth": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "path depth at which we don't pad the POA problem"
+                },
+                "smoothxg_poa_padding": {
                     "type": "number",
-                    "description": "Minimum short length / long length ratio to compare sequences for the containment metric in the clustering.",
-                    "fa_icon": "fas fa-percentage"
+                    "default": 0.03,
+                    "description": "pad each end of each sequence in POA with N*(longest_poas_seq) bp"
                 },
                 "smoothxg_poa_params": {
                     "type": "string",
-                    "default": "1,4,6,2,26,1",
+                    "default": "1,9,16,2,41,1",
                     "description": "Score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2.",
                     "fa_icon": "fab fa-superpowers"
+                },
+                "smoothxg_write_maf": {
+                    "type": "boolean",
+                    "description": "write MAF output representing merged POA blocks"
                 }
             },
             "fa_icon": "fas fa-project-diagram"
+        },
+        "vcf_options": {
+            "title": "VCF options",
+            "type": "object",
+            "description": "Optios for vg deconstruct.",
+            "default": "",
+            "properties": {
+                "vcf_spec": {
+                    "type": "string",
+                    "description": "specify a set of VCFs to produce with SPEC = REF:DELIM[,REF:DELIM]* the paths matching ^REF are used as a reference, while the sample haplotypes are derived from path names, e.g. when DELIM=# and with '-V chm13:#', a path named HG002#1#ctg would be assigned to sample HG002 phase 1"
+                }
+            }
         },
         "visualization_options": {
             "title": "Visualization options",
             "type": "object",
             "description": "Do we want diagnostic visualizations of the built graphs?",
             "default": "",
+            "fa_icon": "fas fa-project-diagram",
             "properties": {
-                "do_viz": {
-                    "type": "boolean",
-                    "description": "Generate 1D visualisations of the built graphs.",
-                    "fa_icon": "fas fa-ban"
-                },
-                "do_layout": {
-                    "type": "boolean",
-                    "description": "Generate 2D visualisations of the built graphs.",
-                    "fa_icon": "fas fa-ban"
+                "viz": {
+                    "type": "string",
+                    "description": "Generate 1D and 2D visualisations of the built graphs",
+                    "fa_icon": "fas fa-project-diagram"
                 }
-            },
-            "fa_icon": "fas fa-project-diagram"
+            }
         },
         "generic_options": {
             "title": "Generic options",
@@ -379,13 +382,16 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/alignment_options"
+            "$ref": "#/definitions/wfmash_options"
         },
         {
             "$ref": "#/definitions/seqwish_options"
         },
         {
             "$ref": "#/definitions/smoothxg_options"
+        },
+        {
+            "$ref": "#/definitions/vcf_options"
         },
         {
             "$ref": "#/definitions/visualization_options"

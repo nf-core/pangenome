@@ -389,14 +389,14 @@ def helpMessage() {
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
     Wfmash options:
-      --wfmash_map_pct_id [n]      percent identity in the wfmash mashmap step [default: 90]
-      --wfmash_n_mappings [n]      number of secondary mappings to retain in 'map' filter mode [default: 10]
-      --wfmash_segment_length [n]  segment length for mapping [default: 3000]
-      --wfmash_block_length [n]    minimum block length filter for mapping [default: 3 * wfmash_segment_length]
-      --wfmash_mash_kmer [n]       kmer size for mashmap [default: 16]
-      --wfmash_merge_segments      merge successive mappings [default: OFF]
-      --wfmash_no_splits           disable splitting of input sequences during mapping [default: OFF]
-      --wfmash_exclude--delim [c]  skip mappings between sequences with the same name prefix before
+      --wfmash_map_pct_id [n]         percent identity in the wfmash mashmap step [default: 90]
+      --wfmash_n_mappings [n]         number of secondary mappings to retain in 'map' filter mode [default: 10]
+      --wfmash_segment_length [n]     segment length for mapping [default: 3000]
+      --wfmash_block_length [n]       minimum block length filter for mapping [default: 3 * wfmash_segment_length]
+      --wfmash_mash_kmer [n]          kmer size for mashmap [default: 16]
+      --wfmash_merge_segments         merge successive mappings [default: OFF]
+      --wfmash_no_splits              disable splitting of input sequences during mapping [default: OFF]
+      --wfmash_exclude--delim [c]     skip mappings between sequences with the same name prefix before
                                       the given delimiter character [default: all-vs-all and !self]
     Seqwish options:
       --seqwish_min_match_length [n]  ignore exact matches below this length [default: 47]
@@ -426,9 +426,14 @@ def helpMessage() {
                                       [default: 1,9,16,2,41,1]
       --smoothxg_write_maf [n]        write MAF output representing merged POA blocks [default: OFF]
 
-
     Visualization options:
       --viz                           Generate 1D and 2D visualisations of the built graphs [default: OFF]
+
+    VCF options:
+      --vcf_spec                      specify a set of VCFs to produce with SPEC = REF:DELIM[,REF:DELIM]*
+                                      the paths matching ^REF are used as a reference, while the sample haplotypes
+                                      are derived from path names, e.g. when DELIM=# and with '-V chm13:#',
+                                      a path named HG002#1#ctg would be assigned to sample HG002 phase 1 [default: OFF]
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved [default: ./results]
