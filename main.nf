@@ -18,11 +18,11 @@ if (params.help){
 }
 
 // We can't change global parameters inside this scope, so we build the ones we need locally
-def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : ""
-def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : "-X"
-def alignment_split_cmd = params.alignment_no_splits ? "-N" : ""
+def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
+def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
+def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
-def alignment_prefix = "wfmash"
+def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
 def n_haps = 0
@@ -42,7 +42,7 @@ ${f.getName()}\
 fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
 
 if (!params.smoothxg_num_haps) {
-  n_haps = params.alignment_n_mappings
+  n_haps = params.wfmash_n_mappings
 }
 
 if (params.smoothxg_consensus_spec != false) {
@@ -58,20 +58,20 @@ process wfmash {
     tuple val(f), path(fasta)
 
   output:
-    tuple val(f), path("${f}${alignment_prefix}.paf")
+    tuple val(f), path("${f}${wfmash_prefix}.paf")
 
   """
-  wfmash ${alignment_exclude_cmd} \
-     -s ${params.alignment_segment_length} \
-     -l ${params.alignment_block_length} \
-     ${alignment_merge_cmd} \
-     ${alignment_split_cmd} \
-     -p ${params.alignment_map_pct_id} \
-     -n ${params.alignment_n_mappings} \
-     -k ${params.alignment_mash_kmer} \
+  wfmash ${wfmash_exclude_cmd} \
+     -s ${params.wfmash_segment_length} \
+     -l ${params.wfmash_block_length} \
+     ${wfmash_merge_cmd} \
+     ${wfmash_split_cmd} \
+     -p ${params.wfmash_map_pct_id} \
+     -n ${params.wfmash_n_mappings} \
+     -k ${params.wfmash_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${alignment_prefix}.paf
+     >${f}${wfmash_prefix}.paf
   """
 }
 
@@ -80,7 +80,7 @@ process seqwish {
 
   input:
     tuple val(f), path(fasta)
-    path(alignment)
+    path(wfmash)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
@@ -90,7 +90,7 @@ process seqwish {
     seqwish \
       -t ${task.cpus} \
       -s $fasta \
-      -p $alignment \
+      -p $wfmash \
       -k ${params.seqwish_min_match_length} \
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
@@ -389,21 +389,21 @@ def helpMessage() {
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
     Wfmash options:
-      --alignment_map_pct_id [n]      percent identity in the wfmash mashmap step [default: 90]
-      --alignment_n_mappings [n]      number of secondary mappings to retain in 'map' filter mode [default: 10]
-      --alignment_segment_length [n]  segment length for mapping [default: 3000]
-      --alignment_block_length [n]    minimum block length filter for mapping [default: 3 * alignment_segment_length]
-      --alignment_mash_kmer [n]       kmer size for mashmap [default: 16]
-      --alignment_merge_segments      merge successive mappings [default: OFF]
-      --alignment_no_splits           disable splitting of input sequences during mapping [default: OFF]
-      --alignment_exclude--delim [c]  skip mappings between sequences with the same name prefix before
+      --wfmash_map_pct_id [n]      percent identity in the wfmash mashmap step [default: 90]
+      --wfmash_n_mappings [n]      number of secondary mappings to retain in 'map' filter mode [default: 10]
+      --wfmash_segment_length [n]  segment length for mapping [default: 3000]
+      --wfmash_block_length [n]    minimum block length filter for mapping [default: 3 * wfmash_segment_length]
+      --wfmash_mash_kmer [n]       kmer size for mashmap [default: 16]
+      --wfmash_merge_segments      merge successive mappings [default: OFF]
+      --wfmash_no_splits           disable splitting of input sequences during mapping [default: OFF]
+      --wfmash_exclude--delim [c]  skip mappings between sequences with the same name prefix before
                                       the given delimiter character [default: all-vs-all and !self]
     Seqwish options:
       --seqwish_min_match_length [n]  ignore exact matches below this length [default: 47]
       --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 10000000]
 
     Smoothxg options:
-      --smoothxg_num_haps [n]         number of haplotypes in the given FASTA [default: alignment_n_mappings]
+      --smoothxg_num_haps [n]         number of haplotypes in the given FASTA [default: wfmash_n_mappings]
       --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 0]
       --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 0]
       --smoothxg_max_poa_length [n]   maximum sequence length to put into POA, can be a comma-separated list; 
@@ -437,7 +437,7 @@ def helpMessage() {
       --email_on_fail [email]         Same as --email, except only send mail if the workflow is not successful
       --max_multiqc_email_size [str]  Threshold size for MultiQC report to be attached in notification email. If file generated by pipeline exceeds the threshold, it will not be attached (Default: 25MB)
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
-      --do_compression                Compress alignment (.paf), graph (.gfa, .og), and MSA (.maf) outputs [default: OFF]
+      --do_compression                Compress wfmash (.paf), graph (.gfa, .og), and MSA (.maf) outputs [default: OFF]
 
     AWSBatch options:
       --awsqueue [str]                The AWSBatch JobQueue that needs to be set when running on AWSBatch
