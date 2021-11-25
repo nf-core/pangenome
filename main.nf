@@ -28,6 +28,13 @@ def seqwish_prefix = ""
 def smoothxg_prefix = ""
 def n_haps = 0
 def consensus_params = "-V"
+def do_1d = false
+def do_2d = false
+
+if (params.viz) {
+  do_1d = true
+  do_2d = true
+}
 
 // set up the prefixes for the output
 // default case
@@ -182,7 +189,6 @@ process smoothxg {
     """
 }
 
-// TODO gfaffix
 process gfaffix {
   publishDir "${params.outdir}/gfaffix", mode: "${params.publish_dir_mode}"
 
@@ -237,14 +243,14 @@ process odgiViz {
     path(graph)
 
   output:
-    path("${graph}.viz_mqc.png")
+    path("${graph}.viz*_mqc.png")
 
   script:
     """
-    odgi viz \
-    -i $graph \
-    -o ${graph}.viz_mqc.png \
-    -x 1500 -y 500 -P 10
+    odgi viz -i $graph -o ${graph}.viz__mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix}
+    odgi viz -i $graph -o ${graph}.viz_pos_mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -u -d
+    odgi viz -i $graph -o ${graph}.viz_depth_mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -m
+    odgi viz -i $graph -o ${graph}.viz_inv_mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -z
     """
 }
 
@@ -295,6 +301,7 @@ process odgiDraw {
   """
 }
 
+// TODO we can parallelize this for each reference given in ${params.vcf_spec}
 process vg_deconstruct {
   publishDir "${params.outdir}/vg_deconstruct", mode: "${params.publish_dir_mode}"
 
@@ -345,7 +352,7 @@ process multiQC {
   path "*_plots"             , optional:true, emit: plots
 
   """
-  multiqc -s .
+  multiqc -s . 
   """
 }
 
@@ -366,11 +373,11 @@ workflow {
     }
 
     odgiVizOut = Channel.empty()
-    if (params.do_viz) {
-        odgiVizOut = odgiViz(odgiBuild.out)
+    if (do_1d) {
+        odgiVizOut = odgiViz(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
     }
     odgiDrawOut = Channel.empty()
-    if (params.do_layout) {
+    if (do_2d) {
       odgiLayout(smoothxg.out.gfa_smooth)
       odgiDrawOut = odgiDraw(odgiLayout.out)
     }
