@@ -59,6 +59,14 @@ if (!params.num_haps) {
 
 if (params.smoothxg_consensus_spec != false) {
   consensus_params = "-C ""${smoothxg_prefix}"".cons,""${params.smoothxg_consensus_spec}"
+} else {
+  consensus_params = "-V"
+}
+
+// FIXME we need to pack this into smoothxg itself
+maf_params = ""
+if (params.smoothxg_write_maf != false) {
+  maf_params = "-m ${smoothxg_prefix}.maf"
 }
 
 process wfmash {
@@ -108,9 +116,6 @@ process seqwish {
     """
 }
 
-smoothxg_w = params.smoothxg_poa_length * n_haps // FIXME
-smoothxg_Y = params.smoothxg_pad_max_depth * n_haps // FIXME
-
 process smoothxg {
   publishDir "${params.outdir}/smoothxg", mode: "${params.publish_dir_mode}"
 
@@ -120,29 +125,66 @@ process smoothxg {
   output:
     path("${f}${smoothxg_prefix}.gfa"), emit: gfa_smooth
     path("${f}*.consensus*.gfa"), optional: true, emit: consensus_smooth
-    path("${f}${smoothxg_prefix}.maf"), optional: true, emit: maf_smooth
+    path("${smoothxg_prefix}.maf"), optional: true, emit: maf_smooth
 
   script:
     """
-    smoothxg \
-      -t ${task.cpus} \
-      -T ${task.cpus} \
-      -g $graph \
-      -w \$(echo "${params.smoothxg_poa_length} * ${n_haps}" | bc) \
-      -K \
-      -X 100 \
-      -I ${params.smoothxg_block_id_min} \
-      -R ${params.smoothxg_block_ratio_min} \
-      -j ${params.smoothxg_max_path_jump} \
-      -e ${params.smoothxg_max_edge_jump} \
-      -l ${params.smoothxg_poa_length} \
-      -p ${params.smoothxg_poa_params} \
-      -O ${params.smoothxg_poa_padding} \
-      -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
-      -d 0 -D 0 \
-      -Q ${params.smoothxg_consensus_prefix} \
-      ${consensus_params} \
-      -o ${f}${smoothxg_prefix}.gfa
+    smooth_iterations=\$(echo ${params.smoothxg_poa_length} | tr ',' '\\\n' | wc -l)
+    echo \$smooth_iterations > smooth_iterations
+    for i in \$(seq 1 \$smooth_iterations);
+    do
+      input_gfa=${graph}
+      if [[ \$i != 1 ]]; then
+        input_gfa=smooth.\$(echo \$i - 1 | bc).gfa 
+      fi
+      if [[ \$i != \$smooth_iterations ]]; then
+        poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
+        echo \$poa_length > poa_length_\$i
+        echo "\$poa_length * ${n_haps}" | bc > block_weight_\$i
+        smoothxg \
+          -t ${task.cpus} \
+          -T ${task.cpus} \
+          -g \$input_gfa \
+          -w \$(echo "\$poa_length * ${n_haps}" | bc) \
+          -K \
+          -X 100 \
+          -I ${params.smoothxg_block_id_min} \
+          -R ${params.smoothxg_block_ratio_min} \
+          -j ${params.smoothxg_max_path_jump} \
+          -e ${params.smoothxg_max_edge_jump} \
+          -l \$poa_length \
+          -p ${params.smoothxg_poa_params} \
+          -O ${params.smoothxg_poa_padding} \
+          -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
+          -d 0 -D 0 \
+          -V \
+          -o smooth.\$i.gfa
+      else
+        poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
+        echo \$poa_length > poa_length
+        echo "\$poa_length * ${n_haps}" | bc > block_weight
+        smoothxg \
+          -t ${task.cpus} \
+          -T ${task.cpus} \
+          -g \$input_gfa \
+          -w \$(echo "\$poa_length * ${n_haps}" | bc) \
+          -K \
+          -X 100 \
+          -I ${params.smoothxg_block_id_min} \
+          -R ${params.smoothxg_block_ratio_min} \
+          -j ${params.smoothxg_max_path_jump} \
+          -e ${params.smoothxg_max_edge_jump} \
+          -l \$poa_length \
+          -p ${params.smoothxg_poa_params} \
+          -O ${params.smoothxg_poa_padding} \
+          -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
+          -d 0 -D 0 \
+          ${maf_params} \
+          -Q ${params.smoothxg_consensus_prefix} \
+          ${consensus_params} \
+          -o ${f}${smoothxg_prefix}.gfa
+      fi
+    done  
     """
 }
 
