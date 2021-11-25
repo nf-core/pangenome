@@ -41,7 +41,7 @@ ${f.getName()}\
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
 
-if (!params.num_haps) {
+if (!params.smoothxg_num_haps) {
   n_haps = params.alignment_n_mappings
 }
 
@@ -269,20 +269,20 @@ process odgiDraw {
   tuple path(graph), path(layoutGraph)
 
   output:
-  path("${layoutGraph}.draw_mqc.png")
+  path("${graph}._mqc.png")
 
   """
   odgi draw \
     -i $graph \
     -c $layoutGraph \
-    -p ${layoutGraph}.draw_mqc.png \
+    -p ${graph}._mqc.png \
     -C \
     -w 20 \
     -H 1000 -t ${task.cpus}
   odgi draw \
     -i $graph \
     -c $layoutGraph \
-    -p ${layoutGraph}.draw.png \
+    -p ${graph}.draw.png \
     -H 100 -t ${task.cpus}
   """
 }
@@ -305,21 +305,6 @@ process vg_deconstruct {
     vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
     vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
   done
-  """
-}
-
-// not sure we want such a process
-process pigzOutputFiles {
-  publishDir "${params.outdir}/compressed_outputs", mode: "${params.publish_dir_mode}"
-
-  input:
-    path(graph)
-
-  output:
-    path("${graph}.gz")
-
-  """
-  pigz -q -p ${task.cpus} $graph -f -k
   """
 }
 
@@ -359,7 +344,7 @@ workflow {
     }
     odgiDrawOut = Channel.empty()
     if (do_2d) {
-      odgiLayout(smoothxg.out.gfa_smooth)
+      odgiLayout(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
       odgiDrawOut = odgiDraw(odgiLayout.out)
     }
 
@@ -403,25 +388,26 @@ def helpMessage() {
       --input [file]                  Path to input FASTA (must be surrounded with quotes)
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
-    Alignment options:
+    Wfmash options:
       --alignment_map_pct_id [n]      percent identity in the wfmash mashmap step [default: 90]
-      --alignment_n_secondary [n]     number of secondary mappings to retain in 'map' filter mode [default: 10]
-      --alignment_segment_length [n]  segment length for mapping [default: 10000]
-      --alignment_block_length [n]    minimum block length filter for mapping [default: 3*alignment_segment_length]
+      --alignment_n_mappings [n]      number of secondary mappings to retain in 'map' filter mode [default: 10]
+      --alignment_segment_length [n]  segment length for mapping [default: 3000]
+      --alignment_block_length [n]    minimum block length filter for mapping [default: 3 * alignment_segment_length]
       --alignment_mash_kmer [n]       kmer size for mashmap [default: 16]
       --alignment_merge_segments      merge successive mappings [default: OFF]
       --alignment_no_splits           disable splitting of input sequences during mapping [default: OFF]
       --alignment_exclude--delim [c]  skip mappings between sequences with the same name prefix before
                                       the given delimiter character [default: all-vs-all and !self]
     Seqwish options:
-      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 19]
-      --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 1000000]
+      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 47]
+      --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 10000000]
 
     Smoothxg options:
-      --smoothxg_max_block_weight [n] maximum seed sequence in block [default: 10000]
-      --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 5000]
-      --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 5000]
-      --smoothxg_max_popa_length [n]  maximum sequence length to put into POA [default: 10000]
+      --smoothxg_num_haps [n]         number of haplotypes in the given FASTA [default: alignment_n_mappings]
+      --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 0]
+      --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 0]
+      --smoothxg_max_poa_length [n]   maximum sequence length to put into POA, can be a comma-separated list; 
+                                      for each element smoothxg will be executed once [default: 4001,4507]
       --smoothxg_consensus_spec [str] consensus graph specification: write the consensus graph to
                                       BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter
                                       (which defines the length of divergences from consensus paths to preserve in the
@@ -430,16 +416,19 @@ def helpMessage() {
                                       minimum coverage of consensus paths to retain (min_cov), and a maximum allele
                                       length (max_len, defaults to 1e6); implies -a; example:
                                       cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000
-                                      [default: 10,100,1000,10000]
-      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: OFF]
-      --smoothxg_ratio_contain [n]    minimum short length / long length ratio to compare sequences for the containment
-                                      metric in the clustering [default: 0]
+                                      [default: OFF]
+      --smoothxg_consensus_prefix [n] use this prefix for consensus path names [default: Consensus_]
+      --smoothxg_block_ratio_min [n]  minimum small / large length ratio to cluster in a block [default: 0.0]
+      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: 0.95]
+      --smoothxg_pad_max_depth [n]    path depth at which we don't pad the POA problem [default: 100]
+      --smoothxg_poa_padding [n]      pad each end of each sequence in POA with N*(longest_poas_seq) bp [default: 0.03]
       --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
-                                      [default: 1,4,6,2,26,1]
+                                      [default: 1,9,16,2,41,1]
+      --smoothxg_write_maf [n]        write MAF output representing merged POA blocks [default: OFF]
+
 
     Visualization options:
-      --do_viz                        Generate 1D visualisations of the built graphs [default: OFF]
-      --do_layout                     Generate 2D visualisations of the built graphs [default: OFF]
+      --viz                           Generate 1D and 2D visualisations of the built graphs [default: OFF]
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved [default: ./results]
