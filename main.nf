@@ -63,14 +63,8 @@ if (params.smoothxg_consensus_spec != false) {
   consensus_params = "-V"
 }
 
-// FIXME we need to pack this into smoothxg itself
-maf_params = ""
-if (params.smoothxg_write_maf != false) {
-  maf_params = "-m ${smoothxg_prefix}.maf"
-}
-
 process wfmash {
-  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
+  publishDir "${params.outdir}/wfmash", mode: "${params.publish_dir_mode}"
 
   input:
     tuple val(f), path(fasta)
@@ -125,12 +119,16 @@ process smoothxg {
   output:
     path("${f}${smoothxg_prefix}.gfa"), emit: gfa_smooth
     path("${f}*.consensus*.gfa"), optional: true, emit: consensus_smooth
-    path("${smoothxg_prefix}.maf"), optional: true, emit: maf_smooth
+    path("${f}.${smoothxg_prefix}.maf"), optional: true, emit: maf_smooth
 
   script:
     """
     smooth_iterations=\$(echo ${params.smoothxg_poa_length} | tr ',' '\\\n' | wc -l)
     echo \$smooth_iterations > smooth_iterations
+    maf_params=""
+    if [[ ${params.smoothxg_write_maf} != false ]]; then
+      maf_params="-m ${f}.${smoothxg_prefix}.maf"
+    fi
     for i in \$(seq 1 \$smooth_iterations);
     do
       input_gfa=${graph}
@@ -139,8 +137,6 @@ process smoothxg {
       fi
       if [[ \$i != \$smooth_iterations ]]; then
         poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
-        echo \$poa_length > poa_length_\$i
-        echo "\$poa_length * ${n_haps}" | bc > block_weight_\$i
         smoothxg \
           -t ${task.cpus} \
           -T ${task.cpus} \
@@ -161,8 +157,6 @@ process smoothxg {
           -o smooth.\$i.gfa
       else
         poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
-        echo \$poa_length > poa_length
-        echo "\$poa_length * ${n_haps}" | bc > block_weight
         smoothxg \
           -t ${task.cpus} \
           -T ${task.cpus} \
@@ -179,7 +173,7 @@ process smoothxg {
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
-          ${maf_params} \
+          \$maf_params \
           -Q ${params.smoothxg_consensus_prefix} \
           ${consensus_params} \
           -o ${f}${smoothxg_prefix}.gfa
