@@ -17,6 +17,9 @@ if (params.help){
     exit 0
 }
 
+ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
+// ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+
 // We can't change global parameters inside this scope, so we build the ones we need locally
 def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
 def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
@@ -221,14 +224,14 @@ process odgiViz {
     path(graph)
 
   output:
-    path("${graph}.viz*_mqc.png")
+    path("${graph}.viz*.png")
 
   script:
     """
-    odgi viz -i $graph -o ${graph}.viz__mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix}
-    odgi viz -i $graph -o ${graph}.viz_pos_mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -u -d
-    odgi viz -i $graph -o ${graph}.viz_depth_mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -m
-    odgi viz -i $graph -o ${graph}.viz_inv_mqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -z
+    odgi viz -i $graph -o ${graph}.viz_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix}
+    odgi viz -i $graph -o ${graph}.viz_pos_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -u -d
+    odgi viz -i $graph -o ${graph}.viz_depth_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -m
+    odgi viz -i $graph -o ${graph}.viz_inv_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -z
     """
 }
 
@@ -266,13 +269,13 @@ process odgiDraw {
   tuple path(graph), path(layoutGraph)
 
   output:
-  path("${graph}._mqc.png")
+  path("${graph}.draw_multiqc.png")
 
   """
   odgi draw \
     -i $graph \
     -c $layoutGraph \
-    -p ${graph}._mqc.png \
+    -p ${graph}.draw_multiqc.png \
     -C \
     -w 20 \
     -H 1000 -t ${task.cpus}
@@ -313,6 +316,7 @@ process multiQC {
   path odgi_stats
   path odgi_viz
   path odgi_draw
+  path(multiqc_config)
 
   output:
   path "*multiqc_report.html", emit: report
@@ -320,7 +324,7 @@ process multiQC {
   path "*_plots"             , optional:true, emit: plots
 
   """
-  multiqc -s . 
+  multiqc -s . -c ${multiqc_config}
   """
 }
 
@@ -352,7 +356,8 @@ workflow {
     multiQC(
       odgiStats.out.collect().ifEmpty([]),
       odgiVizOut.collect().ifEmpty([]),
-      odgiDrawOut.collect().ifEmpty([])
+      odgiDrawOut.collect().ifEmpty([]),
+      ch_multiqc_config
     )
 }
 
@@ -519,8 +524,8 @@ if (workflow.profile.contains('awsbatch')) {
 }
 
 // Stage config files
-ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+// ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
+// ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
