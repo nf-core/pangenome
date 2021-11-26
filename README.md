@@ -10,7 +10,7 @@
 
 ## Introduction
 
-**Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended! 
+**Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended!
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 **nf-core/pangenome** is a bioinformatics best-practise analysis pipeline for the rendering of a collection of sequences into a pangenome graph.
