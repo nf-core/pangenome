@@ -146,7 +146,7 @@
                 },
                 "smoothxg_block_ratio_min": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "description": "minimum small / large length ratio to cluster in a block"
                 },
                 "smoothxg_block_id_min": {
@@ -198,7 +198,7 @@
             "fa_icon": "fas fa-project-diagram",
             "properties": {
                 "viz": {
-                    "type": "string",
+                    "type": "boolean",
                     "description": "Generate 1D and 2D visualisations of the built graphs",
                     "fa_icon": "fas fa-project-diagram"
                 }
