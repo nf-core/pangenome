@@ -235,18 +235,6 @@ process odgiViz {
     """
 }
 
-process odgiChop {
-  input:
-  path(graph)
-
-  output:
-  path("${graph}.chop.og")
-
-  """
-  odgi chop -i $graph -c 100 -o ${graph}.chop.og -t ${task.cpus}
-  """
-}
-
 process odgiLayout {
   input:
   path(graph)
