@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        nxf_ver: ['20.10.0', '21.03.0-edge']
+        nxf_ver: ['20.10.0', '21.04.1', '21.10.3']
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -56,3 +56,7 @@ jobs:
         # We also test basic visualization and reporting options here
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --viz
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --smoothxg consensus_spec 10,100,1000
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --vcf_spec "gi|568815561:#,gi|568815567:#"
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --smoothxg_write_maf

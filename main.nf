@@ -17,120 +17,57 @@ if (params.help){
     exit 0
 }
 
+ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
+// ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+
 // We can't change global parameters inside this scope, so we build the ones we need locally
-def alignment_merge_cmd = params.alignment_merge_segments ? "-M" : ""
-def alignment_exclude_cmd = params.alignment_exclude_delim ? "-Y${params.alignment_exclude_delim}" : "-X"
-def alignment_split_cmd = params.alignment_no_splits ? "-N" : ""
-def aligner = params.wfmash ? "W" : "E"
-def edyeet_align_pct_id_display = params.wfmash ? "" : "a${params.edyeet_align_pct_id}-"
+def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
+def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
+def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
-def file_name_prefix_display = ""
-def alignment_prefix = ""
-def seqwish_prefix = ""
-def smoothxg_prefix = ""
-// default case
-if (!params.file_name_prefix) {
-  file_name_prefix_display = ".pggb"
-  alignment_prefix = "-${aligner}"
-  seqwish_prefix = ".seqwish"
-  smoothxg_prefix = ".smoothxg"
-} else if (params.file_name_prefix == "pggb") {
-  // fancy naming scheme
-  file_name_prefix_display = ".pggb"
-alignment_prefix = """-\
-${aligner}-\
-s${params.alignment_segment_length}-\
-l${params.alignment_block_length}-\
-p${params.alignment_map_pct_id}-\
-n${params.alignment_n_secondary}-\
-${edyeet_align_pct_id_display}\
-K${params.alignment_mash_kmer}\
-${alignment_merge_cmd}\
-${alignment_split_cmd}\
-${alignment_exclude_cmd}\
-"""
-seqwish_prefix = """${alignment_prefix}\
-.seqwish-\
-k${params.seqwish_min_match_length}-\
-B${params.seqwish_transclose_batch}\
-"""
-smoothxg_prefix = """${seqwish_prefix}\
-.smoothxg-\
-w${params.smoothxg_max_block_weight}-\
-j${params.smoothxg_max_path_jump}-\
-e${params.smoothxg_max_edge_jump}-\
-I${params.smoothxg_block_id_min}-\
-p${smoothxg_poa_params_display}-M-J0.7-K-G150\
-"""
-} else {
-  // take the given prefix
-  file_name_prefix_display= "${params.file_name_prefix}.pggb"
-  aligment_prefix = "-${aligner}"
-  seqwish_prefix = ".seqwish"
-  smoothxg_prefix = ".smoothxg"
+def wfmash_prefix = "wfmash"
+def seqwish_prefix = ".seqwish"
+def smoothxg_prefix = ".smoothxg"
+def n_haps = 0
+def do_1d = false
+def do_2d = false
+
+if (params.viz) {
+  do_1d = true
+  do_2d = true
 }
 
-// TODO update, make_file_prefix
 def make_file_prefix = { f -> """\
-${f.getName()}${file_name_prefix_display}\
+${f.getName()}\
 """ }
 
-def make_file_prefix_given = { f -> """\
-${file_name_prefix_display}\
-""" }
+fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
 
-if (!params.file_name_prefix || params.file_name_prefix == "pggb") {
-  fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
-} else {
-  fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix_given(f), f) }
-}
-
-process edyeet {
-  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
-
-  input:
-    tuple val(f), path(fasta)
-
-  output:
-    tuple val(f), path("${f}${alignment_prefix}.paf")
-
-  """
-  edyeet ${alignment_exclude_cmd} \
-     -s ${params.alignment_segment_length} \
-     -l ${params.alignment_block_length} \
-     ${alignment_merge_cmd} \
-     ${alignment_split_cmd} \
-     -p ${params.alignment_map_pct_id} \
-     -n ${params.alignment_n_secondary} \
-     -a ${params.edyeet_align_pct_id} \
-     -k ${params.alignment_mash_kmer} \
-     -t ${task.cpus} \
-     $fasta $fasta \
-     >${f}${alignment_prefix}.paf
-  """
+if (!params.smoothxg_num_haps) {
+  n_haps = params.wfmash_n_mappings
 }
 
 process wfmash {
-  publishDir "${params.outdir}/alignment", mode: "${params.publish_dir_mode}"
+  publishDir "${params.outdir}/wfmash", mode: "${params.publish_dir_mode}"
 
   input:
     tuple val(f), path(fasta)
 
   output:
-    tuple val(f), path("${f}${alignment_prefix}.paf")
+    tuple val(f), path("${f}${wfmash_prefix}.paf")
 
   """
-  wfmash ${alignment_exclude_cmd} \
-     -s ${params.alignment_segment_length} \
-     -l ${params.alignment_block_length} \
-     ${alignment_merge_cmd} \
-     ${alignment_split_cmd} \
-     -p ${params.alignment_map_pct_id} \
-     -n ${params.alignment_n_secondary} \
-     -k ${params.alignment_mash_kmer} \
+  wfmash ${wfmash_exclude_cmd} \
+     -s ${params.wfmash_segment_length} \
+     -l ${params.wfmash_block_length} \
+     ${wfmash_merge_cmd} \
+     ${wfmash_split_cmd} \
+     -p ${params.wfmash_map_pct_id} \
+     -n ${params.wfmash_n_mappings} \
+     -k ${params.wfmash_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${alignment_prefix}.paf
+     >${f}${wfmash_prefix}.paf
   """
 }
 
@@ -139,7 +76,7 @@ process seqwish {
 
   input:
     tuple val(f), path(fasta)
-    path(alignment)
+    path(wfmash)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
@@ -149,7 +86,7 @@ process seqwish {
     seqwish \
       -t ${task.cpus} \
       -s $fasta \
-      -p $alignment \
+      -p $wfmash \
       -k ${params.seqwish_min_match_length} \
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
@@ -165,44 +102,91 @@ process smoothxg {
 
   output:
     path("${f}${smoothxg_prefix}.gfa"), emit: gfa_smooth
-    path("${f}*.consensus*.gfa"), emit: consensus_smooth
-    path("${f}${smoothxg_prefix}.maf"), emit: maf_smooth
+    path("${f}*.cons*.gfa"), optional: true, emit: consensus_smooth
+    path("${f}.${smoothxg_prefix}.maf"), optional: true, emit: maf_smooth
 
   script:
     """
-    smoothxg \
-      -t ${task.cpus} \
-      -g $graph \
-      -w ${params.smoothxg_max_block_weight} \
-      -M \
-      -J 0.7 \
-      -K \
-      -G 150 \
-      -I ${params.smoothxg_block_id_min} \
-      -R ${params.smoothxg_ratio_contain} \
-      -j ${params.smoothxg_max_path_jump} \
-      -e ${params.smoothxg_max_edge_jump} \
-      -l ${params.smoothxg_max_poa_length} \
-      -p ${params.smoothxg_poa_params} \
-      -m ${f}${smoothxg_prefix}.maf \
-      -C ${f}${smoothxg_prefix}.consensus,${params.smoothxg_consensus_spec} \
-      -o ${f}${smoothxg_prefix}.gfa
+    smooth_iterations=\$(echo ${params.smoothxg_poa_length} | tr ',' '\\\n' | wc -l)
+    echo \$smooth_iterations > smooth_iterations
+    maf_params=""
+    if [[ ${params.smoothxg_write_maf} != false ]]; then
+      maf_params="-m ${f}.${smoothxg_prefix}.maf"
+    fi
+    for i in \$(seq 1 \$smooth_iterations);
+    do
+      input_gfa=${graph}
+      if [[ \$i != 1 ]]; then
+        input_gfa=smooth.\$(echo \$i - 1 | bc).gfa 
+      fi
+      if [[ \$i != \$smooth_iterations ]]; then
+        poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
+        smoothxg \
+          -t ${task.cpus} \
+          -T ${task.cpus} \
+          -g \$input_gfa \
+          -w \$(echo "\$poa_length * ${n_haps}" | bc) \
+          -K \
+          -X 100 \
+          -I ${params.smoothxg_block_id_min} \
+          -R ${params.smoothxg_block_ratio_min} \
+          -j ${params.smoothxg_max_path_jump} \
+          -e ${params.smoothxg_max_edge_jump} \
+          -l \$poa_length \
+          -p ${params.smoothxg_poa_params} \
+          -O ${params.smoothxg_poa_padding} \
+          -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
+          -d 0 -D 0 \
+          -V \
+          -o smooth.\$i.gfa
+      else
+        poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
+        consensus_params="-V"
+        if [[ ${params.smoothxg_consensus_spec} != false ]]; then
+          consensus_params="-C ${f}.cons,${params.smoothxg_consensus_spec}"  
+        fi  
+        smoothxg \
+          -t ${task.cpus} \
+          -T ${task.cpus} \
+          -g \$input_gfa \
+          -w \$(echo "\$poa_length * ${n_haps}" | bc) \
+          -K \
+          -X 100 \
+          -I ${params.smoothxg_block_id_min} \
+          -R ${params.smoothxg_block_ratio_min} \
+          -j ${params.smoothxg_max_path_jump} \
+          -e ${params.smoothxg_max_edge_jump} \
+          -l \$poa_length \
+          -p ${params.smoothxg_poa_params} \
+          -O ${params.smoothxg_poa_padding} \
+          -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
+          -d 0 -D 0 \
+          \$maf_params \
+          -Q ${params.smoothxg_consensus_prefix} \
+          \$consensus_params \
+          -o ${f}${smoothxg_prefix}.gfa
+      fi
+    done  
     """
 }
 
-process removeConsensusPaths {
-    publishDir "${params.outdir}/smoothxg", mode: "${params.publish_dir_mode}"
+process gfaffix {
+  publishDir "${params.outdir}/gfaffix", mode: "${params.publish_dir_mode}"
 
-    input:
-        path(graph)
+  input:
+    path(graph)
 
-    output:
-        path("${graph}.no_cons.gfa"), emit: gfa_smooth_no_cons
+  output:
+    path("${graph}.norm.og"), emit: og_norm
+    path("${graph}.norm.gfa"), emit: gfa_norm
+    path("${graph}.norm.affixes.tsv.gz"), emit: tsv_norm
 
-    script:
-        """
-        grep "Consensus_" "$graph" -v > "${graph}.no_cons.gfa"
-        """
+  """
+  gfaffix $graph -o ${graph}.norm.gfa | gzip > ${graph}.norm.affixes.tsv.gz 
+  odgi build -g ${graph}.norm.gfa -o ${graph}.norm.gfa.og -P -t ${task.cpus} -O -o - \
+  | odgi sort -i - -o ${graph}.norm.og -t ${task.cpus} -p Ygs 
+  odgi view -i ${graph}.norm.og -g > ${graph}.norm.gfa
+  """
 }
 
 process odgiBuild {
@@ -226,10 +210,10 @@ process odgiStats {
     path(graph)
 
   output:
-    path("${graph}.stats")
+    path("${graph}.stats.yaml")
 
   """
-  odgi stats -i "${graph}" -S -s -d -l > "${graph}.stats" 2>&1
+  odgi stats -i "${graph}" -m > "${graph}.stats.yaml" 2>&1
   """
 }
 
@@ -240,27 +224,15 @@ process odgiViz {
     path(graph)
 
   output:
-    path("${graph}.viz_mqc.png")
+    path("${graph}.viz*.png")
 
   script:
     """
-    odgi viz \
-    -i $graph \
-    -o ${graph}.viz_mqc.png \
-    -x 1500 -y 500 -P 10
+    odgi viz -i $graph -o ${graph}.viz_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix}
+    odgi viz -i $graph -o ${graph}.viz_pos_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -u -d
+    odgi viz -i $graph -o ${graph}.viz_depth_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -m
+    odgi viz -i $graph -o ${graph}.viz_inv_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -z
     """
-}
-
-process odgiChop {
-  input:
-  path(graph)
-
-  output:
-  path("${graph}.chop.og")
-
-  """
-  odgi chop -i $graph -c 100 -o ${graph}.chop.og -t ${task.cpus}
-  """
 }
 
 process odgiLayout {
@@ -285,30 +257,42 @@ process odgiDraw {
   tuple path(graph), path(layoutGraph)
 
   output:
-  path("${layoutGraph}.draw_mqc.png")
+  path("${graph}.draw_multiqc.png")
 
   """
   odgi draw \
     -i $graph \
     -c $layoutGraph \
-    -p ${layoutGraph}.draw_mqc.png \
+    -p ${graph}.draw_multiqc.png \
     -C \
     -w 20 \
-    -H 1500 -t ${task.cpus}
+    -H 1000 -t ${task.cpus}
+  odgi draw \
+    -i $graph \
+    -c $layoutGraph \
+    -p ${graph}.draw.png \
+    -H 100 -t ${task.cpus}
   """
 }
 
-process pigzOutputFiles {
-  publishDir "${params.outdir}/compressed_outputs", mode: "${params.publish_dir_mode}"
+// TODO we can parallelize this for each reference given in ${params.vcf_spec}
+process vg_deconstruct {
+  publishDir "${params.outdir}/vg_deconstruct", mode: "${params.publish_dir_mode}"
 
   input:
-    path(graph)
+  path(graph)
 
   output:
-    path("${graph}.gz")
+  path("${graph}.*.vcf")
 
   """
-  pigz -q -p ${task.cpus} $graph -f -k
+  for s in \$(echo "${params.vcf_spec}" | tr ',' ' ');
+  do
+    ref=\$(echo "\$s" | cut -f 1 -d:)
+    delim=\$(echo "\$s" | cut -f 2 -d:)
+    vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
+    vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
+  done
   """
 }
 
@@ -320,6 +304,7 @@ process multiQC {
   path odgi_stats
   path odgi_viz
   path odgi_draw
+  path(multiqc_config)
 
   output:
   path "*multiqc_report.html", emit: report
@@ -327,54 +312,40 @@ process multiQC {
   path "*_plots"             , optional:true, emit: plots
 
   """
-  multiqc -s .
+  multiqc -s . -c ${multiqc_config}
   """
 }
 
 workflow {
   main:
-    if (params.wfmash == false) {
-      edyeet(fasta)
-      seqwish(fasta, edyeet.out.collect{it[1]})
-    } else {
-      wfmash(fasta)
-      seqwish(fasta, wfmash.out.collect{it[1]})
-    }
-    smoothxg(seqwish.out)
 
-    removeConsensusPaths(smoothxg.out.gfa_smooth)
-    if (params.do_stats) {
-        odgiBuild(seqwish.out.collect{it[1]}.mix(removeConsensusPaths.out, smoothxg.out.consensus_smooth.flatten()))
-        odgiStats(odgiBuild.out)
-    }
-    else {
-        odgiBuild(seqwish.out.collect{it[1]}.mix(removeConsensusPaths.out, smoothxg.out.gfa_smooth))
-    }
+    wfmash(fasta)
+    seqwish(fasta, wfmash.out.collect{it[1]})
+    smoothxg(seqwish.out)
+    gfaffix(smoothxg.out.gfa_smooth)
+
+    odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), gfaffix.out.gfa_norm))
+    odgiStats(odgiBuild.out)
 
     odgiVizOut = Channel.empty()
-    removeConsensusPathsOut = Channel.empty()
-    if (params.do_viz) {
-        odgiVizOut = odgiViz(odgiBuild.out)
+    if (do_1d) {
+        odgiVizOut = odgiViz(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
     }
     odgiDrawOut = Channel.empty()
-    if (params.do_layout) {
-      odgiChop(odgiBuild.out.filter(~".*smooth.*"))
-      odgiLayout(odgiChop.out)
+    if (do_2d) {
+      odgiLayout(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
       odgiDrawOut = odgiDraw(odgiLayout.out)
     }
 
-    if (params.do_compression) {
-        if (params.wfmash == false) {
-            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, edyeet.out.collect{it[1]}))
-        } else {
-            pigzOutputFiles(seqwish.out.collect{it[1]}.mix(smoothxg.out.gfa_smooth, smoothxg.out.consensus_smooth.flatten(), odgiBuild.out, smoothxg.out.maf_smooth, wfmash.out.collect{it[1]}))
-        }
+    if (params.vcf_spec != false) {
+      vg_deconstruct(gfaffix.out.gfa_norm)
     }
 
     multiQC(
       odgiStats.out.collect().ifEmpty([]),
       odgiVizOut.collect().ifEmpty([]),
-      odgiDrawOut.collect().ifEmpty([])
+      odgiDrawOut.collect().ifEmpty([]),
+      ch_multiqc_config
     )
 }
 
@@ -407,26 +378,26 @@ def helpMessage() {
       --input [file]                  Path to input FASTA (must be surrounded with quotes)
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
-    Alignment options:
-      --edyeet_align_pct_id [n]       percent identity in the edyeet edlib alignment step [default: 90]
-      --alignment_map_pct_id [n]      percent identity in the wfmash or edyeet mashmap step [default: 90]
-      --alignment_n_secondary [n]     number of secondary mappings to retain in 'map' filter mode [default: 10]
-      --alignment_segment_length [n]  segment length for mapping [default: 10000]
-      --alignment_block_length [n]    minimum block length filter for mapping [default: 3*alignment_segment_length]
-      --alignment_mash_kmer [n]       kmer size for mashmap [default: 16]
-      --alignment_merge_segments      merge successive mappings [default: OFF]
-      --alignment_no_splits           disable splitting of input sequences during mapping [default: OFF]
-      --alignment_exclude--delim [c]  skip mappings between sequences with the same name prefix before
+    Wfmash options:
+      --wfmash_map_pct_id [n]         percent identity in the wfmash mashmap step [default: 90]
+      --wfmash_n_mappings [n]         number of secondary mappings to retain in 'map' filter mode [default: 10]
+      --wfmash_segment_length [n]     segment length for mapping [default: 3000]
+      --wfmash_block_length [n]       minimum block length filter for mapping [default: 3 * wfmash_segment_length]
+      --wfmash_mash_kmer [n]          kmer size for mashmap [default: 16]
+      --wfmash_merge_segments         merge successive mappings [default: OFF]
+      --wfmash_no_splits              disable splitting of input sequences during mapping [default: OFF]
+      --wfmash_exclude--delim [c]     skip mappings between sequences with the same name prefix before
                                       the given delimiter character [default: all-vs-all and !self]
     Seqwish options:
-      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 19]
-      --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 1000000]
+      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 47]
+      --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 10000000]
 
     Smoothxg options:
-      --smoothxg_max_block_weight [n] maximum seed sequence in block [default: 10000]
-      --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 5000]
-      --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 5000]
-      --smoothxg_max_popa_length [n]  maximum sequence length to put into POA [default: 10000]
+      --smoothxg_num_haps [n]         number of haplotypes in the given FASTA [default: wfmash_n_mappings]
+      --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 0]
+      --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 0]
+      --smoothxg_max_poa_length [n]   maximum sequence length to put into POA, can be a comma-separated list; 
+                                      for each element smoothxg will be executed once [default: 4001,4507]
       --smoothxg_consensus_spec [str] consensus graph specification: write the consensus graph to
                                       BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter
                                       (which defines the length of divergences from consensus paths to preserve in the
@@ -435,16 +406,24 @@ def helpMessage() {
                                       minimum coverage of consensus paths to retain (min_cov), and a maximum allele
                                       length (max_len, defaults to 1e6); implies -a; example:
                                       cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000
-                                      [default: 10,100,1000,10000]
-      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: OFF]
-      --smoothxg_ratio_contain [n]    minimum short length / long length ratio to compare sequences for the containment
-                                      metric in the clustering [default: 0]
+                                      [default: OFF]
+      --smoothxg_consensus_prefix [n] use this prefix for consensus path names [default: Consensus_]
+      --smoothxg_block_ratio_min [n]  minimum small / large length ratio to cluster in a block [default: 0.0]
+      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: 0.95]
+      --smoothxg_pad_max_depth [n]    path depth at which we don't pad the POA problem [default: 100]
+      --smoothxg_poa_padding [n]      pad each end of each sequence in POA with N*(longest_poas_seq) bp [default: 0.03]
       --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
-                                      [default: 1,4,6,2,26,1]
+                                      [default: 1,9,16,2,41,1]
+      --smoothxg_write_maf [n]        write MAF output representing merged POA blocks [default: OFF]
 
     Visualization options:
-      --do_viz                        Generate 1D visualisations of the built graphs [default: OFF]
-      --do_layout                     Generate 2D visualisations of the built graphs [default: OFF]
+      --viz                           Generate 1D and 2D visualisations of the built graphs [default: OFF]
+
+    VCF options:
+      --vcf_spec                      specify a set of VCFs to produce with SPEC = REF:DELIM[,REF:DELIM]*
+                                      the paths matching ^REF are used as a reference, while the sample haplotypes
+                                      are derived from path names, e.g. when DELIM=# and with '-V chm13:#',
+                                      a path named HG002#1#ctg would be assigned to sample HG002 phase 1 [default: OFF]
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved [default: ./results]
@@ -453,8 +432,6 @@ def helpMessage() {
       --email_on_fail [email]         Same as --email, except only send mail if the workflow is not successful
       --max_multiqc_email_size [str]  Threshold size for MultiQC report to be attached in notification email. If file generated by pipeline exceeds the threshold, it will not be attached (Default: 25MB)
       -name [str]                     Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
-      --file_name_prefix [str]        Prefix for the output file names. If 'pggb', the file names will be very verbose and contain all parameters for each process. [default: --input]
-      --do_compression                Compress alignment (.paf), graph (.gfa, .og), and MSA (.maf) outputs [default: OFF]
 
     AWSBatch options:
       --awsqueue [str]                The AWSBatch JobQueue that needs to be set when running on AWSBatch
@@ -535,8 +512,8 @@ if (workflow.profile.contains('awsbatch')) {
 }
 
 // Stage config files
-ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
-ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+// ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
+// ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
 ch_output_docs = file("$projectDir/docs/output.md", checkIfExists: true)
 ch_output_docs_images = file("$projectDir/docs/images/", checkIfExists: true)
 
