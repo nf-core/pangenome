@@ -84,6 +84,15 @@
                     "type": "string",
                     "description": "skip mappings between sequences with the same name prefix before the given delimiter character",
                     "fa_icon": "fas fa-align-center"
+                },
+                "wfmash_chunks": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1."
+                },
+                "wfmash_only": {
+                    "type": "boolean",
+                    "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
                 }
             }
         },
@@ -146,7 +155,7 @@
                 },
                 "smoothxg_block_ratio_min": {
                     "type": "number",
-                    "default": 0.0,
+                    "default": 0,
                     "description": "minimum small / large length ratio to cluster in a block"
                 },
                 "smoothxg_block_id_min": {

@@ -47,6 +47,68 @@ if (!params.smoothxg_num_haps) {
   n_haps = params.wfmash_n_mappings
 }
 
+process wfmashMap {
+  publishDir "${params.outdir}/wfmash_map", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(fasta)
+
+  output:
+    tuple val(f), path("${f}.${wfmash_prefix}.map.paf")
+
+  """
+  wfmash ${wfmash_exclude_cmd} \
+     -s ${params.wfmash_segment_length} \
+     -l ${params.wfmash_block_length} \
+     ${wfmash_merge_cmd} \
+     ${wfmash_split_cmd} \
+     -p ${params.wfmash_map_pct_id} \
+     -n ${params.wfmash_n_mappings} \
+     -k ${params.wfmash_mash_kmer} \
+     -t ${task.cpus} \
+     -m \
+     $fasta $fasta \
+     >${f}.${wfmash_prefix}.map.paf
+  """  
+}
+
+process splitApproxMappingsInChunks {
+  publishDir "${params.outdir}/wfmash_chunks", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(paf)
+  output:
+    path("${f}*.chunk_*.paf")
+  """
+  python3 /split_approx_mappings_in_chunks.py $paf ${params.wfmash_chunks}
+  """
+}
+
+process wfmashAlign {
+  publishDir "${params.outdir}/wfmash_align", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(fasta), path(paf)
+
+  output:
+    path("${paf}.align.paf")
+
+  """
+  wfmash ${wfmash_exclude_cmd} \
+     -s ${params.wfmash_segment_length} \
+     -l ${params.wfmash_block_length} \
+     ${wfmash_merge_cmd} \
+     ${wfmash_split_cmd} \
+     -p ${params.wfmash_map_pct_id} \
+     -n ${params.wfmash_n_mappings} \
+     -k ${params.wfmash_mash_kmer} \
+     -t ${task.cpus} \
+     -i $paf \
+     $fasta $fasta \
+     >${paf}.align.paf
+  """
+}
+
 process wfmash {
   publishDir "${params.outdir}/wfmash", mode: "${params.publish_dir_mode}"
 
@@ -76,17 +138,23 @@ process seqwish {
 
   input:
     tuple val(f), path(fasta)
-    path(wfmash)
+    path(pafs)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
 
   script:
     """
+    if [[ \$(ls *.paf | wc -l) == 1 ]]; then
+      input=$pafs
+    else 
+      input=\$(ls *.paf | tr '\\\n' ',')
+      input=\${input::-1}
+    fi  
     seqwish \
       -t ${task.cpus} \
       -s $fasta \
-      -p $wfmash \
+      -p \$input \
       -k ${params.seqwish_min_match_length} \
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
@@ -319,34 +387,52 @@ process multiQC {
 workflow {
   main:
 
-    wfmash(fasta)
-    seqwish(fasta, wfmash.out.collect{it[1]})
-    smoothxg(seqwish.out)
-    gfaffix(smoothxg.out.gfa_smooth)
+    if (params.wfmash_only) {
+      // TODO Once we changed the way we changed the publish_dir_mode, we have to emit the .paf file as default, else not
+      if (params.wfmash_chunks == 1) {
+        wfmash(fasta)
+      } else {
+        wfmashMap(fasta)
+        splitApproxMappingsInChunks(wfmashMap.out)
+        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
+      }      
+    } else {
+      if (params.wfmash_chunks == 1) {
+        wfmash(fasta)
+        seqwish(fasta, wfmash.out.collect{it[1]})
+      } else {
+        wfmashMap(fasta)
+        splitApproxMappingsInChunks(wfmashMap.out)
+        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
+        seqwish(fasta, wfmashAlign.out.collect())
+      }
+      smoothxg(seqwish.out)
+      gfaffix(smoothxg.out.gfa_smooth)
 
-    odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), gfaffix.out.gfa_norm))
-    odgiStats(odgiBuild.out)
+      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), gfaffix.out.gfa_norm))
+      odgiStats(odgiBuild.out)
 
-    odgiVizOut = Channel.empty()
-    if (do_1d) {
-        odgiVizOut = odgiViz(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
+      odgiVizOut = Channel.empty()
+      if (do_1d) {
+          odgiVizOut = odgiViz(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
+      }
+      odgiDrawOut = Channel.empty()
+      if (do_2d) {
+        odgiLayout(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
+        odgiDrawOut = odgiDraw(odgiLayout.out)
+      }
+
+      if (params.vcf_spec != false) {
+        vg_deconstruct(gfaffix.out.gfa_norm)
+      }
+
+      multiQC(
+        odgiStats.out.collect().ifEmpty([]),
+        odgiVizOut.collect().ifEmpty([]),
+        odgiDrawOut.collect().ifEmpty([]),
+        ch_multiqc_config
+      )
     }
-    odgiDrawOut = Channel.empty()
-    if (do_2d) {
-      odgiLayout(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
-      odgiDrawOut = odgiDraw(odgiLayout.out)
-    }
-
-    if (params.vcf_spec != false) {
-      vg_deconstruct(gfaffix.out.gfa_norm)
-    }
-
-    multiQC(
-      odgiStats.out.collect().ifEmpty([]),
-      odgiVizOut.collect().ifEmpty([]),
-      odgiDrawOut.collect().ifEmpty([]),
-      ch_multiqc_config
-    )
 }
 
 // /*
@@ -388,6 +474,9 @@ def helpMessage() {
       --wfmash_no_splits              disable splitting of input sequences during mapping [default: OFF]
       --wfmash_exclude--delim [c]     skip mappings between sequences with the same name prefix before
                                       the given delimiter character [default: all-vs-all and !self]
+      --wfmash_chunks                 The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1. [default: 1]
+      --wfmash_only                   If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster. [default: OFF]
+
     Seqwish options:
       --seqwish_min_match_length [n]  ignore exact matches below this length [default: 47]
       --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 10000000]
