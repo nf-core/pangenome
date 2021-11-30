@@ -348,19 +348,16 @@ process vg_deconstruct {
   publishDir "${params.outdir}/vg_deconstruct", mode: "${params.publish_dir_mode}"
 
   input:
-  path(graph)
+  tuple path(graph), val(vcf_spec)
 
   output:
   path("${graph}.*.vcf")
 
   """
-  for s in \$(echo "${params.vcf_spec}" | tr ',' ' ');
-  do
-    ref=\$(echo "\$s" | cut -f 1 -d:)
-    delim=\$(echo "\$s" | cut -f 2 -d:)
-    vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
-    vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
-  done
+  ref=\$(echo "$vcf_spec" | cut -f 1 -d:)
+  delim=\$(echo "$vcf_spec" | cut -f 2 -d:)
+  vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
+  vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
   """
 }
 
@@ -422,8 +419,12 @@ workflow {
         odgiDrawOut = odgiDraw(odgiLayout.out)
       }
 
+      ch_vg_deconstruct = Channel.empty()
+      ch_vcf_spec = Channel.empty()
       if (params.vcf_spec != false) {
-        vg_deconstruct(gfaffix.out.gfa_norm)
+        ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
+        ch_vg_deconstruct = vg_deconstruct(gfaffix.out.gfa_norm.combine(ch_vcf_spec))
+        // TODO add bcftools
       }
 
       multiQC(
