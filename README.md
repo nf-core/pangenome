@@ -98,4 +98,10 @@ You can cite the `nf-core` publication as follows:
 
 In addition, references of tools and data used in this pipeline are as follows:
 
+> **ODGI: understanding pangenome graphs.**
+>
+> Andrea Guarracino, Simon Heumos, Sven Nahnsen, Pjotr Prins & Erik Garrison.
+>
+> _bioRxiv_ 2021 Nov 11 doi: [10.1101/2021.11.10.467921](https://doi.org/10.1101/2021.11.10.467921).
+
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->

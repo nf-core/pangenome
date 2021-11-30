@@ -9,6 +9,8 @@ RUN apt-get update \
                           procps \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
+COPY bin/split_approx_mappings_in_chunks.py /
+
 # Install miniconda
 RUN wget \
     https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
