@@ -176,7 +176,7 @@
                 },
                 "smoothxg_poa_params": {
                     "type": "string",
-                    "default": "1,9,16,2,41,1",
+                    "default": "1,19,39,3,81,1",
                     "description": "Score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2.",
                     "fa_icon": "fab fa-superpowers"
                 },

@@ -503,7 +503,7 @@ def helpMessage() {
       --smoothxg_pad_max_depth [n]    path depth at which we don't pad the POA problem [default: 100]
       --smoothxg_poa_padding [n]      pad each end of each sequence in POA with N*(longest_poas_seq) bp [default: 0.03]
       --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
-                                      [default: 1,9,16,2,41,1]
+                                      [default: 1,19,39,3,81,1]
       --smoothxg_write_maf [n]        write MAF output representing merged POA blocks [default: OFF]
 
     Visualization options:
