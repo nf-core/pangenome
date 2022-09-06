@@ -29,12 +29,15 @@ def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
 def n_haps = 0
-def do_1d = false
-def do_2d = false
+def do_1d = true
+def do_2d = true
 
-if (params.viz) {
-  do_1d = true
-  do_2d = true
+if (params.no_viz) {
+  do_1d = false
+}
+
+if (params.no_layout) {
+  do_2d = false
 }
 
 def make_file_prefix = { f -> """\
@@ -129,7 +132,7 @@ process wfmash {
      -k ${params.wfmash_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${wfmash_prefix}.paf
+     >${f}.${wfmash_prefix}.paf
   """
 }
 
@@ -406,16 +409,16 @@ workflow {
       smoothxg(seqwish.out)
       gfaffix(smoothxg.out.gfa_smooth)
 
-      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), gfaffix.out.gfa_norm))
-      odgiStats(odgiBuild.out)
+      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten()))
+      odgiStats(odgiBuild.out.mix(gfaffix.out.og_norm))
 
       odgiVizOut = Channel.empty()
       if (do_1d) {
-          odgiVizOut = odgiViz(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
+          odgiVizOut = odgiViz(gfaffix.out.og_norm)
       }
       odgiDrawOut = Channel.empty()
       if (do_2d) {
-        odgiLayout(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
+        odgiLayout(gfaffix.out.og_norm)
         odgiDrawOut = odgiDraw(odgiLayout.out)
       }
 

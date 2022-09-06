@@ -206,10 +206,13 @@
             "default": "",
             "fa_icon": "fas fa-project-diagram",
             "properties": {
-                "viz": {
+                "no_viz": {
                     "type": "boolean",
-                    "description": "Generate 1D and 2D visualisations of the built graphs",
-                    "fa_icon": "fas fa-project-diagram"
+                    "description": "Set if you don't want the 1D visualizations."
+                },
+                "no_layout": {
+                    "type": "boolean",
+                    "description": "Set if you don't want the computational expensive 2D layout."
                 }
             }
         },
