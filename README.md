@@ -104,7 +104,7 @@ In addition, references of tools and data used in this pipeline are as follows:
 >
 > _Bioinformatics_ 2022 Jul 01 doi: [10.1093/bioinformatics/btac308](https://doi.org/10.1093/bioinformatics/btac308).
 >
-> **contributed equally*
+> *_contributed equally_
 
 > **Unbiased pangenome graphs**
 >
@@ -117,4 +117,5 @@ In addition, references of tools and data used in this pipeline are as follows:
 ## Attention
 
 ### MultiQC Report  
+
 In the resulting MultiQC report, in the **Detailed ODGI stats table**, it says `smoothxg`. To be clear, these are the stats of the graph after polishing with `gfaffix`! Some tools were hardcoded in the ODGI MultiQC module, but hopefully this will be fixed in the future.

@@ -119,7 +119,7 @@ process wfmash {
     tuple val(f), path(fasta)
 
   output:
-    tuple val(f), path("${f}${wfmash_prefix}.paf")
+    tuple val(f), path("${f}.${wfmash_prefix}.paf")
 
   """
   wfmash ${wfmash_exclude_cmd} \
@@ -397,14 +397,19 @@ workflow {
         wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
       }      
     } else {
-      if (params.wfmash_chunks == 1) {
-        wfmash(fasta)
-        seqwish(fasta, wfmash.out.collect{it[1]})
+      if (params.paf != false) {
+        paf_ch = Channel.fromPath(params.paf)
+        seqwish(fasta, paf_ch)
       } else {
-        wfmashMap(fasta)
-        splitApproxMappingsInChunks(wfmashMap.out)
-        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
-        seqwish(fasta, wfmashAlign.out.collect())
+        if (params.wfmash_chunks == 1) {
+          wfmash(fasta)
+          seqwish(fasta, wfmash.out.collect{it[1]})
+        } else {
+          wfmashMap(fasta)
+          splitApproxMappingsInChunks(wfmashMap.out)
+          wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
+          seqwish(fasta, wfmashAlign.out.collect())
+        }
       }
       smoothxg(seqwish.out)
       gfaffix(smoothxg.out.gfa_smooth)
