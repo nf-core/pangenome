@@ -11,7 +11,8 @@
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
             "required": [
-                "input"
+                "input",
+                "n_mappings"
             ],
             "properties": {
                 "input": {
@@ -19,6 +20,11 @@
                     "fa_icon": "fas fa-dna",
                     "description": "Input FASTA file.",
                     "help_text": "Use this to specify the location of your input FASTA file. For example:\n\n```bash\n--input 'path/to/data/input.fa.gz'\n```\n\n."
+                },
+                "n_mappings": {
+                    "type": "string",
+                    "fa_icon": "fas fa-dna",
+                    "description": "Number of mappings to retain for each segment."
                 },
                 "outdir": {
                     "type": "string",
@@ -50,12 +56,6 @@
                     "type": "integer",
                     "default": 90,
                     "description": "percent identity in the wfmash mashmap step",
-                    "fa_icon": "fas fa-align-center"
-                },
-                "wfmash_n_mappings": {
-                    "type": "integer",
-                    "default": 10,
-                    "description": "number of secondary mappings to retain in 'map' filter mode",
                     "fa_icon": "fas fa-align-center"
                 },
                 "wfmash_segment_length": {
@@ -99,10 +99,7 @@
                     "type": "boolean",
                     "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
                 }
-            },
-            "required": [
-                "wfmash_n_mappings"
-            ]
+            }
         },
         "seqwish_options": {
             "title": "Seqwish options",
