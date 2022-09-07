@@ -41,6 +41,11 @@ ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists
 // ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
 
 // We can't change global parameters inside this scope, so we build the ones we need locally
+def n_haps = 0
+if (!params.smoothxg_num_haps) {
+  n_haps = params.n_mappings
+}
+
 def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
 def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
 def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
@@ -48,11 +53,24 @@ def wfmash_block_length_cmd = params.wfmash_block_length ? "-l${params.wfmash_bl
 def wfmash_mash_kmer_cmd = params.wfmash_mash_kmer ? "-k${params.wfmash_mash_kmer}" : ""
 def wfmash_kmer_thres_cmd = params.wfmash_mash_kmer_thres ? "-H${params.wfmash_kmer_thres}" : ""
 def wfmash_n_mappings_minus_1 = params.n_mappings - 1
+def wfmash_sparse_map_cmd = ""
+if (params.wfmash_sparse_map == "auto") {
+  n = n_haps
+  x = Math.log(n)/n * 10
+  wfmash_sparse_map_frac = 1
+  if (x >= 1) {
+    wfmash_sparse_map_frac = x
+  }
+  wfmash_sparse_map_cmd = "-x${wfmash_sparse_map_frac}"
+} else {
+  if (params.wfmash_sparse_map != null) {
+    wfmash_sparse_map_cmd = "-x${params.wfmash_sparse_map}"
+  }
+}
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
-def n_haps = 0
 def do_1d = true
 def do_2d = true
 
@@ -69,10 +87,6 @@ ${f.getName()}\
 """ }
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
-
-if (!params.smoothxg_num_haps) {
-  n_haps = params.n_mappings
-}
 
 process wfmashMap {
   publishDir "${params.outdir}/wfmash_map", mode: "${params.publish_dir_mode}"
@@ -91,6 +105,7 @@ process wfmashMap {
      ${wfmash_split_cmd} \
      ${wfmash_mash_kmer_cmd} \
      ${wfmash_kmer_thres_cmd} \
+     ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
      -t ${task.cpus} \
@@ -129,6 +144,7 @@ process wfmashAlign {
      ${wfmash_split_cmd} \
      ${wfmash_mash_kmer_cmd} \
      ${wfmash_kmer_thres_cmd} \
+     ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
      -t ${task.cpus} \
@@ -155,6 +171,7 @@ process wfmash {
      ${wfmash_split_cmd} \
      ${wfmash_mash_kmer_cmd} \
      ${wfmash_kmer_thres_cmd} \
+     ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
      -t ${task.cpus} \
