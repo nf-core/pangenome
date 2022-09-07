@@ -44,6 +44,7 @@ ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists
 def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
 def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
 def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
+def wfmash_block_length_cmd = params.wfmash_block_length ? "-l${params.wfmash_block_length}" : ""
 def wfmash_n_mappings_minus_1 = params.n_mappings - 1
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
 def wfmash_prefix = "wfmash"
@@ -68,7 +69,7 @@ ${f.getName()}\
 fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
 
 if (!params.smoothxg_num_haps) {
-  n_haps = params.wfmash_n_mappings
+  n_haps = params.n_mappings
 }
 
 process wfmashMap {
@@ -83,7 +84,7 @@ process wfmashMap {
   """
   wfmash ${wfmash_exclude_cmd} \
      -s ${params.wfmash_segment_length} \
-     -l ${params.wfmash_block_length} \
+     ${wfmash_block_length_cmd} \
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      -p ${params.wfmash_map_pct_id} \
@@ -120,7 +121,7 @@ process wfmashAlign {
   """
   wfmash ${wfmash_exclude_cmd} \
      -s ${params.wfmash_segment_length} \
-     -l ${params.wfmash_block_length} \
+     ${wfmash_block_length_cmd} \
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      -p ${params.wfmash_map_pct_id} \
@@ -145,7 +146,7 @@ process wfmash {
   """
   wfmash ${wfmash_exclude_cmd} \
      -s ${params.wfmash_segment_length} \
-     -l ${params.wfmash_block_length} \
+     ${wfmash_block_length_cmd} \
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      -p ${params.wfmash_map_pct_id} \
