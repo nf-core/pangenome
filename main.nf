@@ -67,8 +67,25 @@ if (params.wfmash_sparse_map == "auto") {
     wfmash_sparse_map_cmd = "-x${params.wfmash_sparse_map}"
   }
 }
-def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
 def smoothxg_block_id_min = params.wfmash_map_pct_id / 100.0
+// TODO: CHANGE TO LARGE P ONCE WE ARE THERE
+def smoothxg_poa_params_cmd = ""
+if (params.smoothxg_poa_params == null) {
+  smoothxg_poa_params = "-p 1,19,39,3,81,1"
+} else {
+  if (params.smoothxg_poa_params == "asm5") {
+    smoothxg_poa_params = "-p 1,19,39,3,81,1"
+  } else if (params.smoothxg_poa_params == "asm10") {
+    smoothxg_poa_params = "-p 1,9,16,2,41,1"
+  } else if (params.smoothxg_poa_params == "asm15") {
+    smoothxg_poa_params = "-p 1,7,11,2,33,1"
+  } else if (params.smoothxg_poa_params == "asm20") {
+    smoothxg_poa_params = "-p 1,4,6,2,26,1"
+  } else {
+    smoothxg_poa_params = "-p${params.smoothxg_poa_params}"
+  }
+}
+def smoothxg_poa_params_display = smoothxg_poa_params.replaceAll(/,/, "_")
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
@@ -249,7 +266,7 @@ process smoothxg {
           -j ${params.smoothxg_max_path_jump} \
           -e ${params.smoothxg_max_edge_jump} \
           -l \$poa_length \
-          -p ${params.smoothxg_poa_params} \
+          ${smoothxg_poa_params} \
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
@@ -273,7 +290,7 @@ process smoothxg {
           -j ${params.smoothxg_max_path_jump} \
           -e ${params.smoothxg_max_edge_jump} \
           -l \$poa_length \
-          -p ${params.smoothxg_poa_params} \
+          ${smoothxg_poa_params} \
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
