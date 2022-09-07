@@ -46,6 +46,7 @@ def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclud
 def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
 def wfmash_block_length_cmd = params.wfmash_block_length ? "-l${params.wfmash_block_length}" : ""
 def wfmash_mash_kmer_cmd = params.wfmash_mash_kmer ? "-k${params.wfmash_mash_kmer}" : ""
+def wfmash_kmer_thres_cmd = params.wfmash_mash_kmer_thres ? "-H${params.wfmash_kmer_thres}" : ""
 def wfmash_n_mappings_minus_1 = params.n_mappings - 1
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
 def wfmash_prefix = "wfmash"
@@ -89,6 +90,7 @@ process wfmashMap {
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      ${wfmash_mash_kmer_cmd} \
+     ${wfmash_kmer_thres_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
      -t ${task.cpus} \
@@ -126,6 +128,7 @@ process wfmashAlign {
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      ${wfmash_mash_kmer_cmd} \
+     ${wfmash_kmer_thres_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
      -t ${task.cpus} \
@@ -151,6 +154,7 @@ process wfmash {
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      ${wfmash_mash_kmer_cmd} \
+     ${wfmash_kmer_thres_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
      -t ${task.cpus} \
