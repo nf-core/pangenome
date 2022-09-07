@@ -17,6 +17,26 @@ if (params.help){
     exit 0
 }
 
+if (params.input == null) {
+        log.info"""
+
+    Mandatory argument --input missing! For more details run with --help.
+
+    """.stripIndent()  
+
+    exit 1
+}
+
+if (params.wfmash_n_mappings == null) {
+        log.info"""
+
+    Mandatory argument --wfmash_n_mappings missing! For more details run with --help.
+
+    """.stripIndent()  
+
+    exit 1
+}
+
 ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
 // ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
 
@@ -24,6 +44,7 @@ ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists
 def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
 def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
 def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
+def wfmash_n_mappings_minus_1 = params.wfmash_n_mappings - 1
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
@@ -66,7 +87,7 @@ process wfmashMap {
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      -p ${params.wfmash_map_pct_id} \
-     -n ${params.wfmash_n_mappings} \
+     -n ${wfmash_n_mappings_minus_1} \
      -k ${params.wfmash_mash_kmer} \
      -t ${task.cpus} \
      -m \
@@ -103,7 +124,7 @@ process wfmashAlign {
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      -p ${params.wfmash_map_pct_id} \
-     -n ${params.wfmash_n_mappings} \
+     -n ${wfmash_n_mappings_minus_1} \
      -k ${params.wfmash_mash_kmer} \
      -t ${task.cpus} \
      -i $paf \
@@ -128,7 +149,7 @@ process wfmash {
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
      -p ${params.wfmash_map_pct_id} \
-     -n ${params.wfmash_n_mappings} \
+     -n ${wfmash_n_mappings_minus_1} \
      -k ${params.wfmash_mash_kmer} \
      -t ${task.cpus} \
      $fasta $fasta \

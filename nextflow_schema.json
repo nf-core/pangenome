@@ -99,7 +99,10 @@
                     "type": "boolean",
                     "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
                 }
-            }
+            },
+            "required": [
+                "wfmash_n_mappings"
+            ]
         },
         "seqwish_options": {
             "title": "Seqwish options",
