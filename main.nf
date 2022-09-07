@@ -67,6 +67,7 @@ if (params.wfmash_sparse_map == "auto") {
     wfmash_sparse_map_cmd = "-x${params.wfmash_sparse_map}"
   }
 }
+
 def smoothxg_block_id_min = params.wfmash_map_pct_id / 100.0
 // TODO: CHANGE TO LARGE P ONCE WE ARE THERE
 def smoothxg_poa_params_cmd = ""
@@ -198,6 +199,7 @@ process wfmash {
   """
 }
 
+/// TODO -f ${params.seqwish_sparse_factor} \
 process seqwish {
   publishDir "${params.outdir}/seqwish", mode: "${params.publish_dir_mode}"
 
