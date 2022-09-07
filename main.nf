@@ -68,6 +68,7 @@ if (params.wfmash_sparse_map == "auto") {
   }
 }
 def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
+def smoothxg_block_id_min = params.wfmash_map_pct_id / 100.0
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
@@ -243,7 +244,7 @@ process smoothxg {
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
           -K \
           -X 100 \
-          -I ${params.smoothxg_block_id_min} \
+          -I ${smoothxg_block_id_min} \
           -R ${params.smoothxg_block_ratio_min} \
           -j ${params.smoothxg_max_path_jump} \
           -e ${params.smoothxg_max_edge_jump} \
@@ -267,7 +268,7 @@ process smoothxg {
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
           -K \
           -X 100 \
-          -I ${params.smoothxg_block_id_min} \
+          -I ${smoothxg_block_id_min} \
           -R ${params.smoothxg_block_ratio_min} \
           -j ${params.smoothxg_max_path_jump} \
           -e ${params.smoothxg_max_edge_jump} \
