@@ -301,7 +301,6 @@ process smoothxg {
           -o smooth.\$i.gfa
       else
         poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
-        consensus_params="-V"
         smoothxg \
           -t ${task.cpus} \
           -T ${task.cpus} \
@@ -321,7 +320,7 @@ process smoothxg {
           -d 0 -D 0 \
           ${smoothxg_xpoa} ${smoothxg_poa_mode} \
           \$maf_params \
-          \$consensus_params \
+          -V \
           -o ${f}${smoothxg_prefix}.gfa
       fi
     done  
