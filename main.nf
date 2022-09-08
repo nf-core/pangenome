@@ -221,7 +221,6 @@ process wfmash {
   """
 }
 
-/// TODO -f ${params.seqwish_sparse_factor} \
 process seqwish {
   publishDir "${params.outdir}/seqwish", mode: "${params.publish_dir_mode}"
 
@@ -245,6 +244,7 @@ process seqwish {
       -s $fasta \
       -p \$input \
       -k ${params.seqwish_min_match_length} \
+      -f ${params.seqwish_sparse_factor} \
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
       ${seqwish_temp_dir} \
