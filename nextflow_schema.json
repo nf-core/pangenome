@@ -22,7 +22,7 @@
                     "help_text": "Use this to specify the location of your input FASTA file. For example:\n\n```bash\n--input 'path/to/data/input.fa.gz'\n```\n\n."
                 },
                 "n_mappings": {
-                    "type": "string",
+                    "type": "integer",
                     "fa_icon": "fas fa-dna",
                     "description": "Number of mappings to retain for each segment."
                 },
@@ -129,7 +129,7 @@
             "default": "",
             "properties": {
                 "smoothxg_num_haps": {
-                    "type": "string",
+                    "type": "integer",
                     "default": "wfmash_n_mappings",
                     "description": "number of haplotypes in the given FASTA"
                 },
