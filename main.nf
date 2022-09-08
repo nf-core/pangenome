@@ -117,8 +117,24 @@ ${f.getName()}\
 """ }
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
-fai = channel.fromPath("${params.input}.fai").collect()
-gzi = channel.fromPath("${params.input}.gzi").collect()
+fai_path = file("${params.input}.fai")
+gzi_path = file("${params.input}.gzi")
+
+process samtoolsFaidx {
+  publishDir "${params.outdir}/samtools_faidx", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(fasta)
+
+  output:
+    path("${f}.fai"), emit: samtools_fai
+    path("${f}.gzi"), emit: samtools_gzi
+
+  """
+  samtools faidx $fasta
+  """
+}
+
 
 process wfmashMap {
   publishDir "${params.outdir}/wfmash_map", mode: "${params.publish_dir_mode}"
@@ -494,6 +510,14 @@ process multiQC {
 workflow {
   main:
 
+    if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
+      samtoolsFaidx(fasta)
+      fai = samtoolsFaidx.out.samtools_fai.collect()
+      gzi = samtoolsFaidx.out.samtools_gzi.collect()
+    } else {
+      fai = channel.fromPath("${params.input}.fai").collect()
+      gzi = channel.fromPath("${params.input}.gzi").collect()
+    }
     if (params.wfmash_only) {
       // TODO Once we changed the way we changed the publish_dir_mode, we have to emit the .paf file as default, else not
       if (params.wfmash_chunks == 1) {
