@@ -87,6 +87,7 @@ if (params.smoothxg_poa_params == null) {
   }
 }
 def smoothxg_poa_params_display = smoothxg_poa_params.replaceAll(/,/, "_")
+def smoothxg_temp_dir = params.smoothxg_temp_dir ? "-b${params.smoothxg_temp_dir}" : ""
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
@@ -261,6 +262,7 @@ process smoothxg {
           -T ${task.cpus} \
           -g \$input_gfa \
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
+          ${smoothxg_temp_dir} \
           -K \
           -X 100 \
           -I ${smoothxg_block_id_min} \
@@ -285,6 +287,7 @@ process smoothxg {
           -T ${task.cpus} \
           -g \$input_gfa \
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
+          ${smoothxg_temp_dir} \
           -K \
           -X 100 \
           -I ${smoothxg_block_id_min} \
