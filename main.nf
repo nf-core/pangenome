@@ -88,6 +88,9 @@ if (params.smoothxg_poa_params == null) {
 }
 def smoothxg_poa_params_display = smoothxg_poa_params.replaceAll(/,/, "_")
 def smoothxg_temp_dir = params.smoothxg_temp_dir ? "-b${params.smoothxg_temp_dir}" : ""
+def smoothxg_keep_intermediate_files = params.smoothxg_keep_intermediate_files ? "-K" : ""
+def smoothxg_xpoa = params.smoothxg_run_abpoa ? "" : "-S"
+def smoothxg_poa_mode = params.smoothxg_run_global_poa ? "-Z" : ""
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
@@ -263,7 +266,7 @@ process smoothxg {
           -g \$input_gfa \
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
           ${smoothxg_temp_dir} \
-          -K \
+          ${smoothxg_keep_intermediate_files} \
           -X 100 \
           -I ${smoothxg_block_id_min} \
           -R ${params.smoothxg_block_ratio_min} \
@@ -274,6 +277,7 @@ process smoothxg {
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
+          ${smoothxg_xpoa} ${smoothxg_poa_mode} \
           -V \
           -o smooth.\$i.gfa
       else
@@ -288,7 +292,7 @@ process smoothxg {
           -g \$input_gfa \
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
           ${smoothxg_temp_dir} \
-          -K \
+          ${smoothxg_keep_intermediate_files} \
           -X 100 \
           -I ${smoothxg_block_id_min} \
           -R ${params.smoothxg_block_ratio_min} \
@@ -299,6 +303,7 @@ process smoothxg {
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
+          ${smoothxg_xpoa} ${smoothxg_poa_mode} \
           \$maf_params \
           -Q ${params.smoothxg_consensus_prefix} \
           \$consensus_params \
