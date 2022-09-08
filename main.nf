@@ -117,12 +117,16 @@ ${f.getName()}\
 """ }
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
+fai = channel.fromPath("${params.input}.fai").collect()
+gzi = channel.fromPath("${params.input}.gzi").collect()
 
 process wfmashMap {
   publishDir "${params.outdir}/wfmash_map", mode: "${params.publish_dir_mode}"
 
   input:
     tuple val(f), path(fasta)
+    path(fai)
+    path(gzi)
 
   output:
     tuple val(f), path("${f}.${wfmash_prefix}.map.paf")
@@ -162,7 +166,9 @@ process wfmashAlign {
   publishDir "${params.outdir}/wfmash_align", mode: "${params.publish_dir_mode}"
 
   input:
-    tuple val(f), path(fasta), path(paf)
+    tuple val(f), path(fasta), path(paf) 
+    path(fai)
+    path(gzi)
 
   output:
     path("${paf}.align.paf")
@@ -191,6 +197,8 @@ process wfmash {
 
   input:
     tuple val(f), path(fasta)
+    path(fai)
+    path(gzi)
 
   output:
     tuple val(f), path("${f}.${wfmash_prefix}.paf")
@@ -425,7 +433,6 @@ process odgiDraw {
   """
 }
 
-// TODO we can parallelize this for each reference given in ${params.vcf_spec}
 process vg_deconstruct {
   publishDir "${params.outdir}/vg_deconstruct", mode: "${params.publish_dir_mode}"
 
@@ -469,11 +476,12 @@ workflow {
     if (params.wfmash_only) {
       // TODO Once we changed the way we changed the publish_dir_mode, we have to emit the .paf file as default, else not
       if (params.wfmash_chunks == 1) {
-        wfmash(fasta)
+        wfmash(fasta, fai, gzi)
       } else {
-        wfmashMap(fasta)
+        wfmashMap(fasta, fai, gzi)
         splitApproxMappingsInChunks(wfmashMap.out)
-        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
+        // TODO update this once I understood it
+        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
       }      
     } else {
       if (params.paf != false) {
@@ -481,12 +489,12 @@ workflow {
         seqwish(fasta, paf_ch)
       } else {
         if (params.wfmash_chunks == 1) {
-          wfmash(fasta)
+          wfmash(fasta, fai, gzi)
           seqwish(fasta, wfmash.out.collect{it[1]})
         } else {
-          wfmashMap(fasta)
+          wfmashMap(fasta, fai, gzi)
           splitApproxMappingsInChunks(wfmashMap.out)
-          wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
+          wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
           seqwish(fasta, wfmashAlign.out.collect())
         }
       }
