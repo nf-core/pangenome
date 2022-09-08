@@ -67,6 +67,9 @@ if (params.wfmash_sparse_map == "auto") {
     wfmash_sparse_map_cmd = "-x${params.wfmash_sparse_map}"
   }
 }
+def wfmash_temp_dir = params.wfmash_temp_dir ? "-B${params.wfmash_temp_dir}" : ""
+
+def seqwish_temp_dir = params.seqwish_temp_dir ? "--temp-dir${params.seqwish_temp_dir}" : ""
 
 def smoothxg_block_id_min = params.wfmash_map_pct_id / 100.0
 // TODO: CHANGE TO LARGE P ONCE WE ARE THERE
@@ -81,7 +84,7 @@ if (params.smoothxg_poa_params == null) {
   } else if (params.smoothxg_poa_params == "asm15") {
     smoothxg_poa_params = "-p 1,7,11,2,33,1"
   } else if (params.smoothxg_poa_params == "asm20") {
-    smoothxg_poa_params = "-p 1,4,6,2,26,1"
+    smoothxg_poa_params = "-p 1,4,6,2,26,1"B
   } else {
     smoothxg_poa_params = "-p${params.smoothxg_poa_params}"
   }
@@ -91,9 +94,13 @@ def smoothxg_temp_dir = params.smoothxg_temp_dir ? "-b${params.smoothxg_temp_dir
 def smoothxg_keep_intermediate_files = params.smoothxg_keep_intermediate_files ? "-K" : ""
 def smoothxg_xpoa = params.smoothxg_run_abpoa ? "" : "-S"
 def smoothxg_poa_mode = params.smoothxg_run_global_poa ? "-Z" : ""
+// disabling consensus graph mode
+def smoothxg_consensus_spec = false
+
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
+
 def do_1d = true
 def do_2d = true
 
@@ -131,6 +138,7 @@ process wfmashMap {
      ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
+     ${wfmash_temp_dir} \
      -t ${task.cpus} \
      -m \
      $fasta $fasta \
@@ -170,6 +178,7 @@ process wfmashAlign {
      ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
+     ${wfmash_temp_dir} \
      -t ${task.cpus} \
      -i $paf \
      $fasta $fasta \
@@ -197,6 +206,7 @@ process wfmash {
      ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
      -n ${wfmash_n_mappings_minus_1} \
+     ${wfmash_temp_dir} \
      -t ${task.cpus} \
      $fasta $fasta \
      >${f}.${wfmash_prefix}.paf
@@ -229,6 +239,7 @@ process seqwish {
       -k ${params.seqwish_min_match_length} \
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
+      ${seqwish_temp_dir} \
       -P
     """
 }
@@ -283,9 +294,6 @@ process smoothxg {
       else
         poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
         consensus_params="-V"
-        if [[ ${params.smoothxg_consensus_spec} != false ]]; then
-          consensus_params="-C ${f}.cons,${params.smoothxg_consensus_spec}"  
-        fi  
         smoothxg \
           -t ${task.cpus} \
           -T ${task.cpus} \
@@ -305,7 +313,6 @@ process smoothxg {
           -d 0 -D 0 \
           ${smoothxg_xpoa} ${smoothxg_poa_mode} \
           \$maf_params \
-          -Q ${params.smoothxg_consensus_prefix} \
           \$consensus_params \
           -o ${f}${smoothxg_prefix}.gfa
       fi
