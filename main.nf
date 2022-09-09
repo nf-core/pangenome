@@ -30,7 +30,7 @@ if (params.input == null) {
 if (params.n_mappings == null) {
         log.info"""
 
-    Mandatory argument --wfmash_n_mappings missing! For more details run with --help.
+    Mandatory argument --n_mappings missing! For more details run with --help.
 
     """.stripIndent()  
 
