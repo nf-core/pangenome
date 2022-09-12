@@ -75,18 +75,18 @@ def smoothxg_block_id_min = params.wfmash_map_pct_id / 100.0
 // TODO: CHANGE TO LARGE P ONCE WE ARE THERE
 def smoothxg_poa_params_cmd = ""
 if (params.smoothxg_poa_params == null) {
-  smoothxg_poa_params = "-p 1,19,39,3,81,1"
+  smoothxg_poa_params = "-P 1,19,39,3,81,1"
 } else {
   if (params.smoothxg_poa_params == "asm5") {
-    smoothxg_poa_params = "-p 1,19,39,3,81,1"
+    smoothxg_poa_params = "-P 1,19,39,3,81,1"
   } else if (params.smoothxg_poa_params == "asm10") {
-    smoothxg_poa_params = "-p 1,9,16,2,41,1"
+    smoothxg_poa_params = "-P 1,9,16,2,41,1"
   } else if (params.smoothxg_poa_params == "asm15") {
-    smoothxg_poa_params = "-p 1,7,11,2,33,1"
+    smoothxg_poa_params = "-P 1,7,11,2,33,1"
   } else if (params.smoothxg_poa_params == "asm20") {
-    smoothxg_poa_params = "-p 1,4,6,2,26,1"B
+    smoothxg_poa_params = "-P 1,4,6,2,26,1"B
   } else {
-    smoothxg_poa_params = "-p${params.smoothxg_poa_params}"
+    smoothxg_poa_params = "-P${params.smoothxg_poa_params}"
   }
 }
 def smoothxg_poa_params_display = smoothxg_poa_params.replaceAll(/,/, "_")
