@@ -45,10 +45,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 5. Start running your own analysis!
 
     ```bash
-    nextflow run nf-core/pangenome -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input "input.fa.gz"
+    nextflow run nf-core/pangenome -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input "input.fa.gz" --n_mappings 11
     ```
 
-See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
+Be careful, the input FASTA must have been compressed with [bgzip](http://www.htslib.org/doc/bgzip.html). See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
 
 ## Pipeline Summary
 
