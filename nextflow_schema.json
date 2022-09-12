@@ -60,7 +60,7 @@
                 },
                 "wfmash_segment_length": {
                     "type": "integer",
-                    "default": 3000,
+                    "default": 5000,
                     "description": "segment length for mapping",
                     "fa_icon": "fas fa-align-center"
                 },
@@ -71,9 +71,12 @@
                 },
                 "wfmash_mash_kmer": {
                     "type": "integer",
-                    "default": 16,
                     "description": "kmer size for mashmap",
                     "fa_icon": "fas fa-align-center"
+                },
+                "wfmash_mash_kmer_thres": {
+                    "type": "number",
+                    "description": "ignore the top % most-frequent kmers [default: 0.001]"
                 },
                 "wfmash_merge_segments": {
                     "type": "boolean",
@@ -98,6 +101,14 @@
                 "wfmash_only": {
                     "type": "boolean",
                     "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
+                },
+                "wfmash_sparse_map": {
+                    "type": "string",
+                    "description": "keep this fraction of mappings ('auto' for giant component heuristic) [default: 1.0]"
+                },
+                "wfmash_temp_dir": {
+                    "type": "string",
+                    "description": "directory for temporary files"
                 }
             }
         },
@@ -109,7 +120,7 @@
             "properties": {
                 "seqwish_min_match_length": {
                     "type": "integer",
-                    "default": 47,
+                    "default": 19,
                     "description": "Ignore exact matches below this length.",
                     "fa_icon": "fas fa-project-diagram"
                 },
@@ -118,6 +129,14 @@
                     "default": 10000000,
                     "description": "Number of bp to use for transitive closure batch.",
                     "fa_icon": "fas fa-project-diagram"
+                },
+                "seqwish_sparse_factor": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "keep this randomly selected fraction of input matches [default: no sparsification]"
+                },
+                "seqwish_temp_dir": {
+                    "type": "string"
                 }
             },
             "fa_icon": "fas fa-project-diagram"
@@ -130,7 +149,7 @@
             "properties": {
                 "smoothxg_num_haps": {
                     "type": "integer",
-                    "default": "wfmash_n_mappings",
+                    "default": 0,
                     "description": "number of haplotypes in the given FASTA"
                 },
                 "smoothxg_max_path_jump": {
@@ -145,13 +164,8 @@
                 },
                 "smoothxg_poa_length": {
                     "type": "string",
-                    "default": "4001,4507",
+                    "default": "700,900,1100",
                     "description": "maximum sequence length to put into POA, can be a comma-separated list; for each element smoothxg will be executed once"
-                },
-                "smoothxg_consensus_spec": {
-                    "type": "string",
-                    "description": "Consensus graph specification: write the consensus graph to BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter (which defines the length of divergences from consensus paths to preserve in the output), optionally a file containing reference paths to preserve in the output, a flag (y/n) indicating whether we should also use the POA consensus paths, a minimum coverage of consensus paths to retain (min_cov), and a maximum allele length (max_len, defaults to 1e6); implies -a; example: cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000.",
-                    "fa_icon": "fab fa-superpowers"
                 },
                 "smoothxg_consensus_prefix": {
                     "type": "string",
@@ -166,8 +180,7 @@
                 "smoothxg_block_id_min": {
                     "type": "number",
                     "description": "Split blocks into groups connected by this identity threshold.",
-                    "fa_icon": "fas fa-percentage",
-                    "default": 0.95
+                    "fa_icon": "fas fa-percentage"
                 },
                 "smoothxg_pad_max_depth": {
                     "type": "integer",
@@ -176,7 +189,7 @@
                 },
                 "smoothxg_poa_padding": {
                     "type": "number",
-                    "default": 0.03,
+                    "default": 0.001,
                     "description": "pad each end of each sequence in POA with N*(longest_poas_seq) bp"
                 },
                 "smoothxg_poa_params": {
@@ -185,9 +198,25 @@
                     "description": "Score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2.",
                     "fa_icon": "fab fa-superpowers"
                 },
+                "smoothxg_run_abpoa": {
+                    "type": "boolean",
+                    "description": "run abPOA [default: SPOA]"
+                },
+                "smoothxg_run_global_poa": {
+                    "type": "string",
+                    "default": null
+                },
                 "smoothxg_write_maf": {
                     "type": "boolean",
                     "description": "write MAF output representing merged POA blocks"
+                },
+                "smoothxg_keep_intermediate_files": {
+                    "type": "string",
+                    "description": "keep intermediate graphs during smoothxg step"
+                },
+                "smoothxg_temp_dir": {
+                    "type": "string",
+                    "description": "directory for temporary files"
                 }
             },
             "fa_icon": "fas fa-project-diagram"
