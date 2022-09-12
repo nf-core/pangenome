@@ -92,7 +92,10 @@ if (params.smoothxg_poa_params == null) {
 def smoothxg_poa_params_display = smoothxg_poa_params.replaceAll(/,/, "_")
 def smoothxg_temp_dir = params.smoothxg_temp_dir ? "-b${params.smoothxg_temp_dir}" : ""
 def smoothxg_keep_intermediate_files = params.smoothxg_keep_intermediate_files ? "-K" : ""
-def smoothxg_xpoa = params.smoothxg_run_abpoa ? "" : "-S"
+def smoothxg_xpoa = "-S" 
+if (params.smoothxg_run_abpoa != null) {
+  smoothxg_xpoa = ""
+}
 def smoothxg_poa_mode = params.smoothxg_run_global_poa ? "-Z" : ""
 // disabling consensus graph mode
 def smoothxg_consensus_spec = false
@@ -312,7 +315,8 @@ process smoothxg {
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
-          ${smoothxg_xpoa} ${smoothxg_poa_mode} \
+          ${smoothxg_xpoa} \
+          ${smoothxg_poa_mode} \
           -V \
           -o smooth.\$i.gfa
       else
@@ -334,7 +338,8 @@ process smoothxg {
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
-          ${smoothxg_xpoa} ${smoothxg_poa_mode} \
+          ${smoothxg_xpoa} \
+          ${smoothxg_poa_mode} \
           \$maf_params \
           -V \
           -o ${f}${smoothxg_prefix}.gfa
@@ -529,7 +534,7 @@ workflow {
         wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
       }      
     } else {
-      if (params.paf != false) {
+      if (params.paf != null) {
         paf_ch = Channel.fromPath(params.paf)
         seqwish(fasta, paf_ch)
       } else {
@@ -561,7 +566,7 @@ workflow {
 
       ch_vcf_spec = Channel.empty()
       vg_deconstruct = Channel.empty()
-      if (params.vcf_spec != false) {
+      if (params.vcf_spec != null) {
         ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
         vg_deconstruct(gfaffix.out.gfa_norm.combine(ch_vcf_spec))
         // TODO add bcftools
