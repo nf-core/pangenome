@@ -35,7 +35,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 4. Test the workflow on a minimal dataset
 
     ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute>
+    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_mappings 11
     ```
 
     [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
