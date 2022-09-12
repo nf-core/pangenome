@@ -174,7 +174,7 @@
                 },
                 "smoothxg_block_ratio_min": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "description": "minimum small / large length ratio to cluster in a block"
                 },
                 "smoothxg_block_id_min": {
@@ -204,7 +204,7 @@
                 },
                 "smoothxg_run_global_poa": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
                 },
                 "smoothxg_write_maf": {
                     "type": "boolean",
