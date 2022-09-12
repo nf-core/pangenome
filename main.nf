@@ -610,58 +610,57 @@ def helpMessage() {
     nextflow run nf-core/pangenome --input 'data/input.fa.gz' -profile docker
 
     Mandatory arguments:
-      --input [file]                  Path to input FASTA (must be surrounded with quotes)
+      --input [file]                  Path to bgzipped input FASTA (must be surrounded with quotes)
+      -- n_mappings [int]             Number of mappings to retain for each segment.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
+    PAF options:
+      --paf [file]                    Optional input to skip the all vs. all alignment wfmash phase directly starting with seqwish.                                      
     Wfmash options:
       --wfmash_map_pct_id [n]         percent identity in the wfmash mashmap step [default: 90]
-      --wfmash_n_mappings [n]         number of secondary mappings to retain in 'map' filter mode [default: 10]
-      --wfmash_segment_length [n]     segment length for mapping [default: 3000]
-      --wfmash_block_length [n]       minimum block length filter for mapping [default: 3 * wfmash_segment_length]
-      --wfmash_mash_kmer [n]          kmer size for mashmap [default: 16]
+      --wfmash_segment_length [n]     segment length for mapping [default: 5000]
+      --wfmash_block_length [n]       minimum block length filter for mapping
+      --wfmash_mash_kmer [n]          kmer size for mashmap
+      --wfmash_mash_kmer_thres [n]    ignore the top % most-frequent kmers [default: 0.001]
       --wfmash_merge_segments         merge successive mappings [default: OFF]
       --wfmash_no_splits              disable splitting of input sequences during mapping [default: OFF]
       --wfmash_exclude--delim [c]     skip mappings between sequences with the same name prefix before
                                       the given delimiter character [default: all-vs-all and !self]
       --wfmash_chunks                 The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1. [default: 1]
       --wfmash_only                   If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster. [default: OFF]
+      --wfmash_sparse_map             keep this fraction of mappings ('auto' for giant component heuristic) [default: 1.0]
+      --wfmash_temp_dir [str]         directory for temporary files
 
     Seqwish options:
-      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 47]
+      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 19]
       --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 10000000]
+      --seqwish_sparse_factor [n]     keep this randomly selected fraction of input matches [default: no sparsification]
+      --seqwish_temp_dir [str]          directory for temporary files
 
     Smoothxg options:
       --smoothxg_num_haps [n]         number of haplotypes in the given FASTA [default: wfmash_n_mappings]
       --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 0]
       --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 0]
-      --smoothxg_max_poa_length [n]   maximum sequence length to put into POA, can be a comma-separated list; 
-                                      for each element smoothxg will be executed once [default: 4001,4507]
-      --smoothxg_consensus_spec [str] consensus graph specification: write the consensus graph to
-                                      BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter
-                                      (which defines the length of divergences from consensus paths to preserve in the
-                                      output), optionally a file containing reference paths to preserve in the output,
-                                      a flag (y/n) indicating whether we should also use the POA consensus paths, a
-                                      minimum coverage of consensus paths to retain (min_cov), and a maximum allele
-                                      length (max_len, defaults to 1e6); implies -a; example:
-                                      cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000
-                                      [default: OFF]
+      --smoothxg_poa_length [n]       maximum sequence length to put into POA, can be a comma-separated list; 
+                                      for each element smoothxg will be executed once [default: 700,900,1100]
       --smoothxg_consensus_prefix [n] use this prefix for consensus path names [default: Consensus_]
       --smoothxg_block_ratio_min [n]  minimum small / large length ratio to cluster in a block [default: 0.0]
-      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: 0.95]
+      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: wfmash_map_pct_id / 100.0]
       --smoothxg_pad_max_depth [n]    path depth at which we don't pad the POA problem [default: 100]
       --smoothxg_poa_padding [n]      pad each end of each sequence in POA with N*(longest_poas_seq) bp [default: 0.03]
-      --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
-                                      [default: 1,19,39,3,81,1]
+      --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2 may also be given as presets: asm5, asm10, asm15, asm20 [default: 1,19,39,3,81,1 = asm5]
+      --smoothxg_run_abpoa            run abPOA [default: SPOA]
+      --smoothxg_run_global_poa       run the POA in global mode [default: local mode]
       --smoothxg_write_maf [n]        write MAF output representing merged POA blocks [default: OFF]
+      --smoothxg_keep_intermediate_files       keep intermediate graphs during smoothxg step
+      --smoothxg_temp_dir [str]       directory for temporary files
 
     Visualization options:
-      --viz                           Generate 1D and 2D visualisations of the built graphs [default: OFF]
+      --no_viz                        Set if you don't want the 1D visualizations.
+      --no_layout                     Set if you don't want the computational expensive 2D layout.
 
     VCF options:
-      --vcf_spec                      specify a set of VCFs to produce with SPEC = REF:DELIM[,REF:DELIM]*
-                                      the paths matching ^REF are used as a reference, while the sample haplotypes
-                                      are derived from path names, e.g. when DELIM=# and with '-V chm13:#',
-                                      a path named HG002#1#ctg would be assigned to sample HG002 phase 1 [default: OFF]
+      --vcf_spec                      specify a set of VCFs to produce with SPEC = REF:DELIM[:LEN][,REF:DELIM:[LEN]]* the paths matching ^REF are used as a reference, while the sample haplotypes are derived from path names, e.g. when DELIM=# and with '-V chm13:#', a path name HG002#1#ctg would be assigned to sample HG002 phase 1. If LEN is specified and greater than 0, the VCFs are decomposed, filtering  sites whose max allele length is greater than LEN. [default: off]
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved [default: ./results]
