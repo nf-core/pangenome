@@ -190,7 +190,7 @@ process wfmashAlign {
     path(gzi)
 
   output:
-    path("${paf}.align.paf")
+    path("${paf}.align.paf"), emit: paf
 
   """
   wfmash ${wfmash_exclude_cmd} \
@@ -245,23 +245,18 @@ process seqwish {
 
   input:
     tuple val(f), path(fasta)
-    path(pafs)
+    path(paf)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
 
   script:
+    def input = paf.join(',')
     """
-    if [[ \$(ls *.paf | wc -l) == 1 ]]; then
-      input=$pafs
-    else 
-      input=\$(ls *.paf | tr '\\\n' ',')
-      input=\${input::-1}
-    fi  
     seqwish \
       -t ${task.cpus} \
       -s $fasta \
-      -p \$input \
+      -p $input \
       -k ${params.seqwish_min_match_length} \
       -f ${params.seqwish_sparse_factor} \
       -g ${f}${seqwish_prefix}.gfa -P \
