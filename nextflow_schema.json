@@ -12,7 +12,7 @@
             "description": "Define where the pipeline should find input data and save output data.",
             "required": [
                 "input",
-                "n_mappings"
+                "n_haplotypes"
             ],
             "properties": {
                 "input": {
@@ -21,10 +21,10 @@
                     "description": "Input FASTA file.",
                     "help_text": "Use this to specify the location of your input FASTA file. For example:\n\n```bash\n--input 'path/to/data/input.fa.gz'\n```\n\n."
                 },
-                "n_mappings": {
-                    "type": "integer",
-                    "fa_icon": "fas fa-dna",
-                    "description": "Number of mappings to retain for each segment."
+                "n_haplotypes": {
+                    "type": "string",
+                    "default": null,
+                    "fa_icon": "fas fa-dna"
                 },
                 "outdir": {
                     "type": "string",
@@ -148,10 +148,9 @@
             "description": "Options for graph smoothing phase.",
             "default": "",
             "properties": {
-                "smoothxg_num_haps": {
-                    "type": "integer",
-                    "default": 0,
-                    "description": "number of haplotypes in the given FASTA"
+                "smoothxg_haplotypes_smooth": {
+                    "type": "string",
+                    "default": null
                 },
                 "smoothxg_max_path_jump": {
                     "type": "integer",

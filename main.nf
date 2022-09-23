@@ -27,10 +27,10 @@ if (params.input == null) {
     exit 1
 }
 
-if (params.n_mappings == null) {
+if (params.n_haplotypes == null) {
         log.info"""
 
-    Mandatory argument --n_mappings missing! For more details run with --help.
+    Mandatory argument --n_haplotypes missing! For more details run with --help.
 
     """.stripIndent()  
 
@@ -42,8 +42,8 @@ ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists
 
 // We can't change global parameters inside this scope, so we build the ones we need locally
 def n_haps = 0
-if (!params.smoothxg_num_haps) {
-  n_haps = params.n_mappings
+if (!params.smoothxg_haplotypes_smooth) {
+  n_haps = params.n_haplotypes
 }
 
 def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
@@ -52,7 +52,7 @@ def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
 def wfmash_block_length_cmd = params.wfmash_block_length ? "-l${params.wfmash_block_length}" : ""
 def wfmash_mash_kmer_cmd = params.wfmash_mash_kmer ? "-k${params.wfmash_mash_kmer}" : ""
 def wfmash_kmer_thres_cmd = params.wfmash_mash_kmer_thres ? "-H${params.wfmash_kmer_thres}" : ""
-def wfmash_n_mappings_minus_1 = params.n_mappings - 1
+def wfmash_n_mappings_minus_1 = params.n_haplotypes - 1
 def wfmash_sparse_map_cmd = ""
 if (params.wfmash_sparse_map == "auto") {
   n = n_haps
@@ -612,7 +612,7 @@ def helpMessage() {
 
     Mandatory arguments:
       --input [file]                  Path to bgzipped input FASTA (must be surrounded with quotes)
-      -- n_mappings [int]             Number of mappings to retain for each segment.
+      -- n_haplotypes [int]             Number of mappings to retain for each segment.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
     PAF options:
@@ -639,7 +639,7 @@ def helpMessage() {
       --seqwish_temp_dir [str]          directory for temporary files
 
     Smoothxg options:
-      --smoothxg_num_haps [n]         number of haplotypes in the given FASTA [default: wfmash_n_mappings]
+      --smoothxg_haplotypes-smooth [n]number of haplotypes if different than set with --n_haplotypes [default: n_haplotypes]
       --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 0]
       --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 0]
       --smoothxg_poa_length [n]       maximum sequence length to put into POA, can be a comma-separated list; 
