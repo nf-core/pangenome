@@ -17,24 +17,102 @@ if (params.help){
     exit 0
 }
 
+if (params.input == null) {
+        log.info"""
+
+    Mandatory argument --input missing! For more details run with --help.
+
+    """.stripIndent()  
+
+    exit 1
+}
+
+if (params.n_mappings == null) {
+        log.info"""
+
+    Mandatory argument --n_mappings missing! For more details run with --help.
+
+    """.stripIndent()  
+
+    exit 1
+}
+
 ch_multiqc_config = file("$projectDir/assets/multiqc_config.yaml", checkIfExists: true)
 // ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
 
 // We can't change global parameters inside this scope, so we build the ones we need locally
+def n_haps = 0
+if (!params.smoothxg_num_haps) {
+  n_haps = params.n_mappings
+}
+
 def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
 def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
 def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
-def smoothxg_poa_params_display = params.smoothxg_poa_params.replaceAll(/,/, "_")
+def wfmash_block_length_cmd = params.wfmash_block_length ? "-l${params.wfmash_block_length}" : ""
+def wfmash_mash_kmer_cmd = params.wfmash_mash_kmer ? "-k${params.wfmash_mash_kmer}" : ""
+def wfmash_kmer_thres_cmd = params.wfmash_mash_kmer_thres ? "-H${params.wfmash_kmer_thres}" : ""
+def wfmash_n_mappings_minus_1 = params.n_mappings - 1
+def wfmash_sparse_map_cmd = ""
+if (params.wfmash_sparse_map == "auto") {
+  n = n_haps
+  x = Math.log(n)/n * 10
+  wfmash_sparse_map_frac = 1
+  if (x >= 1) {
+    wfmash_sparse_map_frac = x
+  }
+  wfmash_sparse_map_cmd = "-x${wfmash_sparse_map_frac}"
+} else {
+  if (params.wfmash_sparse_map != null) {
+    wfmash_sparse_map_cmd = "-x${params.wfmash_sparse_map}"
+  }
+}
+def wfmash_temp_dir = params.wfmash_temp_dir ? "-B${params.wfmash_temp_dir}" : ""
+
+def seqwish_temp_dir = params.seqwish_temp_dir ? "--temp-dir${params.seqwish_temp_dir}" : ""
+
+def smoothxg_block_id_min = params.wfmash_map_pct_id / 100.0
+// TODO: CHANGE TO LARGE P ONCE WE ARE THERE
+def smoothxg_poa_params_cmd = ""
+if (params.smoothxg_poa_params == null) {
+  smoothxg_poa_params = "-P 1,19,39,3,81,1"
+} else {
+  if (params.smoothxg_poa_params == "asm5") {
+    smoothxg_poa_params = "-P 1,19,39,3,81,1"
+  } else if (params.smoothxg_poa_params == "asm10") {
+    smoothxg_poa_params = "-P 1,9,16,2,41,1"
+  } else if (params.smoothxg_poa_params == "asm15") {
+    smoothxg_poa_params = "-P 1,7,11,2,33,1"
+  } else if (params.smoothxg_poa_params == "asm20") {
+    smoothxg_poa_params = "-P 1,4,6,2,26,1"B
+  } else {
+    smoothxg_poa_params = "-P${params.smoothxg_poa_params}"
+  }
+}
+def smoothxg_poa_params_display = smoothxg_poa_params.replaceAll(/,/, "_")
+def smoothxg_temp_dir = params.smoothxg_temp_dir ? "-b${params.smoothxg_temp_dir}" : ""
+def smoothxg_keep_intermediate_files = params.smoothxg_keep_intermediate_files ? "-K" : ""
+def smoothxg_xpoa = "-S" 
+if (params.smoothxg_run_abpoa != null) {
+  smoothxg_xpoa = ""
+}
+def smoothxg_poa_mode = params.smoothxg_run_global_poa ? "-Z" : ""
+// disabling consensus graph mode
+def smoothxg_consensus_spec = false
+
 def wfmash_prefix = "wfmash"
 def seqwish_prefix = ".seqwish"
 def smoothxg_prefix = ".smoothxg"
-def n_haps = 0
-def do_1d = false
-def do_2d = false
 
-if (params.viz) {
-  do_1d = true
-  do_2d = true
+def do_1d = true
+def do_2d = true
+
+if (params.no_viz) {
+  do_1d = false
+}
+
+if (params.no_layout) {
+  do_2d = false
 }
 
 def make_file_prefix = { f -> """\
@@ -42,16 +120,32 @@ ${f.getName()}\
 """ }
 
 fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
+fai_path = file("${params.input}.fai")
+gzi_path = file("${params.input}.gzi")
 
-if (!params.smoothxg_num_haps) {
-  n_haps = params.wfmash_n_mappings
+process samtoolsFaidx {
+  publishDir "${params.outdir}/samtools_faidx", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(fasta)
+
+  output:
+    path("${f}.fai"), emit: samtools_fai
+    path("${f}.gzi"), emit: samtools_gzi
+
+  """
+  samtools faidx $fasta
+  """
 }
+
 
 process wfmashMap {
   publishDir "${params.outdir}/wfmash_map", mode: "${params.publish_dir_mode}"
 
   input:
     tuple val(f), path(fasta)
+    path(fai)
+    path(gzi)
 
   output:
     tuple val(f), path("${f}.${wfmash_prefix}.map.paf")
@@ -59,12 +153,15 @@ process wfmashMap {
   """
   wfmash ${wfmash_exclude_cmd} \
      -s ${params.wfmash_segment_length} \
-     -l ${params.wfmash_block_length} \
+     ${wfmash_block_length_cmd} \
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
+     ${wfmash_mash_kmer_cmd} \
+     ${wfmash_kmer_thres_cmd} \
+     ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
-     -n ${params.wfmash_n_mappings} \
-     -k ${params.wfmash_mash_kmer} \
+     -n ${wfmash_n_mappings_minus_1} \
+     ${wfmash_temp_dir} \
      -t ${task.cpus} \
      -m \
      $fasta $fasta \
@@ -88,20 +185,25 @@ process wfmashAlign {
   publishDir "${params.outdir}/wfmash_align", mode: "${params.publish_dir_mode}"
 
   input:
-    tuple val(f), path(fasta), path(paf)
+    tuple val(f), path(fasta), path(paf) 
+    path(fai)
+    path(gzi)
 
   output:
-    path("${paf}.align.paf")
+    path("${paf}.align.paf"), emit: paf
 
   """
   wfmash ${wfmash_exclude_cmd} \
      -s ${params.wfmash_segment_length} \
-     -l ${params.wfmash_block_length} \
+     ${wfmash_block_length_cmd} \
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
+     ${wfmash_mash_kmer_cmd} \
+     ${wfmash_kmer_thres_cmd} \
+     ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
-     -n ${params.wfmash_n_mappings} \
-     -k ${params.wfmash_mash_kmer} \
+     -n ${wfmash_n_mappings_minus_1} \
+     ${wfmash_temp_dir} \
      -t ${task.cpus} \
      -i $paf \
      $fasta $fasta \
@@ -114,22 +216,27 @@ process wfmash {
 
   input:
     tuple val(f), path(fasta)
+    path(fai)
+    path(gzi)
 
   output:
-    tuple val(f), path("${f}${wfmash_prefix}.paf")
+    tuple val(f), path("${f}.${wfmash_prefix}.paf")
 
   """
   wfmash ${wfmash_exclude_cmd} \
      -s ${params.wfmash_segment_length} \
-     -l ${params.wfmash_block_length} \
+     ${wfmash_block_length_cmd} \
      ${wfmash_merge_cmd} \
      ${wfmash_split_cmd} \
+     ${wfmash_mash_kmer_cmd} \
+     ${wfmash_kmer_thres_cmd} \
+     ${wfmash_sparse_map_cmd} \
      -p ${params.wfmash_map_pct_id} \
-     -n ${params.wfmash_n_mappings} \
-     -k ${params.wfmash_mash_kmer} \
+     -n ${wfmash_n_mappings_minus_1} \
+     ${wfmash_temp_dir} \
      -t ${task.cpus} \
      $fasta $fasta \
-     >${f}${wfmash_prefix}.paf
+     >${f}.${wfmash_prefix}.paf
   """
 }
 
@@ -138,26 +245,23 @@ process seqwish {
 
   input:
     tuple val(f), path(fasta)
-    path(pafs)
+    path(paf)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
 
   script:
+    def input = paf.join(',')
     """
-    if [[ \$(ls *.paf | wc -l) == 1 ]]; then
-      input=$pafs
-    else 
-      input=\$(ls *.paf | tr '\\\n' ',')
-      input=\${input::-1}
-    fi  
     seqwish \
       -t ${task.cpus} \
       -s $fasta \
-      -p \$input \
+      -p $input \
       -k ${params.seqwish_min_match_length} \
+      -f ${params.seqwish_sparse_factor} \
       -g ${f}${seqwish_prefix}.gfa -P \
       -B ${params.seqwish_transclose_batch} \
+      ${seqwish_temp_dir} \
       -P
     """
 }
@@ -194,44 +298,45 @@ process smoothxg {
           -T ${task.cpus} \
           -g \$input_gfa \
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
-          -K \
+          ${smoothxg_temp_dir} \
+          ${smoothxg_keep_intermediate_files} \
           -X 100 \
-          -I ${params.smoothxg_block_id_min} \
+          -I ${smoothxg_block_id_min} \
           -R ${params.smoothxg_block_ratio_min} \
           -j ${params.smoothxg_max_path_jump} \
           -e ${params.smoothxg_max_edge_jump} \
           -l \$poa_length \
-          -p ${params.smoothxg_poa_params} \
+          ${smoothxg_poa_params} \
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
+          ${smoothxg_xpoa} \
+          ${smoothxg_poa_mode} \
           -V \
           -o smooth.\$i.gfa
       else
         poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
-        consensus_params="-V"
-        if [[ ${params.smoothxg_consensus_spec} != false ]]; then
-          consensus_params="-C ${f}.cons,${params.smoothxg_consensus_spec}"  
-        fi  
         smoothxg \
           -t ${task.cpus} \
           -T ${task.cpus} \
           -g \$input_gfa \
           -w \$(echo "\$poa_length * ${n_haps}" | bc) \
-          -K \
+          ${smoothxg_temp_dir} \
+          ${smoothxg_keep_intermediate_files} \
           -X 100 \
-          -I ${params.smoothxg_block_id_min} \
+          -I ${smoothxg_block_id_min} \
           -R ${params.smoothxg_block_ratio_min} \
           -j ${params.smoothxg_max_path_jump} \
           -e ${params.smoothxg_max_edge_jump} \
           -l \$poa_length \
-          -p ${params.smoothxg_poa_params} \
+          ${smoothxg_poa_params} \
           -O ${params.smoothxg_poa_padding} \
           -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
           -d 0 -D 0 \
+          ${smoothxg_xpoa} \
+          ${smoothxg_poa_mode} \
           \$maf_params \
-          -Q ${params.smoothxg_consensus_prefix} \
-          \$consensus_params \
+          -V \
           -o ${f}${smoothxg_prefix}.gfa
       fi
     done  
@@ -300,6 +405,7 @@ process odgiViz {
     odgi viz -i $graph -o ${graph}.viz_pos_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -u -d
     odgi viz -i $graph -o ${graph}.viz_depth_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -m
     odgi viz -i $graph -o ${graph}.viz_inv_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -z
+    odgi viz -i $graph -o ${graph}.viz_O_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -O
     """
 }
 
@@ -343,24 +449,41 @@ process odgiDraw {
   """
 }
 
-// TODO we can parallelize this for each reference given in ${params.vcf_spec}
 process vg_deconstruct {
   publishDir "${params.outdir}/vg_deconstruct", mode: "${params.publish_dir_mode}"
 
   input:
-  path(graph)
+  tuple path(graph), val(vcf_spec)
 
   output:
-  path("${graph}.*.vcf")
+  path("${graph}.*.vcf"), emit: vg_deconstruct_vcf
+  path("*.vcf.stats"), optional: true, emit: vg_deconstruct_bcftools_stats
 
   """
-  for s in \$(echo "${params.vcf_spec}" | tr ',' ' ');
-  do
-    ref=\$(echo "\$s" | cut -f 1 -d:)
-    delim=\$(echo "\$s" | cut -f 2 -d:)
-    vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
-    vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
-  done
+  ref=\$(echo "$vcf_spec" | cut -f 1 -d:)
+  delim=\$(echo "$vcf_spec" | cut -f 2 -d:)
+  pop_length=\$(echo "$vcf_spec" | cut -f 3 -d:)
+  if [[ -z \$pop_length ]]; then
+    pop_length=0
+  fi
+  vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
+  vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
+  bcftools stats \$vcf > \$vcf.stats
+
+  if [[ \$pop_length -gt 0 ]]; then
+  vcf_decomposed=${graph}.final.\$(echo \$ref | tr '/|' '_').decomposed.vcf
+  vcf_decomposed_tmp=\$vcf_decomposed.tmp.vcf
+  bgzip -c -@ ${task.cpus} \$vcf > \$vcf.gz
+  vcfbub -l 0 -a \$pop_length --input \$vcf.gz | vcfwave -I 1000 -t ${task.cpus} > \$vcf_decomposed_tmp
+
+  #TODO: to remove when vcfwave will be bug-free
+  # The TYPE info sometimes is wrong/missing
+  # There are variants without the ALT allele
+  bcftools annotate -x INFO/TYPE \$vcf_decomposed_tmp  | awk '\$5 != "."' > \$vcf_decomposed
+  rm \$vcf_decomposed_tmp \$vcf.gz
+
+  bcftools stats \$vcf_decomposed > \$vcf_decomposed.stats
+fi
   """
 }
 
@@ -369,6 +492,7 @@ process multiQC {
   publishDir "${params.outdir}", mode: "${params.publish_dir_mode}"
 
   input:
+  path vg_deconstruct_bcftools_stats
   path odgi_stats
   path odgi_viz
   path odgi_draw
@@ -387,51 +511,77 @@ process multiQC {
 workflow {
   main:
 
+    if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
+      samtoolsFaidx(fasta)
+      fai = samtoolsFaidx.out.samtools_fai.collect()
+      gzi = samtoolsFaidx.out.samtools_gzi.collect()
+    } else {
+      fai = channel.fromPath("${params.input}.fai").collect()
+      gzi = channel.fromPath("${params.input}.gzi").collect()
+    }
     if (params.wfmash_only) {
       // TODO Once we changed the way we changed the publish_dir_mode, we have to emit the .paf file as default, else not
       if (params.wfmash_chunks == 1) {
-        wfmash(fasta)
+        wfmash(fasta, fai, gzi)
       } else {
-        wfmashMap(fasta)
+        wfmashMap(fasta, fai, gzi)
         splitApproxMappingsInChunks(wfmashMap.out)
-        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
+        // TODO update this once I understood it
+        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
       }      
     } else {
-      if (params.wfmash_chunks == 1) {
-        wfmash(fasta)
-        seqwish(fasta, wfmash.out.collect{it[1]})
+      if (params.paf != null) {
+        paf_ch = Channel.fromPath(params.paf)
+        seqwish(fasta, paf_ch)
       } else {
-        wfmashMap(fasta)
-        splitApproxMappingsInChunks(wfmashMap.out)
-        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()))
-        seqwish(fasta, wfmashAlign.out.collect())
+        if (params.wfmash_chunks == 1) {
+          wfmash(fasta, fai, gzi)
+          seqwish(fasta, wfmash.out.collect{it[1]})
+        } else {
+          wfmashMap(fasta, fai, gzi)
+          splitApproxMappingsInChunks(wfmashMap.out)
+          wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
+          seqwish(fasta, wfmashAlign.out.collect())
+        }
       }
       smoothxg(seqwish.out)
       gfaffix(smoothxg.out.gfa_smooth)
 
-      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten(), gfaffix.out.gfa_norm))
-      odgiStats(odgiBuild.out)
+      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten()))
+      odgiStats(odgiBuild.out.mix(gfaffix.out.og_norm))
 
       odgiVizOut = Channel.empty()
       if (do_1d) {
-          odgiVizOut = odgiViz(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
+          odgiVizOut = odgiViz(gfaffix.out.og_norm)
       }
       odgiDrawOut = Channel.empty()
       if (do_2d) {
-        odgiLayout(odgiBuild.out.filter( ~/.*smoothxg.*/ ))
+        odgiLayout(gfaffix.out.og_norm)
         odgiDrawOut = odgiDraw(odgiLayout.out)
       }
 
-      if (params.vcf_spec != false) {
-        vg_deconstruct(gfaffix.out.gfa_norm)
-      }
-
-      multiQC(
+      ch_vcf_spec = Channel.empty()
+      vg_deconstruct = Channel.empty()
+      if (params.vcf_spec != null) {
+        ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
+        vg_deconstruct(gfaffix.out.gfa_norm.combine(ch_vcf_spec))
+        // TODO add bcftools
+        multiQC(
+        vg_deconstruct.out.vg_deconstruct_bcftools_stats.collect().ifEmpty([]),
         odgiStats.out.collect().ifEmpty([]),
         odgiVizOut.collect().ifEmpty([]),
         odgiDrawOut.collect().ifEmpty([]),
         ch_multiqc_config
-      )
+        )
+      } else {
+        multiQC(
+          vg_deconstruct.collect().ifEmpty([]),
+          odgiStats.out.collect().ifEmpty([]),
+          odgiVizOut.collect().ifEmpty([]),
+          odgiDrawOut.collect().ifEmpty([]),
+          ch_multiqc_config
+        )
+      }
     }
 }
 
@@ -461,58 +611,57 @@ def helpMessage() {
     nextflow run nf-core/pangenome --input 'data/input.fa.gz' -profile docker
 
     Mandatory arguments:
-      --input [file]                  Path to input FASTA (must be surrounded with quotes)
+      --input [file]                  Path to bgzipped input FASTA (must be surrounded with quotes)
+      -- n_mappings [int]             Number of mappings to retain for each segment.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
+    PAF options:
+      --paf [file]                    Optional input to skip the all vs. all alignment wfmash phase directly starting with seqwish.                                      
     Wfmash options:
       --wfmash_map_pct_id [n]         percent identity in the wfmash mashmap step [default: 90]
-      --wfmash_n_mappings [n]         number of secondary mappings to retain in 'map' filter mode [default: 10]
-      --wfmash_segment_length [n]     segment length for mapping [default: 3000]
-      --wfmash_block_length [n]       minimum block length filter for mapping [default: 3 * wfmash_segment_length]
-      --wfmash_mash_kmer [n]          kmer size for mashmap [default: 16]
+      --wfmash_segment_length [n]     segment length for mapping [default: 5000]
+      --wfmash_block_length [n]       minimum block length filter for mapping
+      --wfmash_mash_kmer [n]          kmer size for mashmap
+      --wfmash_mash_kmer_thres [n]    ignore the top % most-frequent kmers [default: 0.001]
       --wfmash_merge_segments         merge successive mappings [default: OFF]
       --wfmash_no_splits              disable splitting of input sequences during mapping [default: OFF]
       --wfmash_exclude--delim [c]     skip mappings between sequences with the same name prefix before
                                       the given delimiter character [default: all-vs-all and !self]
       --wfmash_chunks                 The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1. [default: 1]
       --wfmash_only                   If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster. [default: OFF]
+      --wfmash_sparse_map             keep this fraction of mappings ('auto' for giant component heuristic) [default: 1.0]
+      --wfmash_temp_dir [str]         directory for temporary files
 
     Seqwish options:
-      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 47]
+      --seqwish_min_match_length [n]  ignore exact matches below this length [default: 19]
       --seqwish_transclose_batch [n]  number of bp to use for transitive closure batch [default: 10000000]
+      --seqwish_sparse_factor [n]     keep this randomly selected fraction of input matches [default: no sparsification]
+      --seqwish_temp_dir [str]          directory for temporary files
 
     Smoothxg options:
       --smoothxg_num_haps [n]         number of haplotypes in the given FASTA [default: wfmash_n_mappings]
       --smoothxg_max_path_jump [n]    maximum path jump to include in block [default: 0]
       --smoothxg_max_edge_jump [n]    maximum edge jump before breaking [default: 0]
-      --smoothxg_max_poa_length [n]   maximum sequence length to put into POA, can be a comma-separated list; 
-                                      for each element smoothxg will be executed once [default: 4001,4507]
-      --smoothxg_consensus_spec [str] consensus graph specification: write the consensus graph to
-                                      BASENAME.cons_[spec].gfa; where each spec contains at least a min_len parameter
-                                      (which defines the length of divergences from consensus paths to preserve in the
-                                      output), optionally a file containing reference paths to preserve in the output,
-                                      a flag (y/n) indicating whether we should also use the POA consensus paths, a
-                                      minimum coverage of consensus paths to retain (min_cov), and a maximum allele
-                                      length (max_len, defaults to 1e6); implies -a; example:
-                                      cons,100,1000:refs1.txt:n,1000:refs2.txt:y:2.3:1000000,10000
-                                      [default: OFF]
+      --smoothxg_poa_length [n]       maximum sequence length to put into POA, can be a comma-separated list; 
+                                      for each element smoothxg will be executed once [default: 700,900,1100]
       --smoothxg_consensus_prefix [n] use this prefix for consensus path names [default: Consensus_]
       --smoothxg_block_ratio_min [n]  minimum small / large length ratio to cluster in a block [default: 0.0]
-      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: 0.95]
+      --smoothxg_block_id_min [n]     split blocks into groups connected by this identity threshold [default: wfmash_map_pct_id / 100.0]
       --smoothxg_pad_max_depth [n]    path depth at which we don't pad the POA problem [default: 100]
       --smoothxg_poa_padding [n]      pad each end of each sequence in POA with N*(longest_poas_seq) bp [default: 0.03]
-      --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2
-                                      [default: 1,9,16,2,41,1]
+      --smoothxg_poa_params [str]     score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2 may also be given as presets: asm5, asm10, asm15, asm20 [default: 1,19,39,3,81,1 = asm5]
+      --smoothxg_run_abpoa            run abPOA [default: SPOA]
+      --smoothxg_run_global_poa       run the POA in global mode [default: local mode]
       --smoothxg_write_maf [n]        write MAF output representing merged POA blocks [default: OFF]
+      --smoothxg_keep_intermediate_files       keep intermediate graphs during smoothxg step
+      --smoothxg_temp_dir [str]       directory for temporary files
 
     Visualization options:
-      --viz                           Generate 1D and 2D visualisations of the built graphs [default: OFF]
+      --no_viz                        Set if you don't want the 1D visualizations.
+      --no_layout                     Set if you don't want the computational expensive 2D layout.
 
     VCF options:
-      --vcf_spec                      specify a set of VCFs to produce with SPEC = REF:DELIM[,REF:DELIM]*
-                                      the paths matching ^REF are used as a reference, while the sample haplotypes
-                                      are derived from path names, e.g. when DELIM=# and with '-V chm13:#',
-                                      a path named HG002#1#ctg would be assigned to sample HG002 phase 1 [default: OFF]
+      --vcf_spec                      specify a set of VCFs to produce with SPEC = REF:DELIM[:LEN][,REF:DELIM:[LEN]]* the paths matching ^REF are used as a reference, while the sample haplotypes are derived from path names, e.g. when DELIM=# and with '-V chm13:#', a path name HG002#1#ctg would be assigned to sample HG002 phase 1. If LEN is specified and greater than 0, the VCFs are decomposed, filtering  sites whose max allele length is greater than LEN. [default: off]
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved [default: ./results]

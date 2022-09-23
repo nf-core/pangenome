@@ -10,11 +10,11 @@
 
 ## Introduction
 
-**Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended!
+> **Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended!
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 **nf-core/pangenome** is a bioinformatics best-practise analysis pipeline for the rendering of a collection of sequences into a pangenome graph.
-Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs**.
+Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
 
@@ -35,7 +35,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 4. Test the workflow on a minimal dataset
 
     ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute>
+    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_mappings 11
     ```
 
     [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
@@ -45,10 +45,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 5. Start running your own analysis!
 
     ```bash
-    nextflow run nf-core/pangenome -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input "input.fa.gz"
+    nextflow run nf-core/pangenome -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input "input.fa.gz" --n_mappings 11
     ```
 
-See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
+Be careful, the input FASTA must have been compressed with [bgzip](http://www.htslib.org/doc/bgzip.html). See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
 
 ## Pipeline Summary
 
@@ -68,12 +68,12 @@ Many thanks to all who have helped out and contributed along the way, including 
 
 | Name                                                     | Affiliation                                                                           |
 |----------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [Philipp Ehmele](https://github.com/imipenem)            | [University of Hamburg, Hamburg, Germany](https://www.uni-hamburg.de/en.html)         |
+| [Philipp Ehmele](https://github.com/imipenem)            | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html)         |
 | [Erik Garrison](https://github.com/ekg)                  | [The University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)|
-| [Andrea Guarracino](https://github.com/AndreaGuarracino) | [University of Rome Tor Vergata, Rome, Italy](http://www.scienze.uniroma2.it/)        |
+| [Andrea Guarracino](https://github.com/AndreaGuarracino) | [Genomics Research Centre, Human Technopole, Milan, Italy](https://humantechnopole.it/en/)        |
 | [Michael Heuer](https://github.com/heuermh)              | [UC Berkeley, USA](https://rise.cs.berkeley.edu)                                      |
-| [Lukas Heumos](https://github.com/zethson)               | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) \\ [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html) |
-| [Simon Heumos](https://github.com/subwaystation)         | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) |
+| [Lukas Heumos](https://github.com/zethson)               | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) <br /> [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html) |
+| [Simon Heumos](https://github.com/subwaystation)         | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br /> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
 
 > \* Listed in alphabetical order
 
@@ -100,8 +100,22 @@ In addition, references of tools and data used in this pipeline are as follows:
 
 > **ODGI: understanding pangenome graphs.**
 >
-> Andrea Guarracino, Simon Heumos, Sven Nahnsen, Pjotr Prins & Erik Garrison.
+> Andrea Guarracino*, Simon Heumos*, Sven Nahnsen, Pjotr Prins & Erik Garrison.
 >
-> _bioRxiv_ 2021 Nov 11 doi: [10.1101/2021.11.10.467921](https://doi.org/10.1101/2021.11.10.467921).
+> _Bioinformatics_ 2022 Jul 01 doi: [10.1093/bioinformatics/btac308](https://doi.org/10.1093/bioinformatics/btac308).
+>
+> *_contributed equally_
+
+> **Unbiased pangenome graphs**
+>
+> Erik Garrison, Andrea Guarracino.
+>
+> _bioRxiv_ 2022 Feb 02 doi: [10.1101/2022.02.14.480413](https://doi.org/10.1101/2022.02.14.480413).
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
+
+## Attention
+
+### MultiQC Report  
+
+In the resulting MultiQC report, in the **Detailed ODGI stats table**, it says `smoothxg`. To be clear, these are the stats of the graph after polishing with `gfaffix`! Some tools were hardcoded in the ODGI MultiQC module, but hopefully this will be fixed in the future.
