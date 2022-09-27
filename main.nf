@@ -357,6 +357,7 @@ process gfaffix {
   """
   gfaffix $graph -o ${graph}.norm.gfa | gzip > ${graph}.norm.affixes.tsv.gz 
   odgi build -g ${graph}.norm.gfa -o ${graph}.norm.gfa.og -P -t ${task.cpus} -O -o - \
+  | odgi unchop -P -t ${task.cpus} -i - -o - \
   | odgi sort -i - -o ${graph}.norm.og -t ${task.cpus} -p Ygs 
   odgi view -i ${graph}.norm.og -g > ${graph}.norm.gfa
   """
