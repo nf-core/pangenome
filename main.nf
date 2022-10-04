@@ -4,7 +4,8 @@
     nf-core/pangenome
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/pangenome
-Website: https://nf-co.re/pangenome
+
+    Website: https://nf-co.re/pangenome
     Slack  : https://nfcore.slack.com/channels/pangenome
 ----------------------------------------------------------------------------------------
 */
