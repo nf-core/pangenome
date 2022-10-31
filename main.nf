@@ -47,11 +47,12 @@ if (!params.smoothxg_haplotypes_smooth) {
 }
 
 def wfmash_merge_cmd = params.wfmash_merge_segments ? "-M" : ""
-def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y${params.wfmash_exclude_delim}" : "-X"
+def wfmash_exclude_cmd = params.wfmash_exclude_delim ? "-Y ${params.wfmash_exclude_delim}" : "-X"
 def wfmash_split_cmd = params.wfmash_no_splits ? "-N" : ""
-def wfmash_block_length_cmd = params.wfmash_block_length ? "-l${params.wfmash_block_length}" : ""
-def wfmash_mash_kmer_cmd = params.wfmash_mash_kmer ? "-k${params.wfmash_mash_kmer}" : ""
-def wfmash_kmer_thres_cmd = params.wfmash_mash_kmer_thres ? "-H${params.wfmash_kmer_thres}" : ""
+def wfmash_block_length = params.wfmash_segment_length*5
+def wfmash_block_length_cmd = "-l ${wfmash_block_length}"
+def wfmash_mash_kmer_cmd = "-k ${params.wfmash_mash_kmer}"
+def wfmash_kmer_thres_cmd = "-H ${params.wfmash_mash_kmer_thres}"
 def wfmash_n_mappings_minus_1 = params.n_haplotypes - 1
 def wfmash_sparse_map_cmd = ""
 if (params.wfmash_sparse_map == "auto") {
