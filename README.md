@@ -35,7 +35,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 4. Test the workflow on a minimal dataset
 
     ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_mappings 11
+    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_haplotypes 12
     ```
 
     [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
@@ -49,6 +49,35 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
     ```
 
 Be careful, the input FASTA must have been compressed with [bgzip](http://www.htslib.org/doc/bgzip.html). See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
+
+## Examples
+
+### DRB1-3123 Pangenome Graph
+
+For an optimal workload of the computations, we can specify the resources of each process in a config file. We can call this for example `savasana.config`:
+
+```
+process {
+    withName:'wfmash|seqwish|odgiLayout|wfmashMap|wfmashAlign|vg_deconstruct|gfaffix' {
+        cpus = 4
+        memory = 4.GB
+    }
+
+    withName:'smoothxg|odgiDraw|odgiBuild' {
+        cpus = 4
+        memory = 4.GB
+    }
+
+    withName:'splitApproxMappingsInChunks|odgiStats|odgiViz|multiQC|odgiDraw' {
+        cpus = 1
+        memory = 1.GB
+    }
+}
+```
+
+```bash
+nextflow run nf-core/pangenome -r dev -profile docker --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz -c savasana.config --n_haplotypes 12 --wfmash_map_pct_id 70 --wfmash_segment_length 2000 --smoothxg_poa_length 2000
+```
 
 ## Pipeline Summary
 
