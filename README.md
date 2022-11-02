@@ -75,9 +75,15 @@ process {
 }
 ```
 
+Executing the pipeline using the config file:
+
 ```bash
 nextflow run nf-core/pangenome -r dev -profile docker --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz -c savasana.config --n_haplotypes 12 --wfmash_map_pct_id 70 --wfmash_segment_length 2000 --smoothxg_poa_length 2000
 ```
+
+## Advantages over PGGB
+This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set `--wfmash_chunks 10`.
+If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to `--wfmash_chunks 10` could be a good fit, because then you don't have to wait too long for your jobs to finish.
 
 ## Pipeline Summary
 
