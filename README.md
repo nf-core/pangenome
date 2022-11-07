@@ -35,7 +35,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 4. Test the workflow on a minimal dataset
 
     ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_mappings 11
+    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_haplotypes 12
     ```
 
     [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
@@ -49,6 +49,41 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
     ```
 
 Be careful, the input FASTA must have been compressed with [bgzip](http://www.htslib.org/doc/bgzip.html). See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
+
+## Examples
+
+### DRB1-3123 Pangenome Graph
+
+For an optimal workload of the computations, we can specify the resources of each process in a config file. We can call this for example `savasana.config`:
+
+```
+process {
+    withName:'wfmash|seqwish|odgiLayout|wfmashMap|wfmashAlign|vg_deconstruct|gfaffix' {
+        cpus = 4
+        memory = 4.GB
+    }
+
+    withName:'smoothxg|odgiDraw|odgiBuild' {
+        cpus = 4
+        memory = 4.GB
+    }
+
+    withName:'splitApproxMappingsInChunks|odgiStats|odgiViz|multiQC|odgiDraw' {
+        cpus = 1
+        memory = 1.GB
+    }
+}
+```
+
+Executing the pipeline using the config file:
+
+```bash
+nextflow run nf-core/pangenome -r dev -profile docker --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz -c savasana.config --n_haplotypes 12 --wfmash_map_pct_id 70 --wfmash_segment_length 2000 --smoothxg_poa_length 2000
+```
+
+## Advantages over [`pggb`](https://github.com/pangenome/pggb)
+This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set `--wfmash_chunks 10`.
+If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to `--wfmash_chunks 10` could be a good fit, because then you don't have to wait too long for your jobs to finish.
 
 ## Pipeline Summary
 
