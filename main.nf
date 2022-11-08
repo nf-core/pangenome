@@ -351,7 +351,7 @@ process gfaffix {
     path(graph)
 
   output:
-    path("${graph}.norm.og"), emit: og_norm
+    path("*.norm.og"), emit: og_norm
     path("${graph}.norm.gfa"), emit: gfa_norm
     path("${graph}.norm.affixes.tsv.gz"), emit: tsv_norm
 
@@ -546,10 +546,14 @@ workflow {
           seqwish(fasta, wfmashAlign.out.collect())
         }
       }
-      smoothxg(seqwish.out)
-      gfaffix(smoothxg.out.gfa_smooth)
-
-      odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten()))
+      if (params.skip_smoothxg) {
+        gfaffix(seqwish.out.collect{it[1]})  
+        odgiBuild(seqwish.out.collect{it[1]})
+      } else {
+        smoothxg(seqwish.out)
+        gfaffix(smoothxg.out.gfa_smooth)
+        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten()))
+      }
       odgiStats(odgiBuild.out.mix(gfaffix.out.og_norm))
 
       odgiVizOut = Channel.empty()
