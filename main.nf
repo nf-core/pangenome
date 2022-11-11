@@ -280,67 +280,32 @@ process smoothxg {
 
   script:
     """
-    smooth_iterations=\$(echo ${params.smoothxg_poa_length} | tr ',' '\\\n' | wc -l)
-    echo \$smooth_iterations > smooth_iterations
     maf_params=""
     if [[ ${params.smoothxg_write_maf} != false ]]; then
       maf_params="-m ${f}.${smoothxg_prefix}.maf"
     fi
-    for i in \$(seq 1 \$smooth_iterations);
-    do
-      input_gfa=${graph}
-      if [[ \$i != 1 ]]; then
-        input_gfa=smooth.\$(echo \$i - 1 | bc).gfa 
-      fi
-      if [[ \$i != \$smooth_iterations ]]; then
-        poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
-        smoothxg \
-          -t ${task.cpus} \
-          -T ${task.cpus} \
-          -g \$input_gfa \
-          -w \$(echo "\$poa_length * ${n_haps}" | bc) \
-          ${smoothxg_temp_dir} \
-          ${smoothxg_keep_intermediate_files} \
-          -X 100 \
-          -I ${smoothxg_block_id_min} \
-          -R ${params.smoothxg_block_ratio_min} \
-          -j ${params.smoothxg_max_path_jump} \
-          -e ${params.smoothxg_max_edge_jump} \
-          -l \$poa_length \
-          ${smoothxg_poa_params} \
-          -O ${params.smoothxg_poa_padding} \
-          -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
-          -d 0 -D 0 \
-          ${smoothxg_xpoa} \
-          ${smoothxg_poa_mode} \
-          -V \
-          -o smooth.\$i.gfa
-      else
-        poa_length=\$(echo ${params.smoothxg_poa_length} | cut -f \$i -d,)
-        smoothxg \
-          -t ${task.cpus} \
-          -T ${task.cpus} \
-          -g \$input_gfa \
-          -w \$(echo "\$poa_length * ${n_haps}" | bc) \
-          ${smoothxg_temp_dir} \
-          ${smoothxg_keep_intermediate_files} \
-          -X 100 \
-          -I ${smoothxg_block_id_min} \
-          -R ${params.smoothxg_block_ratio_min} \
-          -j ${params.smoothxg_max_path_jump} \
-          -e ${params.smoothxg_max_edge_jump} \
-          -l \$poa_length \
-          ${smoothxg_poa_params} \
-          -O ${params.smoothxg_poa_padding} \
-          -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
-          -d 0 -D 0 \
-          ${smoothxg_xpoa} \
-          ${smoothxg_poa_mode} \
-          \$maf_params \
-          -V \
-          -o ${f}${smoothxg_prefix}.gfa
-      fi
-    done  
+    smoothxg \
+      -t ${task.cpus} \
+      -T ${task.cpus} \
+      -g ${graph} \
+      -r ${n_haps} \
+      ${smoothxg_temp_dir} \
+      ${smoothxg_keep_intermediate_files} \
+      -X 100 \
+      -I ${smoothxg_block_id_min} \
+      -R ${params.smoothxg_block_ratio_min} \
+      -j ${params.smoothxg_max_path_jump} \
+      -e ${params.smoothxg_max_edge_jump} \
+      -l ${params.smoothxg_poa_length} \
+      ${smoothxg_poa_params} \
+      -O ${params.smoothxg_poa_padding} \
+      -Y \$(echo "${params.smoothxg_pad_max_depth} * ${n_haps}" | bc) \
+      -d 0 -D 0 \
+      ${smoothxg_xpoa} \
+      ${smoothxg_poa_mode} \
+      \$maf_params \
+      -V \
+      -o ${f}${smoothxg_prefix}.gfa
     """
 }
 
