@@ -282,7 +282,7 @@ process smoothxg {
     """
     maf_params=""
     if [[ ${params.smoothxg_write_maf} != false ]]; then
-      maf_params="-m ${f}.${smoothxg_prefix}.maf"
+      maf_params="-m ${f}${smoothxg_prefix}.maf"
     fi
     smoothxg \
       -t ${task.cpus} \
