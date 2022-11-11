@@ -206,7 +206,7 @@ process wfmashAlign {
      -n ${wfmash_n_mappings_minus_1} \
      ${wfmash_temp_dir} \
      -t ${task.cpus} \
-     -i $paf \
+     -i $paf --invert-filtering \
      $fasta $fasta \
      >${paf}.align.paf
   """
