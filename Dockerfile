@@ -1,4 +1,4 @@
-FROM ghcr.io/pangenome/pggb:20221128155756b3886f
+FROM ghcr.io/pangenome/pggb:20221207160858676151
 LABEL authors="Simon Heumos, Michael Heuer, Lukas Heumos, Erik Garrison, Andrea Guarracino" \
       description="Docker image containing all software requirements for the nf-core/pangenome pipeline"
 
