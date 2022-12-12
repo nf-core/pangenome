@@ -28,20 +28,54 @@ if (params.wfmash_sparse_map == "auto") {
 }
 def wfmash_temp_dir = params.wfmash_temp_dir ? "-B${params.wfmash_temp_dir}" : ""
 
-def wfmash_prefix = "wfmash"
+def wfmash_prefix = "wfmash_map_community"
 
 def make_file_prefix = { f -> """\
 ${f.getName()}\
 """ }
 
+process wfmashMap {
+  publishDir "${params.outdir}/wfmash_map", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(fasta)
+    path(fai)
+    path(gzi)
+
+  output:
+    tuple val(f), path("${f}.${wfmash_prefix}.map.paf")
+
+  """
+  wfmash ${wfmash_exclude_cmd} \
+     -s ${params.wfmash_segment_length} \
+     ${wfmash_block_length_cmd} \
+     ${wfmash_merge_cmd} \
+     ${wfmash_split_cmd} \
+     ${wfmash_mash_kmer_cmd} \
+     ${wfmash_kmer_thres_cmd} \
+     ${wfmash_sparse_map_cmd} \
+     -p ${params.wfmash_map_pct_id} \
+     -n ${wfmash_n_mappings_minus_1} \
+     ${wfmash_temp_dir} \
+     -t ${task.cpus} \
+     -m \
+     $fasta $fasta \
+     >${f}.${wfmash_prefix}.map.paf
+  """  
+}
+
 workflow COMMUNITY {
   take:
   ch_fasta
+  fai_path
+  gzi_path
 
   main:
 
   fasta = ch_fasta.map { f -> tuple(make_file_prefix(f), f) }
   fasta_file_name = ch_fasta.map {it.getName()}
+
+  wfmashMap(fasta, fai_path, gzi_path)
 
   ch_empty = Channel.empty()
   // we currently don't want to emit anything

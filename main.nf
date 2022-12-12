@@ -45,7 +45,7 @@ include { COMMUNITY } from './subworkflows/local/community/main'
 include { PGGB } from './subworkflows/local/pggb/main'
 
 workflow PANGENOME {
-  ch_community = COMMUNITY (ch_fasta)
+  ch_community = COMMUNITY (ch_fasta, fai_path, gzi_path)
   PGGB (
     ch_community, 
     fai_path, 

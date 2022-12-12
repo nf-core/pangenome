@@ -34,7 +34,6 @@ def wfmash_temp_dir = params.wfmash_temp_dir ? "-B${params.wfmash_temp_dir}" : "
 def seqwish_temp_dir = params.seqwish_temp_dir ? "--temp-dir${params.seqwish_temp_dir}" : ""
 
 def smoothxg_block_id_min = params.wfmash_map_pct_id / 100.0
-// TODO: CHANGE TO LARGE P ONCE WE ARE THERE
 def smoothxg_poa_params_cmd = ""
 if (params.smoothxg_poa_params == null) {
   smoothxg_poa_params = "-P 1,19,39,3,81,1"
@@ -59,7 +58,7 @@ if (params.smoothxg_run_abpoa != null) {
   smoothxg_xpoa = ""
 }
 def smoothxg_poa_mode = params.smoothxg_run_global_poa ? "-Z" : ""
-// disabling consensus graph mode
+// disabling consensus graph mode cause it is buggy
 def smoothxg_consensus_spec = false
 
 def wfmash_prefix = "wfmash"
