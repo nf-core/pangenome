@@ -174,7 +174,7 @@ In addition, references of tools and data used in this pipeline are as follows:
 >
 > Erik Garrison, Andrea Guarracino.
 >
-> _bioRxiv_ 2022 Feb 02 doi: [10.1101/2022.02.14.480413](https://doi.org/10.1101/2022.02.14.480413).
+> _Bioinformatics_ 2022 Nov 30 doi: [10.1093/bioinformatics/btac743](https://doi.org/10.1093/bioinformatics/btac743).
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 
