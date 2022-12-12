@@ -37,22 +37,20 @@ if (params.n_haplotypes == null) {
     exit 1
 }
 
-def make_file_prefix = { f -> """\
-${f.getName()}\
-""" }
-
 ch_fasta = Channel.fromPath("${params.input}")
 fai_path = file("${params.input}.fai")
 gzi_path = file("${params.input}.gzi")
 
+include { COMMUNITY } from './subworkflows/local/community/main'
 include { PGGB } from './subworkflows/local/pggb/main'
 
 workflow PANGENOME {
-    PGGB (
-      ch_fasta, 
-      fai_path, 
-      gzi_path, 
-      )
+  ch_community = COMMUNITY (ch_fasta)
+  PGGB (
+    ch_community, 
+    fai_path, 
+    gzi_path 
+    )
 }
 
 workflow {
