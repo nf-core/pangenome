@@ -37,10 +37,25 @@ if (params.n_haplotypes == null) {
     exit 1
 }
 
+def make_file_prefix = { f -> """\
+${f.getName()}\
+""" }
+
+fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
+fai_path = file("${params.input}.fai")
+gzi_path = file("${params.input}.gzi")
+fasta_file = file("${params.input}")
+fasta_file_name = fasta_file.getName()
+
 include { PGGB } from './subworkflows/local/pggb/main'
 
 workflow PANGENOME {
-    PGGB ("abc")
+    PGGB (
+      fasta, 
+      fai_path, 
+      gzi_path, 
+      fasta_file_name
+      )
 }
 
 workflow {

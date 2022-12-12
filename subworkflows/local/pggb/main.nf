@@ -77,17 +77,6 @@ if (params.no_layout) {
   do_2d = false
 }
 
-def make_file_prefix = { f -> """\
-${f.getName()}\
-""" }
-
-fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
-fai_path = file("${params.input}.fai")
-gzi_path = file("${params.input}.gzi")
-
-fasta_file = file(params.input)
-fasta_file_name = fasta_file.getName()
-
 process samtoolsFaidx {
   publishDir "${params.outdir}/samtools_faidx", mode: "${params.publish_dir_mode}"
 
@@ -428,20 +417,24 @@ process multiQC {
   path odgi_viz
   path odgi_draw
   path(multiqc_config)
+  val(prefix)
 
   output:
-  path "${fasta_file_name}_multiqc/*multiqc_report.html", emit: report
-  path "${fasta_file_name}_multiqc/*_data"              , emit: data
-  path "${fasta_file_name}_multiqc/*_plots"             , optional:true, emit: plots
+  path "${prefix}_multiqc/*multiqc_report.html", emit: report
+  path "${prefix}_multiqc/*_data"              , emit: data
+  path "${prefix}_multiqc/*_plots"             , optional:true, emit: plots
 
   """
-  multiqc -s . -c ${multiqc_config} --outdir ${fasta_file_name}_multiqc
+  multiqc -s . -c ${multiqc_config} --outdir ${prefix}_multiqc
   """
 }
 
 workflow PGGB {
   take:
-  test
+  fasta
+  fai_path
+  gzi_path
+  fasta_file_name
 
   main:
 
@@ -517,7 +510,8 @@ workflow PGGB {
           odgiStats.out.collect().ifEmpty([]),
           odgiVizOut.collect().ifEmpty([]),
           odgiDrawOut.collect().ifEmpty([]),
-          ch_multiqc_config
+          ch_multiqc_config,
+          fasta_file_name
         )
       }
     }
