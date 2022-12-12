@@ -77,6 +77,10 @@ if (params.no_layout) {
   do_2d = false
 }
 
+def make_file_prefix = { f -> """\
+${f.getName()}\
+""" }
+
 process samtoolsFaidx {
   publishDir "${params.outdir}/samtools_faidx", mode: "${params.publish_dir_mode}"
 
@@ -431,13 +435,15 @@ process multiQC {
 
 workflow PGGB {
   take:
-  fasta
+  ch_fasta
   fai_path
   gzi_path
-  fasta_file_name
 
   main:
 
+  fasta = ch_fasta.map { f -> tuple(make_file_prefix(f), f) }
+  fasta_file_name = ch_fasta.map {it.getName()}
+  
     if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
       samtoolsFaidx(fasta)
       fai = samtoolsFaidx.out.samtools_fai.collect()

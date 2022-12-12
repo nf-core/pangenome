@@ -41,20 +41,17 @@ def make_file_prefix = { f -> """\
 ${f.getName()}\
 """ }
 
-fasta = channel.fromPath("${params.input}").map { f -> tuple(make_file_prefix(f), f) }
+ch_fasta = Channel.fromPath("${params.input}")
 fai_path = file("${params.input}.fai")
 gzi_path = file("${params.input}.gzi")
-fasta_file = file("${params.input}")
-fasta_file_name = fasta_file.getName()
 
 include { PGGB } from './subworkflows/local/pggb/main'
 
 workflow PANGENOME {
     PGGB (
-      fasta, 
+      ch_fasta, 
       fai_path, 
       gzi_path, 
-      fasta_file_name
       )
 }
 
