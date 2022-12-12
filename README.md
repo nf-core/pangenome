@@ -35,7 +35,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 4. Test the workflow on a minimal dataset
 
     ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_mappings 11
+    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_haplotypes 12
     ```
 
     [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
@@ -49,6 +49,68 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
     ```
 
 Be careful, the input FASTA must have been compressed with [bgzip](http://www.htslib.org/doc/bgzip.html). See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
+
+## Examples
+
+### DRB1-3123 Pangenome Graph
+
+For an optimal workload of the computations, we can specify the resources of each process in a config file. We can call this for example `savasana.config`:
+
+```
+process {
+    withName:'wfmash|seqwish|odgiLayout|wfmashMap|wfmashAlign|vg_deconstruct|gfaffix' {
+        cpus = 4
+        memory = 4.GB
+    }
+
+    withName:'smoothxg|odgiDraw|odgiBuild' {
+        cpus = 4
+        memory = 4.GB
+    }
+
+    withName:'splitApproxMappingsInChunks|odgiStats|odgiViz|multiQC|odgiDraw' {
+        cpus = 1
+        memory = 1.GB
+    }
+}
+```
+
+Executing the pipeline using the config file:
+
+```bash
+nextflow run nf-core/pangenome -r dev -profile docker --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz -c savasana.config --n_haplotypes 12 --wfmash_map_pct_id 70 --wfmash_segment_length 2000 --smoothxg_poa_length 2000
+```
+
+## Advantages over [`pggb`](https://github.com/pangenome/pggb)
+This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set `--wfmash_chunks 10`.
+If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to `--wfmash_chunks 10` could be a good fit, because then you don't have to wait too long for your jobs to finish.
+
+## Building a native container
+It has been evaluated, that the current PGGB docker image can lead to slow performance of certain processes. 
+While a single process my run up to 10 times slower compared to a native build, performance increase of a native build is expected to be ~30% regarding a whole pipeline run. This can be critical when building very large pangenomes. The [native_image.sh](bin/native_image.sh) script can tackle this problem.
+
+### Singularity
+Assuming you are located in your `git` folder, where you have both the nf-core/pangenome and the PGGB repository, then just
+
+```bash
+cp pangenome/bin/native_image.sh
+./native_image.sh
+```
+
+This will generate a new folder, `pangenome_image`, in which all relevant files to build a native singularity container will be stored. After the script is finished, you can use the `pangenome-dev.img` in a pipeline:
+
+```bash
+nextflow run nf-core/pangenome -r dev - profile singularity --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz --n_haplotypes 12 -with-singularity PATH_TO/pangenome_image/pangenome-dev.img
+```
+
+### Docker
+If you want to build a docker image directly, just take a look at the script itself and comment out all lines that are surrounded by `#### SKIP ... ####`.
+
+Then you can also run `./native_image.sh`. You can then execute a pipeline:
+
+```bash
+nextflow run nf-core/pangenome -r dev -profile docker --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz --n_haplotypes 12 -with-docker ${USER}/pangenome-dev:latest
+```
 
 ## Pipeline Summary
 
@@ -69,8 +131,10 @@ Many thanks to all who have helped out and contributed along the way, including 
 | Name                                                     | Affiliation                                                                           |
 |----------------------------------------------------------|---------------------------------------------------------------------------------------|
 | [Philipp Ehmele](https://github.com/imipenem)            | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html)         |
+| [Gisela Gabernet](https://github.com/ggabernet)                  | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)|
 | [Erik Garrison](https://github.com/ekg)                  | [The University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)|
 | [Andrea Guarracino](https://github.com/AndreaGuarracino) | [Genomics Research Centre, Human Technopole, Milan, Italy](https://humantechnopole.it/en/)        |
+| [Friederieke Hanssen](https://github.com/FriederikeHanssen) | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)        |
 | [Michael Heuer](https://github.com/heuermh)              | [UC Berkeley, USA](https://rise.cs.berkeley.edu)                                      |
 | [Lukas Heumos](https://github.com/zethson)               | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) <br /> [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html) |
 | [Simon Heumos](https://github.com/subwaystation)         | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br /> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
