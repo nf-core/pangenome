@@ -95,37 +95,6 @@ process samtoolsFaidx {
   """
 }
 
-
-process wfmashMap {
-  publishDir "${params.outdir}/wfmash_map", mode: "${params.publish_dir_mode}"
-
-  input:
-    tuple val(f), path(fasta)
-    path(fai)
-    path(gzi)
-
-  output:
-    tuple val(f), path("${f}.${wfmash_prefix}.map.paf")
-
-  """
-  wfmash ${wfmash_exclude_cmd} \
-     -s ${params.wfmash_segment_length} \
-     ${wfmash_block_length_cmd} \
-     ${wfmash_merge_cmd} \
-     ${wfmash_split_cmd} \
-     ${wfmash_mash_kmer_cmd} \
-     ${wfmash_kmer_thres_cmd} \
-     ${wfmash_sparse_map_cmd} \
-     -p ${params.wfmash_map_pct_id} \
-     -n ${wfmash_n_mappings_minus_1} \
-     ${wfmash_temp_dir} \
-     -t ${task.cpus} \
-     -m \
-     $fasta $fasta \
-     >${f}.${wfmash_prefix}.map.paf
-  """  
-}
-
 process splitApproxMappingsInChunks {
   publishDir "${params.outdir}/wfmash_chunks", mode: "${params.publish_dir_mode}"
 
@@ -432,6 +401,8 @@ process multiQC {
   """
 }
 
+include { WFMASH_MAP } from '../wfmash_map/main'
+
 workflow PGGB {
   take:
   ch_fasta
@@ -456,8 +427,8 @@ workflow PGGB {
       if (params.wfmash_chunks == 1) {
         wfmash(fasta, fai, gzi)
       } else {
-        wfmashMap(fasta, fai, gzi)
-        splitApproxMappingsInChunks(wfmashMap.out)
+        WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
+        splitApproxMappingsInChunks(WFMASH_MAP.out)
         // TODO update this once I understood it
         wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
       }      
@@ -470,8 +441,8 @@ workflow PGGB {
           wfmash(fasta, fai, gzi)
           seqwish(fasta, wfmash.out.collect{it[1]})
         } else {
-          wfmashMap(fasta, fai, gzi)
-          splitApproxMappingsInChunks(wfmashMap.out)
+          WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
+          splitApproxMappingsInChunks(WFMASH_MAP.out)
           wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
           seqwish(fasta, wfmashAlign.out.collect())
         }
