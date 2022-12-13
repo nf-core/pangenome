@@ -397,7 +397,9 @@ process multiQC {
   path "${prefix}_multiqc/*_plots"             , optional:true, emit: plots
 
   """
-  multiqc -s . -c ${multiqc_config} --outdir ${prefix}_multiqc
+  mkdir local_multiqc
+  cp -r *${prefix}* local_multiqc/
+  multiqc -s local_multiqc/ -c ${multiqc_config} --outdir ${prefix}_multiqc
   """
 }
 
@@ -449,13 +451,13 @@ workflow PGGB {
       }
       if (params.skip_smoothxg) {
         gfaffix(seqwish.out.collect{it[1]})  
-        odgiBuild(seqwish.out.collect{it[1]})
+        odgiBuild(seqwish.out.collect{it[1]}.flatten())
       } else {
         smoothxg(seqwish.out)
         gfaffix(smoothxg.out.gfa_smooth)
-        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten()))
+        odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten()).flatten())
       }
-      odgiStats(odgiBuild.out.mix(gfaffix.out.og_norm))
+      odgiStats(odgiBuild.out.mix(gfaffix.out.og_norm).flatten())
 
       odgiVizOut = Channel.empty()
       if (do_1d) {

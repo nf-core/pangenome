@@ -45,9 +45,12 @@ include { COMMUNITY } from './subworkflows/local/community/main'
 include { PGGB } from './subworkflows/local/pggb/main'
 
 workflow PANGENOME {
-  ch_community = COMMUNITY (ch_fasta, fai_path, gzi_path)
+  ch_community = COMMUNITY(ch_fasta, fai_path, gzi_path).flatten()
+  /// force the PGGB workflow to build the FASTA index for each community
+  fai_path = file(".fai")
+  gzi_path = file(".gzi")
   PGGB (
-    ch_community, 
+    ch_community,
     fai_path, 
     gzi_path 
     )

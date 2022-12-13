@@ -42,9 +42,21 @@ process extractCommunities {
   input:
     tuple val(f), path(fasta), path(community)
   output:
-    tuple val(f), path("${f}*.community.*.fa")
+    path("${f}*.community.*.fa")
   """
   samtools faidx ${fasta} \$(cat ${community}) > ${community}.fa
+  """
+}
+
+process bgzip {
+  publishDir "${params.outdir}/bgzip", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(fasta), path(extracted_community)
+  output:
+    path("${f}*.community.*.fa.gz")
+  """
+  bgzip -@ ${task.cpus} -c ${extracted_community} > ${extracted_community}.gz
   """
 }
 
@@ -61,8 +73,9 @@ workflow COMMUNITY {
   net2Communities(paf2Net.out)
   fasta = ch_fasta.map { f -> tuple(make_file_prefix(f), f) }
   extractCommunities(fasta.combine(net2Communities.out.flatten()))
+  ch_bgzip_extract_communities = bgzip(fasta.combine(extractCommunities.out.flatten()))
 
   emit:
-  ch_fasta
+  ch_bgzip_extract_communities /// TODO!
 
 }
