@@ -170,8 +170,7 @@ process seqwish {
   publishDir "${params.outdir}/seqwish", mode: "${params.publish_dir_mode}"
 
   input:
-    tuple val(f), path(fasta)
-    path(paf)
+    tuple val(f), path(fasta), path(paf)
 
   output:
     tuple val(f), path("${f}${seqwish_prefix}.gfa")
@@ -452,12 +451,13 @@ workflow PGGB {
       } else {
         if (params.wfmash_chunks == 1) {
           wfmash(fasta, fai, gzi)
-          seqwish(fasta, wfmash.out.collect{it[1]})
+          fasta.combine(wfmash.out, by:0).view()
+          seqwish(fasta.combine(wfmash.out, by:0))
         } else {
           WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
           splitApproxMappingsInChunks(WFMASH_MAP.out)
           wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0), fai, gzi)
-          seqwish(fasta, wfmashAlign.out.collect())
+          seqwish(fasta.combine(wfmashAlign.out, by:0).groupTuple(by:[0,1]))
         }
       }
       if (params.skip_smoothxg) {
