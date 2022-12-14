@@ -57,7 +57,7 @@ jobs:
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_poa_length 700
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --no_viz --no_layout --smoothxg_poa_length 700
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --vcf_spec "gi|568815561:#,gi|568815567:#"
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --vcf_spec "gi|568815561:#,gi|568815567:#" --smoothxg_poa_length 700
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_write_maf --smoothxg_poa_length 700
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_chunks 2 --smoothxg_poa_length 700
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_only
