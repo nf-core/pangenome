@@ -432,17 +432,7 @@ workflow PGGB {
       } else {
         WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
         splitApproxMappingsInChunks(WFMASH_MAP.out)
-        //fasta.view()
-        //fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0).view()
-        //fasta.flatten().collate(2).join(splitApproxMappingsInChunks.out.transpose()).view()
-        //fasta.collect().join(splitApproxMappingsInChunks.out.transpose(), remainder = true).view()
-        //fasta.combine(splitApproxMappingsInChunks.out.flatten()).view()
-        // fasta.combine(splitApproxMappingsInChunks.out).view()
-        //splitApproxMappingsInChunks.out.flatten().view()
-        // TODO update this once I understood it
         wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0), fai, gzi)
-        //wfmashAlign.out.view()
-        fasta.combine(wfmashAlign.out, by:0).groupTuple(by:[0,1]).view()
       }      
     } else {
       if (params.paf != null) {
