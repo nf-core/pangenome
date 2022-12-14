@@ -37,6 +37,17 @@ if (params.n_haplotypes == null) {
     exit 1
 }
 
+if (params.communities && params.vcf_spec != null) {
+          log.info"""
+
+    When running 'nf-core/pangenome' in community mode, it is not clear to which community graph 'vg deconstruct' should be applied. 
+    Please either don't run in community mode or apply 'vg deconstruct' after 'nf-core/pangenome' was run. For more details run with --help.
+
+    """.stripIndent()  
+
+    exit 1
+}
+
 ch_fasta = Channel.fromPath("${params.input}")
 fai_path = file("${params.input}.fai")
 gzi_path = file("${params.input}.gzi")
@@ -45,15 +56,24 @@ include { COMMUNITY } from './subworkflows/local/community/main'
 include { PGGB } from './subworkflows/local/pggb/main'
 
 workflow PANGENOME {
-  ch_community = COMMUNITY(ch_fasta, fai_path, gzi_path).flatten()
-  /// force the PGGB workflow to build the FASTA index for each community
-  fai_path = file(".fai")
-  gzi_path = file(".gzi")
-  PGGB (
-    ch_community,
-    fai_path, 
-    gzi_path 
+  if (params.communities) {
+    ch_community = COMMUNITY(ch_fasta, fai_path, gzi_path).flatten()
+    /// force the PGGB workflow to build the FASTA index for each community
+    fai_path = file(".fai")
+    gzi_path = file(".gzi")
+    PGGB (
+        ch_community,
+        fai_path, 
+        gzi_path 
     )
+  } else {
+        PGGB (
+        ch_fasta,
+        fai_path, 
+        gzi_path 
+    )
+  }
+
 }
 
 workflow {
