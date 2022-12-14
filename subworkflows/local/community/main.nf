@@ -60,6 +60,21 @@ process bgzip {
   """
 }
 
+process samtoolsFaidx {
+  publishDir "${params.outdir}/samtools_faidx", mode: "${params.publish_dir_mode}"
+
+  input:
+    tuple val(f), path(fasta)
+
+  output:
+    path("${f}.fai"), emit: samtools_fai
+    path("${f}.gzi"), emit: samtools_gzi
+
+  """
+  samtools faidx $fasta
+  """
+}
+
 workflow COMMUNITY {
   take:
   ch_fasta
@@ -67,6 +82,15 @@ workflow COMMUNITY {
   gzi_path
 
   main:
+
+  if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
+    samtoolsFaidx(fasta)
+    fai = samtoolsFaidx.out.samtools_fai.collect()
+    gzi = samtoolsFaidx.out.samtools_gzi.collect()
+  } else {
+    fai = channel.fromPath("${params.input}.fai").collect()
+    gzi = channel.fromPath("${params.input}.gzi").collect()
+  }
 
   WFMASH_MAP(ch_fasta, fai_path, gzi_path, wfmash_prefix)
   paf2Net(WFMASH_MAP.out)
