@@ -101,7 +101,7 @@ process splitApproxMappingsInChunks {
   input:
     tuple val(f), path(paf)
   output:
-    path("${f}*.chunk_*.paf")
+    tuple val(f), path("${f}*.chunk_*.paf")
   """
   python3 /split_approx_mappings_in_chunks.py $paf ${params.wfmash_chunks}
   """
@@ -116,7 +116,7 @@ process wfmashAlign {
     path(gzi)
 
   output:
-    path("${paf}.align.paf"), emit: paf
+    tuple val(f), path("${paf}.align.paf"), emit: paf
 
   """
   wfmash ${wfmash_exclude_cmd} \
@@ -397,7 +397,9 @@ process multiQC {
   path "${prefix}_multiqc/*_plots"             , optional:true, emit: plots
 
   """
-  mkdir local_multiqc
+  if [ ! -f local_multiqc ]; then
+    mkdir local_multiqc
+  fi
   cp -r *${prefix}* local_multiqc/
   multiqc -s local_multiqc/ -c ${multiqc_config} --outdir ${prefix}_multiqc
   """
@@ -431,8 +433,16 @@ workflow PGGB {
       } else {
         WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
         splitApproxMappingsInChunks(WFMASH_MAP.out)
+        //fasta.view()
+        //fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0).view()
+        //fasta.flatten().collate(2).join(splitApproxMappingsInChunks.out.transpose()).view()
+        //fasta.collect().join(splitApproxMappingsInChunks.out.transpose(), remainder = true).view()
+        //fasta.combine(splitApproxMappingsInChunks.out.flatten()).view()
+        // fasta.combine(splitApproxMappingsInChunks.out).view()
+        //splitApproxMappingsInChunks.out.flatten().view()
         // TODO update this once I understood it
-        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
+        wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0), fai, gzi)
+        wfmashAlign.out.view()
       }      
     } else {
       if (params.paf != null) {
@@ -480,7 +490,8 @@ workflow PGGB {
         odgiStats.out.collect().ifEmpty([]),
         odgiVizOut.collect().ifEmpty([]),
         odgiDrawOut.collect().ifEmpty([]),
-        ch_multiqc_config
+        ch_multiqc_config,
+        fasta_file_name
         )
       } else {
         multiQC(
