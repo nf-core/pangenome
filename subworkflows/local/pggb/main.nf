@@ -441,7 +441,6 @@ workflow PGGB {
       } else {
         if (params.wfmash_chunks == 1) {
           wfmash(fasta, fai, gzi)
-          fasta.combine(wfmash.out, by:0).view()
           seqwish(fasta.combine(wfmash.out, by:0))
         } else {
           WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
