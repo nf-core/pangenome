@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        nxf_ver: ['20.10.0', '21.04.1', '21.10.3']
+        nxf_ver: ['20.10.0', '21.04.1', '21.10.3', '22.04.5']
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -57,8 +57,8 @@ jobs:
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --no_viz --no_layout
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg consensus_spec 10,100,1000
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --vcf_spec "gi|568815561:#,gi|568815567:#"
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_write_maf
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_chunks 2
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_only
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --communities
