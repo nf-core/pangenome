@@ -83,19 +83,20 @@ workflow COMMUNITY {
 
   main:
 
+  fasta = ch_fasta.map { f -> tuple(make_file_prefix(f), f) }
+
   if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
     samtoolsFaidx(fasta)
-    fai = samtoolsFaidx.out.samtools_fai.collect()
-    gzi = samtoolsFaidx.out.samtools_gzi.collect()
+    fai_path = samtoolsFaidx.out.samtools_fai.collect()
+    gzi_path = samtoolsFaidx.out.samtools_gzi.collect()
   } else {
-    fai = channel.fromPath("${params.input}.fai").collect()
-    gzi = channel.fromPath("${params.input}.gzi").collect()
+    fai_path = channel.fromPath("${params.input}.fai").collect()
+    gzi_path = channel.fromPath("${params.input}.gzi").collect()
   }
 
   WFMASH_MAP(ch_fasta, fai_path, gzi_path, wfmash_prefix)
   paf2Net(WFMASH_MAP.out)
   net2Communities(paf2Net.out)
-  fasta = ch_fasta.map { f -> tuple(make_file_prefix(f), f) }
   extractCommunities(fasta.combine(net2Communities.out.flatten()))
   ch_bgzip_extract_communities = bgzip(fasta.combine(extractCommunities.out.flatten()))
 
