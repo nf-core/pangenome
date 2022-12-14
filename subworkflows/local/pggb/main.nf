@@ -442,7 +442,8 @@ workflow PGGB {
         //splitApproxMappingsInChunks.out.flatten().view()
         // TODO update this once I understood it
         wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0), fai, gzi)
-        wfmashAlign.out.view()
+        //wfmashAlign.out.view()
+        fasta.combine(wfmashAlign.out, by:0).groupTuple(by:[0,1]).view()
       }      
     } else {
       if (params.paf != null) {
@@ -455,7 +456,7 @@ workflow PGGB {
         } else {
           WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
           splitApproxMappingsInChunks(WFMASH_MAP.out)
-          wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.flatten()), fai, gzi)
+          wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0), fai, gzi)
           seqwish(fasta, wfmashAlign.out.collect())
         }
       }
