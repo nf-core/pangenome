@@ -263,7 +263,7 @@ jobs:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
         parameters: 
-          - "--communities"
+          - "--communities --squeeze_gfa"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2

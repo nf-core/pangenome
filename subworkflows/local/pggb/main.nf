@@ -267,79 +267,6 @@ process odgiBuild {
   """
 }
 
-process odgiStats {
-  publishDir "${params.outdir}/odgi_stats", mode: "${params.publish_dir_mode}"
-
-  input:
-    path(graph)
-
-  output:
-    path("${graph}.stats.yaml")
-
-  """
-  odgi stats -i "${graph}" -m > "${graph}.stats.yaml" 2>&1
-  """
-}
-
-process odgiViz {
-  publishDir "${params.outdir}/odgi_viz", mode: "${params.publish_dir_mode}"
-
-  input:
-    path(graph)
-
-  output:
-    path("${graph}.viz*.png")
-
-  script:
-    """
-    odgi viz -i $graph -o ${graph}.viz_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix}
-    odgi viz -i $graph -o ${graph}.viz_pos_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -u -d
-    odgi viz -i $graph -o ${graph}.viz_depth_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -m
-    odgi viz -i $graph -o ${graph}.viz_inv_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -z
-    odgi viz -i $graph -o ${graph}.viz_O_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -O
-    """
-}
-
-process odgiLayout {
-  input:
-  path(graph)
-
-  output:
-  tuple path(graph), path("${graph}.lay")
-
-  """
-  odgi layout \
-    -i $graph \
-    -o ${graph}.lay \
-    -t ${task.cpus} -P
-  """
-}
-
-process odgiDraw {
-  publishDir "${params.outdir}/odgi_draw", mode: "${params.publish_dir_mode}"
-
-  input:
-  tuple path(graph), path(layoutGraph)
-
-  output:
-  path("${graph}.draw_multiqc.png")
-
-  """
-  odgi draw \
-    -i $graph \
-    -c $layoutGraph \
-    -p ${graph}.draw_multiqc.png \
-    -C \
-    -w 20 \
-    -H 1000 -t ${task.cpus}
-  odgi draw \
-    -i $graph \
-    -c $layoutGraph \
-    -p ${graph}.draw.png \
-    -H 100 -t ${task.cpus}
-  """
-}
-
 process vg_deconstruct {
   publishDir "${params.outdir}/vg_deconstruct", mode: "${params.publish_dir_mode}"
 
@@ -405,6 +332,9 @@ process multiQC {
 }
 
 include { WFMASH_MAP } from '../wfmash_map/main'
+include { ODGI_STATS } from '../odgi/odgi_stats/main'
+include { ODGI_VIZ } from '../odgi/odgi_viz/main'
+include { ODGI_2D } from '../odgi/odgi2d/main'
 
 workflow PGGB {
   take:
@@ -457,16 +387,15 @@ workflow PGGB {
         gfaffix(smoothxg.out.gfa_smooth)
         odgiBuild(seqwish.out.collect{it[1]}.mix(smoothxg.out.consensus_smooth.flatten()).flatten())
       }
-      odgiStats(odgiBuild.out.mix(gfaffix.out.og_norm).flatten())
+      ODGI_STATS(odgiBuild.out.mix(gfaffix.out.og_norm).flatten())
 
       odgiVizOut = Channel.empty()
       if (do_1d) {
-          odgiVizOut = odgiViz(gfaffix.out.og_norm)
+          odgiVizOut = ODGI_VIZ(gfaffix.out.og_norm)
       }
       odgiDrawOut = Channel.empty()
       if (do_2d) {
-        odgiLayout(gfaffix.out.og_norm)
-        odgiDrawOut = odgiDraw(odgiLayout.out)
+        odgiDrawOut = ODGI_2D(gfaffix.out.og_norm)
       }
 
       ch_vcf_spec = Channel.empty()
@@ -477,7 +406,7 @@ workflow PGGB {
         // TODO add bcftools
         multiQC(
         vg_deconstruct.out.vg_deconstruct_bcftools_stats.collect().ifEmpty([]),
-        odgiStats.out.collect().ifEmpty([]),
+        ODGI_STATS.out.collect().ifEmpty([]),
         odgiVizOut.collect().ifEmpty([]),
         odgiDrawOut.collect().ifEmpty([]),
         ch_multiqc_config,
@@ -486,7 +415,7 @@ workflow PGGB {
       } else {
         multiQC(
           vg_deconstruct.collect().ifEmpty([]),
-          odgiStats.out.collect().ifEmpty([]),
+          ODGI_STATS.out.collect().ifEmpty([]),
           odgiVizOut.collect().ifEmpty([]),
           odgiDrawOut.collect().ifEmpty([]),
           ch_multiqc_config,
