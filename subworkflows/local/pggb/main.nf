@@ -495,10 +495,6 @@ workflow PGGB {
       }
     }
 
-    ch_empty = Channel.empty()
-    // we currently don't want to emit anything
-
   emit:
-    ch_empty
-
+    ch_pggb = gfaffix.out.og_norm
 }

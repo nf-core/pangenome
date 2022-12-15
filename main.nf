@@ -54,6 +54,9 @@ gzi_path = file("${params.input}.gzi")
 
 include { COMMUNITY } from './subworkflows/local/community/main'
 include { PGGB } from './subworkflows/local/pggb/main'
+include { SQUEEZE } from './subworkflows/local/squeeze/main'
+
+ch_pggb = Channel.empty()
 
 workflow PANGENOME {
   if (params.communities) {
@@ -61,13 +64,18 @@ workflow PANGENOME {
     /// force the PGGB workflow to build the FASTA index for each community
     fai_path = file(".fai")
     gzi_path = file(".gzi")
-    PGGB (
+    ch_pggb = PGGB (
         ch_community,
         fai_path, 
         gzi_path 
     )
+    if (params.squeeze) {
+    SQUEEZE(
+        ch_pggb.collect(),
+        ch_fasta)
+    }
   } else {
-        PGGB (
+        ch_pggb = PGGB (
         ch_fasta,
         fai_path, 
         gzi_path 
