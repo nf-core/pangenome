@@ -8,19 +8,21 @@ on:
   release:
     types: [published]
 
+env: 
+  NXF_ANSI_LOG: false
+
 jobs:
   test:
-    name: Run workflow tests
+    name: Run pipeline with test data
     # Only run on push if this is the nf-core dev branch (merged PRs)
     if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
     runs-on: ubuntu-latest
-    env:
-      NXF_VER: ${{ matrix.nxf_ver }}
-      NXF_ANSI_LOG: false
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        nxf_ver: ['20.10.0', '21.04.1', '21.10.3', '22.04.5']
+        NXF_VER: 
+          - "20.10.0"
+          - "latest-everything"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -43,22 +45,17 @@ jobs:
           docker tag nfcore/pangenome:dev nfcore/pangenome:dev
 
       - name: Install Nextflow
-        env:
-          CAPSULE_LOG: none
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
 
       - name: Run pipeline with test data
-        # TODO nf-core: You can customise CI pipeline run tests as required
-        # For example: adding multiple test runs with different parameters
-        # Remember that you can parallelise this by using strategy.matrix
-        # We also test basic visualization and reporting options here
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_poa_length 700
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --no_viz --no_layout --smoothxg_poa_length 700
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --vcf_spec "gi|568815561:#,gi|568815567:#" --smoothxg_poa_length 700
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_write_maf --smoothxg_poa_length 700
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_chunks 2 --smoothxg_poa_length 700
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_only
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --communities
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12
+#          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_poa_length 700
+#          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --no_viz --no_layout --smoothxg_poa_length 700
+#          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --vcf_spec "gi|568815561:#,gi|568815567:#" --smoothxg_poa_length 700
+#          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_write_maf --smoothxg_poa_length 700
+#          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_chunks 2 --smoothxg_poa_length 700
+#          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_only
+#          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --communities
