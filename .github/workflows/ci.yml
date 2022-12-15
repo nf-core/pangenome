@@ -61,9 +61,9 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        NXF_VER: 
-          - "20.10.0"
-          - "22.04.5"
+        parameters: 
+          - "--no_viz"
+          - "--no_layout"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -92,7 +92,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --no_viz --no_layout
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   vg_deconstruct:
     name: Run pipeline with vg deconstruct parameter
@@ -102,9 +102,8 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        NXF_VER: 
-          - "20.10.0"
-          - "22.04.5"
+        parameters: 
+          - "--vcf_spec \"gi|568815561:#,gi|568815567:#\""
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -133,7 +132,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --vcf_spec "gi|568815561:#,gi|568815567:#"
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   smoothxg:
     name: Run pipeline with smoothxg parameters
@@ -143,9 +142,8 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        NXF_VER: 
-          - "20.10.0"
-          - "22.04.5"
+        parameters: 
+          - "--smoothxg_write_maf --smoothxg_poa_length 100,200,300 --smoothxg_run_abpoa --smoothxg_run_global_poa"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -174,7 +172,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_write_maf --smoothxg_poa_length 100,200,300 --smoothxg_run_abpoa --smoothxg_run_global_poa
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   wfmash_chunks:
     name: Run pipeline with wfmash chunk parameter
@@ -184,9 +182,8 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        NXF_VER: 
-          - "20.10.0"
-          - "22.04.5"
+        parameters: 
+          - "--wfmash_chunks 2"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -215,7 +212,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_chunks
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   wfmash_only:
     name: Run only the wfmash part of the pipeline
@@ -225,9 +222,8 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        NXF_VER: 
-          - "20.10.0"
-          - "22.04.5"
+        parameters: 
+          - "--wfmash_only"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -256,7 +252,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_only
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   communities:
     name: Run the pipeline with the communities parameter
@@ -266,9 +262,8 @@ jobs:
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        NXF_VER: 
-          - "20.10.0"
-          - "22.04.5"
+        parameters: 
+          - "--communities"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -297,4 +292,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --communities
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
