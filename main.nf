@@ -166,6 +166,13 @@ def helpMessage() {
     VCF options:
       --vcf_spec                      specify a set of VCFs to produce with SPEC = REF:DELIM[:LEN][,REF:DELIM:[LEN]]* the paths matching ^REF are used as a reference, while the sample haplotypes are derived from path names, e.g. when DELIM=# and with '-V chm13:#', a path name HG002#1#ctg would be assigned to sample HG002 phase 1. If LEN is specified and greater than 0, the VCFs are decomposed, filtering  sites whose max allele length is greater than LEN. [default: off]
 
+    Community options:
+      --communities                   Detects all communities in the given FASTA and runs graph construction on all of them. Can scale in parallel across a cluster. For each community one MultiQC report will be generated. Additionally, all community graphs are squeezed into one, for which a final MultiQC report is generated. [default: OFF]
+
+    Squeeze options:
+      --squeeze                       This is only applied when '--communities' is true. Can be turned off, but that's not recommended. [default: ON]
+      --squeeze_gfa                   Converts the final squeezed ODGI graph to GFAv1. [default: OFF]
+
     Other options:
       --outdir [file]                 The output directory where the results will be saved [default: ./results]
       --publish_dir_mode [str]        Mode for publishing results in the output directory. Available: symlink, rellink, link, copy, copyNoFollow, move (default: copy)

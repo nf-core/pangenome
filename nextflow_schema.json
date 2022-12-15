@@ -23,7 +23,7 @@
                 },
                 "n_haplotypes": {
                     "type": "string",
-                    "default": null,
+                    "default": "None",
                     "fa_icon": "fas fa-dna"
                 },
                 "outdir": {
@@ -150,7 +150,7 @@
             "properties": {
                 "smoothxg_haplotypes_smooth": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
                 },
                 "smoothxg_max_path_jump": {
                     "type": "integer",
@@ -217,6 +217,9 @@
                 "smoothxg_temp_dir": {
                     "type": "string",
                     "description": "directory for temporary files"
+                },
+                "skip_smoothxg": {
+                    "type": "boolean"
                 }
             },
             "fa_icon": "fas fa-project-diagram"
@@ -247,6 +250,36 @@
                 "no_layout": {
                     "type": "boolean",
                     "description": "Set if you don't want the computational expensive 2D layout."
+                }
+            }
+        },
+        "community_options": {
+            "title": "Community options",
+            "type": "object",
+            "description": "Options for detecting communities in the FASTA.",
+            "default": "",
+            "properties": {
+                "communities": {
+                    "type": "boolean",
+                    "description": "Detects all communities in the given FASTA and runs graph construction on all of them. Can scale in parallel across a cluster. For each community one MultiQC report will be generated. Additionally, all community graphs are squeezed into one, for which a final MultiQC report is generated. [default: OFF]",
+                    "help_text": "Detects all communities in the given FASTA and runs graph construction on all of them. Can scale in parallel across a cluster. For each community one MultiQC report will be generated. Additionally, all community graphs are squeezed into one, for which a final MultiQC report is generated. [default: OFF]"
+                }
+            }
+        },
+        "squeeze_options": {
+            "title": "Squeeze Options",
+            "type": "object",
+            "description": "Options for squeezing community graphs.",
+            "default": "",
+            "properties": {
+                "squeeze": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "This is only applied when '--communities' is true. Can be turned off, but that's not recommended. [default: ON]"
+                },
+                "squeeze_gfa": {
+                    "type": "boolean",
+                    "description": "Converts the final squeezed ODGI graph to GFAv1. [default: OFF]"
                 }
             }
         },
@@ -441,6 +474,12 @@
         },
         {
             "$ref": "#/definitions/visualization_options"
+        },
+        {
+            "$ref": "#/definitions/community_options"
+        },
+        {
+            "$ref": "#/definitions/squeeze_options"
         },
         {
             "$ref": "#/definitions/generic_options"
