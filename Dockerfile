@@ -10,6 +10,8 @@ RUN apt-get update \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 COPY bin/split_approx_mappings_in_chunks.py /
+COPY bin/paf2net.py /
+COPY bin/net2communities.py /
 
 # Install miniconda
 RUN wget \
