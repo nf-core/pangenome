@@ -8,19 +8,21 @@ on:
   release:
     types: [published]
 
+env: 
+  NXF_ANSI_LOG: false
+
 jobs:
   test:
-    name: Run workflow tests
+    name: Run pipeline with test data
     # Only run on push if this is the nf-core dev branch (merged PRs)
     if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
     runs-on: ubuntu-latest
-    env:
-      NXF_VER: ${{ matrix.nxf_ver }}
-      NXF_ANSI_LOG: false
     strategy:
       matrix:
         # Nextflow versions: check pipeline minimum and current latest
-        nxf_ver: ['20.10.0', '21.04.1', '21.10.3']
+        NXF_VER: 
+          - "20.10.0"
+          - "22.04.5"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -43,22 +45,251 @@ jobs:
           docker tag nfcore/pangenome:dev nfcore/pangenome:dev
 
       - name: Install Nextflow
-        env:
-          CAPSULE_LOG: none
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
 
       - name: Run pipeline with test data
-        # TODO nf-core: You can customise CI pipeline run tests as required
-        # For example: adding multiple test runs with different parameters
-        # Remember that you can parallelise this by using strategy.matrix
-        # We also test basic visualization and reporting options here
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --no_viz --no_layout
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg consensus_spec 10,100,1000
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --vcf_spec "gi|568815561:#,gi|568815567:#"
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --smoothxg_write_maf
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_chunks 2
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 --wfmash_only
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12
+
+  no_viz_no_layout:
+    name: Run pipeline without graph vizualizations or graph layouts
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Nextflow versions: check pipeline minimum and current latest
+        parameters: 
+          - "--no_viz"
+          - "--no_layout"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Check if Dockerfile or Conda environment changed
+        uses: technote-space/get-diff-action@v4
+        with:
+          FILES: |
+            Dockerfile
+            environment.yml
+
+      - name: Build new docker image
+        if: env.MATCHED_FILES
+        run: docker build --no-cache . -t nfcore/pangenome:dev
+
+      - name: Pull docker image
+        if: ${{ !env.MATCHED_FILES }}
+        run: |
+          docker pull nfcore/pangenome:dev
+          docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with test data
+        run: |
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+
+  vg_deconstruct:
+    name: Run pipeline with vg deconstruct parameter
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Nextflow versions: check pipeline minimum and current latest
+        parameters: 
+          - "--vcf_spec \"gi|568815561:#,gi|568815567:#\""
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Check if Dockerfile or Conda environment changed
+        uses: technote-space/get-diff-action@v4
+        with:
+          FILES: |
+            Dockerfile
+            environment.yml
+
+      - name: Build new docker image
+        if: env.MATCHED_FILES
+        run: docker build --no-cache . -t nfcore/pangenome:dev
+
+      - name: Pull docker image
+        if: ${{ !env.MATCHED_FILES }}
+        run: |
+          docker pull nfcore/pangenome:dev
+          docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with test data
+        run: |
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+
+  smoothxg:
+    name: Run pipeline with smoothxg parameters
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Nextflow versions: check pipeline minimum and current latest
+        parameters: 
+          - "--smoothxg_write_maf --smoothxg_poa_length 100,200,300 --smoothxg_run_abpoa --smoothxg_run_global_poa"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Check if Dockerfile or Conda environment changed
+        uses: technote-space/get-diff-action@v4
+        with:
+          FILES: |
+            Dockerfile
+            environment.yml
+
+      - name: Build new docker image
+        if: env.MATCHED_FILES
+        run: docker build --no-cache . -t nfcore/pangenome:dev
+
+      - name: Pull docker image
+        if: ${{ !env.MATCHED_FILES }}
+        run: |
+          docker pull nfcore/pangenome:dev
+          docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with test data
+        run: |
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+
+  wfmash_chunks:
+    name: Run pipeline with wfmash chunk parameter
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Nextflow versions: check pipeline minimum and current latest
+        parameters: 
+          - "--wfmash_chunks 2"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Check if Dockerfile or Conda environment changed
+        uses: technote-space/get-diff-action@v4
+        with:
+          FILES: |
+            Dockerfile
+            environment.yml
+
+      - name: Build new docker image
+        if: env.MATCHED_FILES
+        run: docker build --no-cache . -t nfcore/pangenome:dev
+
+      - name: Pull docker image
+        if: ${{ !env.MATCHED_FILES }}
+        run: |
+          docker pull nfcore/pangenome:dev
+          docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with test data
+        run: |
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+
+  wfmash_only:
+    name: Run only the wfmash part of the pipeline
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Nextflow versions: check pipeline minimum and current latest
+        parameters: 
+          - "--wfmash_only"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Check if Dockerfile or Conda environment changed
+        uses: technote-space/get-diff-action@v4
+        with:
+          FILES: |
+            Dockerfile
+            environment.yml
+
+      - name: Build new docker image
+        if: env.MATCHED_FILES
+        run: docker build --no-cache . -t nfcore/pangenome:dev
+
+      - name: Pull docker image
+        if: ${{ !env.MATCHED_FILES }}
+        run: |
+          docker pull nfcore/pangenome:dev
+          docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with test data
+        run: |
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+
+  communities:
+    name: Run the pipeline with the communities parameter
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: ${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Nextflow versions: check pipeline minimum and current latest
+        parameters: 
+          - "--communities --squeeze_gfa"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v2
+
+      - name: Check if Dockerfile or Conda environment changed
+        uses: technote-space/get-diff-action@v4
+        with:
+          FILES: |
+            Dockerfile
+            environment.yml
+
+      - name: Build new docker image
+        if: env.MATCHED_FILES
+        run: docker build --no-cache . -t nfcore/pangenome:dev
+
+      - name: Pull docker image
+        if: ${{ !env.MATCHED_FILES }}
+        run: |
+          docker pull nfcore/pangenome:dev
+          docker tag nfcore/pangenome:dev nfcore/pangenome:dev
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with test data
+        run: |
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
