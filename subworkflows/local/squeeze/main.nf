@@ -26,7 +26,8 @@ workflow SQUEEZE {
   main:
   fasta = ch_fasta.map { f -> tuple(make_file_prefix(f), f) }
   ch_squeezed = odgiSqueeze(ch_pggb, fasta)
-  // TODO GFA?
+  // TODO GFA as optional additional output
+  // TODO stats
   // TODO viz
   // TODO layout
   // TODO MultiQC

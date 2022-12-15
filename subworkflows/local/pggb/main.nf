@@ -494,7 +494,11 @@ workflow PGGB {
         )
       }
     }
+    gfaffix_out_og_norm = Channel.empty()
+    if (!params.wfmash_only) {
+          gfaffix_out_og_norm = gfaffix.out.og_norm
+    }
 
   emit:
-    ch_pggb = gfaffix.out.og_norm
+    ch_pggb = gfaffix_out_og_norm
 }
