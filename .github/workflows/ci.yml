@@ -51,7 +51,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12
 
   no_viz_no_layout:
     name: Run pipeline without graph vizualizations or graph layouts
@@ -92,7 +92,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   vg_deconstruct:
     name: Run pipeline with vg deconstruct parameter
@@ -132,7 +132,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   smoothxg:
     name: Run pipeline with smoothxg parameters
@@ -172,7 +172,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   wfmash_chunks:
     name: Run pipeline with wfmash chunk parameter
@@ -212,7 +212,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   wfmash_only:
     name: Run only the wfmash part of the pipeline
@@ -252,7 +252,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
 
   communities:
     name: Run the pipeline with the communities parameter
@@ -292,4 +292,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
+          NXF_VER=22.04.5 nextflow run ${GITHUB_WORKSPACE} -profile test,docker --n_haplotypes 12 ${{ matrix.parameters }}
