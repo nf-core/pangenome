@@ -35,6 +35,8 @@ if [ ! -d bin ]; then
     mkdir bin
 fi
 cp ../pangenome/bin/split_approx_mappings_in_chunks.py bin/
+cp ../pangenome/bin/paf2net.py bin/
+cp ../pangenome/bin/net2communities.py bin/
 cp ../pangenome/environment.yml .
 #### SKIP ####
 
