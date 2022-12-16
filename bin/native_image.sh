@@ -35,11 +35,13 @@ if [ ! -d bin ]; then
     mkdir bin
 fi
 cp ../pangenome/bin/split_approx_mappings_in_chunks.py bin/
+cp ../pangenome/bin/paf2net.py bin/
+cp ../pangenome/bin/net2communities.py bin/
 cp ../pangenome/environment.yml .
 #### SKIP ####
 
 docker build -t ${USER}/pangenome-dev:latest .
-#### SKIP Commen the following lines out if you only want to build an image for docker. ####
+#### SKIP Comment the following lines out if you only want to build an image for docker. ####
 docker run -d -p 5000:5000 --name registry registry:2
 docker image tag $(docker images | grep pangenome-dev | grep latest | grep ${USER} | tr -s ' ' | cut -f 3 -d ' ') localhost:5000/pangenome-dev
 docker push localhost:5000/pangenome-dev
