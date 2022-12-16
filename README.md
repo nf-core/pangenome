@@ -10,7 +10,7 @@
 
 ## Introduction
 
-> **Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended!
+> **Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended! This pipeline can only be run with Nextflow version 22.04.5 or earlier. This issue is currently investigated https://nextflow.slack.com/archives/C02T98A23U7/p1671183108988419. If you have a newer Nextflow version, please prepend `NXF_VER=22.04.5` to your command line.
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 **nf-core/pangenome** is a bioinformatics best-practise analysis pipeline for the rendering of a collection of sequences into a pangenome graph.
