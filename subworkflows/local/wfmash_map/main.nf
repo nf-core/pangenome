@@ -38,7 +38,6 @@ process wfmashMap {
 
   output:
     tuple val(f), path("${f}.${wfmash_prefix}.map.paf")
-
   """
   wfmash ${wfmash_exclude_cmd} \
      -s ${params.wfmash_segment_length} \
@@ -54,7 +53,7 @@ process wfmashMap {
      -t ${task.cpus} \
      -m \
      $fasta $fasta \
-     >${f}.${wfmash_prefix}.map.paf
+     > "${f}.${wfmash_prefix}.map.paf"
   """  
 }
 
