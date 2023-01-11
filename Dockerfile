@@ -1,4 +1,4 @@
-FROM ghcr.io/pangenome/pggb:20221228184922288a39
+FROM ghcr.io/pangenome/pggb:20230110163855669c4e
 LABEL authors="Simon Heumos, Michael Heuer, Lukas Heumos, Erik Garrison, Andrea Guarracino" \
       description="Docker image containing all software requirements for the nf-core/pangenome pipeline"
 
@@ -35,3 +35,6 @@ RUN echo "export PATH=$PATH" > /etc/profile
 
 # Dump the details of the conda-installed packages to a file for posterity
 RUN conda env export --name nf-core-pangenome-1.0dev > nf-core-pangenome-1.0dev.yml
+
+# this should fix https://nextflow.slack.com/archives/C02T98A23U7/p1671183108988419
+SHELL ["/bin/bash", "-c"]
