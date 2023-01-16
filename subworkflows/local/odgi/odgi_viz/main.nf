@@ -14,6 +14,7 @@ process odgiViz {
     odgi viz -i $graph -o ${graph}.viz_depth_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -m
     odgi viz -i $graph -o ${graph}.viz_inv_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -z
     odgi viz -i $graph -o ${graph}.viz_O_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -O
+    odgi viz -i $graph -o ${graph}.viz_uncalled_multiqc.png -x 1500 -y 500 -a 10 -I ${params.smoothxg_consensus_prefix} -N
     """
 }
 
