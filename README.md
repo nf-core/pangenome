@@ -10,7 +10,7 @@
 
 ## Introduction
 
-> **Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended! This pipeline can only be run with Nextflow version 22.04.5 or earlier. This issue is currently investigated https://nextflow.slack.com/archives/C02T98A23U7/p1671183108988419. If you have a newer Nextflow version, please prepend `NXF_VER=22.04.5` to your command line.
+> **Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended! This pipeline can only be run with Nextflow version 22.04.5 or later.
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 **nf-core/pangenome** is a bioinformatics best-practise analysis pipeline for the rendering of a collection of sequences into a pangenome graph.
@@ -134,7 +134,7 @@ Many thanks to all who have helped out and contributed along the way, including 
 | [Gisela Gabernet](https://github.com/ggabernet)                  | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)|
 | [Erik Garrison](https://github.com/ekg)                  | [The University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)|
 | [Andrea Guarracino](https://github.com/AndreaGuarracino) | [Genomics Research Centre, Human Technopole, Milan, Italy](https://humantechnopole.it/en/)        |
-| [Friederieke Hanssen](https://github.com/FriederikeHanssen) | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)        |
+| [Friederike Hanssen](https://github.com/FriederikeHanssen) | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)        |
 | [Michael Heuer](https://github.com/heuermh)              | [UC Berkeley, USA](https://rise.cs.berkeley.edu)                                      |
 | [Lukas Heumos](https://github.com/zethson)               | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) <br /> [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html) |
 | [Simon Heumos](https://github.com/subwaystation)         | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br /> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
