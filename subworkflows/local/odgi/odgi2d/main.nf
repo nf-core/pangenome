@@ -1,4 +1,5 @@
 process odgiLayout {
+  publishDir "${params.outdir}/odgi_layout", mode: "${params.publish_dir_mode}"
   input:
   path(graph)
 
