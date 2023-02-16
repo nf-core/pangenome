@@ -23,6 +23,8 @@ sed -i "70 s/./#&/" Dockerfile
 sed -i "71 s/./#&/" Dockerfile
 sed -i "72 s/./#&/" Dockerfile
 cp ../pggb/pggb .
+cp ../pggb/partition-before-pggb .
+cp -r ../pggb/scripts .
 if [ ! -d .git ]; then
     cp -r ../pggb/.git .
 fi
@@ -45,6 +47,6 @@ docker build -t ${USER}/pangenome-dev:latest .
 docker run -d -p 5000:5000 --name registry registry:2
 docker image tag $(docker images | grep pangenome-dev | grep latest | grep ${USER} | tr -s ' ' | cut -f 3 -d ' ') localhost:5000/pangenome-dev
 docker push localhost:5000/pangenome-dev
-SINGULARITY_NOHTTPS=true singularity build pangenome-dev.img docker://localhost:5000/pangenome-dev
+SINGULARITY_NOHTTPS=true singularity build pangenome-dev.img docker://localhost:5000/pangenome-dev --force
 docker container stop registry && docker container rm -v registry
 #### SKIP ####
