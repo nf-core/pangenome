@@ -53,9 +53,9 @@ if (params.smoothxg_poa_params == null) {
 def smoothxg_poa_params_display = smoothxg_poa_params.replaceAll(/,/, "_")
 def smoothxg_temp_dir = params.smoothxg_temp_dir ? "-b${params.smoothxg_temp_dir}" : ""
 def smoothxg_keep_intermediate_files = params.smoothxg_keep_intermediate_files ? "-K" : ""
-def smoothxg_xpoa = "-S" 
+def smoothxg_xpoa = "" 
 if (params.smoothxg_run_abpoa != null) {
-  smoothxg_xpoa = ""
+  smoothxg_xpoa = "-A"
 }
 def smoothxg_poa_mode = params.smoothxg_run_global_poa ? "-Z" : ""
 // disabling consensus graph mode cause it is buggy
