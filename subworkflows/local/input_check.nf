@@ -3,6 +3,7 @@
 //
 
 include { TABIX_BGZIP                } from '../../modules/nf-core/tabix/bgzip/main.nf'
+include { SAMTOOLS_FAIDX             } from '../../modules/nf-core/samtools/faidx/main.nf'
 
 workflow INPUT_CHECK {
     take:
@@ -14,14 +15,14 @@ workflow INPUT_CHECK {
     gzi_path = file("${params.input}.gzi")
 
     def fasta_file_name = fasta.getName()
+    // TODO this only applies when we end with *.fa!
     fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 3)
     meta = [ id:fasta_file_name ]
     ch_fasta = tuple(meta, fasta)
 
-    ch_versions = Channel.empty()
     TABIX_BGZIP(ch_fasta)
-    ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
-    
+    SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
+
 /*
     if (params.input.endsWith(".gz")) {
         if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
@@ -38,9 +39,14 @@ workflow INPUT_CHECK {
 
     }
 */
+    ch_versions = Channel.empty()
+    ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
+    ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
+
+    // TODO combine output so that we have
 
     emit:
-    fasta                      // channel: [ val(meta), [ reads ] ]
+    fasta                  // channel: [ val(meta), [ reads ] ]
     versions = ch_versions // channel: [ versions.yml ]
 }
 
