@@ -11,10 +11,7 @@ class WorkflowPangenome {
     //
     public static void initialise(params, log) {
 
-        if (!params.fasta) {
-            log.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
-            System.exit(1)
-        }
+        // This function is currently not in use
     }
 
     //

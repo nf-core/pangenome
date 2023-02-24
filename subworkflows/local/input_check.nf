@@ -1,6 +1,8 @@
 //
-// Check input samplesheet and get read channels
+// Check input FASTA and prepare indices
 //
+
+include { TABIX_BGZIP                } from '../../modules/nf-core/tabix/bgzip/main.nf'
 
 workflow INPUT_CHECK {
     take:
@@ -8,10 +10,38 @@ workflow INPUT_CHECK {
 
     main:
 
+    fai_path = file("${params.input}.fai")
+    gzi_path = file("${params.input}.gzi")
+
+    def fasta_file_name = fasta.getName()
+    fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 3)
+    meta = [ id:fasta_file_name ]
+    ch_fasta = tuple(meta, fasta)
+
+    ch_versions = Channel.empty()
+    TABIX_BGZIP(ch_fasta)
+    ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
+    
+/*
+    if (params.input.endsWith(".gz")) {
+        if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
+        // samtoolsFaidx(fasta)
+        // fai = samtoolsFaidx.out.samtools_fai.collect()
+        // gzi = samtoolsFaidx.out.samtools_gzi.collect()
+        } else {
+        fai = channel.fromPath("${params.input}.fai").collect()
+        gzi = channel.fromPath("${params.input}.gzi").collect()
+        }
+    } else {
+        // val(meta), path(input)
+        TABIX_BGZIP(ch_fasta)
+
+    }
+*/
 
     emit:
     fasta                      // channel: [ val(meta), [ reads ] ]
-    versions = Channel.empty() // channel: [ versions.yml ]
+    versions = ch_versions // channel: [ versions.yml ]
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
@@ -36,3 +66,4 @@ def create_fastq_channel(LinkedHashMap row) {
     }
     return fastq_meta
 }
+
