@@ -6,8 +6,8 @@
 
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
-// Validate input parameters
-WorkflowPangenome.initialise(params, log)
+// Validate input parameters - This pipeline does not need a reference fasta so we can skip this step completely for now.
+// WorkflowPangenome.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
