@@ -42,23 +42,6 @@
                 }
             }
         },
-        "reference_genome_options": {
-            "title": "Reference genome options",
-            "type": "object",
-            "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
-            "properties": {
-                "fasta": {
-                    "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
-                }
-            }
-        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -249,9 +232,6 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
-        },
-        {
-            "$ref": "#/definitions/reference_genome_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

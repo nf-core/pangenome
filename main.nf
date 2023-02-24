@@ -18,8 +18,8 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// TODO we dont't need this parameter
-params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
+// We dont't need this parameter in this pipeline
+// params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
