@@ -23,6 +23,17 @@ workflow INPUT_CHECK {
     TABIX_BGZIP(ch_fasta)
     SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
 
+    // TODO wfmash testing
+    /*
+    input:
+    tuple val(meta), path(fasta_gz)
+    val(query_self)
+    path(gzi)
+    path(fai)
+    path(fasta_query_list)
+    path(paf)
+    */
+
 /*
     if (params.input.endsWith(".gz")) {
         if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
