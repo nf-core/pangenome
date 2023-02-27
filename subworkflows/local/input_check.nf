@@ -4,6 +4,7 @@
 
 include { TABIX_BGZIP                } from '../../modules/nf-core/tabix/bgzip/main.nf'
 include { SAMTOOLS_FAIDX             } from '../../modules/nf-core/samtools/faidx/main.nf'
+include { WFMASH                     } from '../../modules/nf-core/wfmash/main.nf'
 
 workflow INPUT_CHECK {
     take:
@@ -16,12 +17,23 @@ workflow INPUT_CHECK {
 
     def fasta_file_name = fasta.getName()
     // TODO this only applies when we end with *.fa!
+    // SAMTOOLS_FAIDX(fasta.map{ it -> [[id:it[0].baseName], it] })
+    // https://stackoverflow.com/questions/20954779/regular-expression-to-get-last-3-characters-of-a-string
+    // ... id:get_last_three_chars(it[0]) ...
     fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 3)
     meta = [ id:fasta_file_name ]
     ch_fasta = tuple(meta, fasta)
 
     TABIX_BGZIP(ch_fasta)
+    TABIX_BGZIP.out.output.view()
     SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
+    def query_self = true
+    WFMASH(TABIX_BGZIP.out.output,
+            query_self,
+            SAMTOOLS_FAIDX.out.gzi.collect{it[1]},
+            SAMTOOLS_FAIDX.out.fai.collect{it[1]},
+            [],
+            [])
 
     // TODO wfmash testing
     /*
