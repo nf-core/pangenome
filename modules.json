@@ -27,7 +27,7 @@
                     },
                     "wfmash": {
                         "branch": "master",
-                        "git_sha": "7ba9a187b72f099e1feaa8d519b6e606835ec8f9",
+                        "git_sha": "674e7a91bdd85eecd15060bd4abf1d0091115b94",
                         "installed_by": ["modules"]
                     }
                 }
