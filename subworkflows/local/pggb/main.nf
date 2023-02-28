@@ -45,7 +45,7 @@ if (params.smoothxg_poa_params == null) {
   } else if (params.smoothxg_poa_params == "asm15") {
     smoothxg_poa_params = "-P 1,7,11,2,33,1"
   } else if (params.smoothxg_poa_params == "asm20") {
-    smoothxg_poa_params = "-P 1,4,6,2,26,1"B
+    smoothxg_poa_params = "-P 1,4,6,2,26,1"
   } else {
     smoothxg_poa_params = "-P${params.smoothxg_poa_params}"
   }
