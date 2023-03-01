@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": ["input", "n_haplotypes", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -21,6 +21,10 @@
                     "description": "Path to input FASTA to build the pangenome graph from.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/pangenome/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
+                },
+                "n_haplotypes": {
+                    "type": "number",
+                    "description": "The number of haplotypes in the input FASTA."
                 },
                 "outdir": {
                     "type": "string",
@@ -39,6 +43,68 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                }
+            }
+        },
+        "wfmash_options": {
+            "title": "Wfmash Options",
+            "type": "object",
+            "description": "Options for the all versus all alignment phase.",
+            "default": "",
+            "properties": {
+                "wfmash_map_pct_id": {
+                    "type": "number",
+                    "default": 90.0,
+                    "description": "Percent identity in the wfmash mashmap step."
+                },
+                "wfmash_segment_length": {
+                    "type": "integer",
+                    "default": 5000,
+                    "description": "Segment length for mapping."
+                },
+                "wfmash_block_length": {
+                    "type": "string",
+                    "default": "wfmash_segment_length * 5"
+                },
+                "wfmash_mash_kmer": {
+                    "type": "integer",
+                    "default": 19,
+                    "description": "Kmer size for mashmap."
+                },
+                "wfmash_mash_kmer_thres": {
+                    "type": "number",
+                    "default": 0.001,
+                    "description": "Ignore the top % most-frequent kmers."
+                },
+                "wfmash_sparse_map": {
+                    "type": "string",
+                    "default": "1.0",
+                    "description": "Keep this fraction of mappings (\"auto\" for giant component heuristic)."
+                },
+                "wfmash_merge_segments": {
+                    "type": "boolean",
+                    "description": "Merge successive mappings."
+                },
+                "wfmash_no_splits": {
+                    "type": "boolean",
+                    "description": "Disable splitting of input sequences during mapping."
+                },
+                "wfmash_exclude_delim": {
+                    "type": "string",
+                    "default": "None"
+                },
+                "wfmash_temp_dir": {
+                    "type": "string",
+                    "default": "None"
+                },
+                "wfmash_chunks": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1."
+                },
+                "wfmash_only": {
+                    "type": "boolean",
+                    "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
                 }
             }
         },
@@ -232,6 +298,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/wfmash_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
