@@ -25,7 +25,6 @@ workflow INPUT_CHECK {
     ch_fasta = tuple(meta, fasta)
 
     TABIX_BGZIP(ch_fasta)
-    TABIX_BGZIP.out.output.view()
     SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
     def query_self = true
     WFMASH(TABIX_BGZIP.out.output,
