@@ -20,6 +20,11 @@
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
                         "installed_by": ["modules"]
                     },
+                    "seqwish/induce": {
+                        "branch": "master",
+                        "git_sha": "8fef6dafd1ce4dd8048582746df0badd4a76685e",
+                        "installed_by": ["modules"]
+                    },
                     "tabix/bgzip": {
                         "branch": "master",
                         "git_sha": "90294980a903ecebd99ac31d8b6c66af48fa8259",
@@ -27,7 +32,7 @@
                     },
                     "wfmash": {
                         "branch": "master",
-                        "git_sha": "674e7a91bdd85eecd15060bd4abf1d0091115b94",
+                        "git_sha": "caff2dd48eaaeed8837f7ee8c7196b482e7fe3b7",
                         "installed_by": ["modules"]
                     }
                 }

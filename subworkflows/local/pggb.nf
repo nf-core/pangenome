@@ -2,7 +2,8 @@
 // Run the default PanGenome Graph Builder (PGGB) pipeline
 //
 
-include { WFMASH                 } from '../../modules/nf-core/wfmash/main.nf'
+include { WFMASH                    } from '../../modules/nf-core/wfmash/main.nf'
+include { SEQWISH_INDUCE as SEQWISH } from '../../modules/nf-core/seqwish/induce/main.nf'
 
 workflow PGGB {
     take:
@@ -22,6 +23,10 @@ workflow PGGB {
             [],
             [])
     ch_versions = ch_versions.mix(WFMASH.out.versions)
+
+    ch_seqwish_input = WFMASH.out.paf.combine(fasta, by:0).groupTuple(by:0) // TODO I want the output file to be named meta_id.seqwish.gfa!
+    SEQWISH(ch_seqwish_input) // tuple val(meta), path("*.gfa"), emit: gfa
+    ch_versions = ch_versions.mix(SEQWISH.out.versions)
 
     emit:
     versions = ch_versions   // channel: [ versions.yml ]

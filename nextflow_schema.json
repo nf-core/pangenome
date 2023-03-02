@@ -54,7 +54,7 @@
             "properties": {
                 "wfmash_map_pct_id": {
                     "type": "number",
-                    "default": 90.0,
+                    "default": 90,
                     "description": "Percent identity in the wfmash mashmap step."
                 },
                 "wfmash_segment_length": {
@@ -105,6 +105,33 @@
                 "wfmash_only": {
                     "type": "boolean",
                     "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
+                }
+            }
+        },
+        "seqwish_options": {
+            "title": "Seqwish Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "seqwish_min_match_length": {
+                    "type": "integer",
+                    "default": 19,
+                    "description": "Ignores exact matches below this length."
+                },
+                "seqwish_transclose_batch": {
+                    "type": "integer",
+                    "default": 10000000,
+                    "description": "Number of base pairs to use for transitive closure batch."
+                },
+                "seqwish_sparse_factor": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Keep this randomly selected fraction of input matches."
+                },
+                "seqwish_temp_dir": {
+                    "type": "string",
+                    "default": null
                 }
             }
         },
@@ -301,6 +328,9 @@
         },
         {
             "$ref": "#/definitions/wfmash_options"
+        },
+        {
+            "$ref": "#/definitions/seqwish_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
