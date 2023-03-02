@@ -12,56 +12,62 @@ workflow INPUT_CHECK {
 
     main:
 
+    ch_versions = Channel.empty() // we collect all versions here
+    ch_fasta = Channel.empty() // final output channel [ val(meta) , [ fasta ] ]
+
     fai_path = file("${params.input}.fai")
     gzi_path = file("${params.input}.gzi")
 
-    def fasta_file_name = fasta.getName()
-    // TODO this only applies when we end with *.fa!
-    // SAMTOOLS_FAIDX(fasta.map{ it -> [[id:it[0].baseName], it] })
-    // https://stackoverflow.com/questions/20954779/regular-expression-to-get-last-3-characters-of-a-string
-    // ... id:get_last_three_chars(it[0]) ...
-    fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 3)
-    meta = [ id:fasta_file_name ]
-    ch_fasta = tuple(meta, fasta)
+    fai = Channel.empty() // we store the .fai index here [ fai ]
+    gzi = Channel.empty() // we store the .gzi index here [ gzi ]
 
-    TABIX_BGZIP(ch_fasta)
-    SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
+    meta_fasta = Channel.empty() // intermediate channel where we build our [ val(meta) , [ fasta ] ]
+
+
+    if (params.input.endsWith(".gz")) {
+        meta_fasta = fasta.map{ it -> [[id:it[0].baseName], it] }
+        // TODO We want to check, if the input file was actually compressed with bgzip with the upcoming grabix module.
+        // For now we assume it was bgzip. If not wfmash will complain instantly anyhow.
+        if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
+            SAMTOOLS_FAIDX(meta_fasta)
+            fai = SAMTOOLS_FAIDX.out.fai.collect{it[1]}
+            gzi = SAMTOOLS_FAIDX.out.gzi.collect{it[1]}
+        } else {
+            fai = Channel.fromPath("${params.input}.fai").collect()
+            gzi = Channel.fromPath("${params.input}.gzi").collect()
+        }
+        ch_fasta = meta_fasta
+    } else {
+        fasta_file_name = fasta.getName()
+        if (params.input.endsWith("fa")) {
+            // SAMTOOLS_FAIDX(fasta.map{ it -> [[id:it[0].baseName], it] })
+            // https://stackoverflow.com/questions/20954779/regular-expression-to-get-last-3-characters-of-a-string
+            // ... id:get_last_three_chars(it[0]) ...
+            fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 3)
+        } else {
+            if (params.input.endswith("fasta")) {
+                fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 6)
+            } else { // we assume "fna" here
+                fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 4)
+            }
+        }
+        meta = [ id:fasta_file_name ]
+        meta_fasta = tuple(meta, fasta)
+        TABIX_BGZIP(meta_fasta)
+        ch_fasta = TABIX_BGZIP.out.output
+        SAMTOOLS_FAIDX(ch_fasta)
+        gzi = SAMTOOLS_FAIDX.out.gzi.collect{it[1]}
+        fai = SAMTOOLS_FAIDX.out.fai.collect{it[1]}
+    }
+
     def query_self = true
-    WFMASH(TABIX_BGZIP.out.output,
+    WFMASH(ch_fasta,
             query_self,
-            SAMTOOLS_FAIDX.out.gzi.collect{it[1]},
-            SAMTOOLS_FAIDX.out.fai.collect{it[1]},
+            gzi,
+            fai,
             [],
             [])
 
-    // TODO wfmash testing
-    /*
-    input:
-    tuple val(meta), path(fasta_gz)
-    val(query_self)
-    path(gzi)
-    path(fai)
-    path(fasta_query_list)
-    path(paf)
-    */
-
-/*
-    if (params.input.endsWith(".gz")) {
-        if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
-        // samtoolsFaidx(fasta)
-        // fai = samtoolsFaidx.out.samtools_fai.collect()
-        // gzi = samtoolsFaidx.out.samtools_gzi.collect()
-        } else {
-        fai = channel.fromPath("${params.input}.fai").collect()
-        gzi = channel.fromPath("${params.input}.gzi").collect()
-        }
-    } else {
-        // val(meta), path(input)
-        TABIX_BGZIP(ch_fasta)
-
-    }
-*/
-    ch_versions = Channel.empty()
     ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
     ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
 
