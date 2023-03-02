@@ -50,6 +50,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { WFMASH                      } from '../modules/nf-core/wfmash/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,6 +72,15 @@ workflow PANGENOME {
         ch_input
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+
+    def query_self = true
+    WFMASH(INPUT_CHECK.out.fasta,
+            query_self,
+            INPUT_CHECK.out.gzi,
+            INPUT_CHECK.out.fai,
+            [],
+            [])
+    ch_versions = ch_versions.mix(WFMASH.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
