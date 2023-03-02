@@ -38,6 +38,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { PGGB        } from '../subworkflows/local/pggb'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,14 +74,12 @@ workflow PANGENOME {
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    def query_self = true
-    WFMASH(INPUT_CHECK.out.fasta,
-            query_self,
-            INPUT_CHECK.out.gzi,
-            INPUT_CHECK.out.fai,
-            [],
-            [])
-    ch_versions = ch_versions.mix(WFMASH.out.versions)
+    PGGB (
+        INPUT_CHECK.out.fasta,
+        INPUT_CHECK.out.fai,
+        INPUT_CHECK.out.gzi
+    )
+    ch_versions = ch_versions.mix(PGGB.out.versions)
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
