@@ -91,11 +91,11 @@
                 },
                 "wfmash_exclude_delim": {
                     "type": "string",
-                    "default": "None"
+                    "default": null
                 },
                 "wfmash_temp_dir": {
                     "type": "string",
-                    "default": "None"
+                    "default": null
                 },
                 "wfmash_chunks": {
                     "type": "integer",

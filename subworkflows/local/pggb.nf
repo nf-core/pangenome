@@ -24,7 +24,7 @@ workflow PGGB {
             [])
     ch_versions = ch_versions.mix(WFMASH.out.versions)
 
-    ch_seqwish_input = WFMASH.out.paf.combine(fasta, by:0).groupTuple(by:0) // TODO I want the output file to be named meta_id.seqwish.gfa!
+    ch_seqwish_input = WFMASH.out.paf.combine(fasta, by:0).groupTuple(by:0, size:1) // TODO I want the output file to be named meta_id.seqwish.gfa!
     SEQWISH(ch_seqwish_input) // tuple val(meta), path("*.gfa"), emit: gfa
     ch_versions = ch_versions.mix(SEQWISH.out.versions)
 
