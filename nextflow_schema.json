@@ -54,7 +54,7 @@
             "properties": {
                 "wfmash_map_pct_id": {
                     "type": "number",
-                    "default": 90,
+                    "default": 90.0,
                     "description": "Percent identity in the wfmash mashmap step."
                 },
                 "wfmash_segment_length": {
@@ -91,11 +91,11 @@
                 },
                 "wfmash_exclude_delim": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
                 },
                 "wfmash_temp_dir": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
                 },
                 "wfmash_chunks": {
                     "type": "integer",
@@ -126,12 +126,88 @@
                 },
                 "seqwish_sparse_factor": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "description": "Keep this randomly selected fraction of input matches."
                 },
                 "seqwish_temp_dir": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
+                }
+            }
+        },
+        "smoothxg_options": {
+            "title": "Smoothxg options",
+            "type": "object",
+            "description": "Options for graph smoothing phase.",
+            "default": "",
+            "properties": {
+                "skip_smoothxg": {
+                    "type": "boolean",
+                    "description": "Skip the graph smoothing step of the pipeline."
+                },
+                "smoothxg_max_path_jump": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Maximum path jump to include in the block."
+                },
+                "smoothxg_max_edge_jump": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Maximum edge jump before a block is broken."
+                },
+                "smoothxg_poa_length": {
+                    "type": "string",
+                    "default": "700,900,1100",
+                    "description": "Maximum sequence length to put int POA. Is a comma-separated list. For each integer, SMOOTHXG wil be executed once."
+                },
+                "smoothxg_block_id_min": {
+                    "type": "string",
+                    "default": "None"
+                },
+                "smoothxg_block_ratio_min": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Minimum 'smallest / largest' sequence length ration to cluster in a block."
+                },
+                "smoothxg_pad_max_depth": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Path depth at which we don't pad the POA problem."
+                },
+                "smoothxg_poa_padding": {
+                    "type": "number",
+                    "default": 0.001,
+                    "description": "Pad each end of each seuqence in POA with 'smoothxg_poa_padding * longest_poa_seq' base pairs."
+                },
+                "smoothxg_poa_params": {
+                    "type": "string",
+                    "default": "1,19,39,3,81,1",
+                    "description": "Score parameters for POA in the form of 'match,mismatch,gap1,ext1,gap2,ext2'. It may also be given as presets: 'asm5', 'asm10', 'asm15', 'asm20'. [default: 1,19,39,3,81,1 = asm5]."
+                },
+                "smoothxg_write_maf": {
+                    "type": "boolean",
+                    "description": "Write MAF output representing merged POA blocks."
+                },
+                "smoothxg_consensus_prefix": {
+                    "type": "string",
+                    "default": "Consensus_",
+                    "description": "Use this prefix for consensus path names."
+                },
+                "smoothxg_temp_dir": {
+                    "type": "string",
+                    "default": "None"
+                },
+                "smoothxg_keep_intermediate_files": {
+                    "type": "boolean",
+                    "description": "Keep intermediate graphs during SMOOTHXG."
+                },
+                "smoothxg_run_abpoa": {
+                    "type": "boolean",
+                    "description": "Run abPOA. [default: SPOA]."
+                },
+                "smoothxg_run_global_poa": {
+                    "type": "boolean",
+                    "description": "Run the POA in global mode. [default: local mode]."
                 }
             }
         },
@@ -331,6 +407,9 @@
         },
         {
             "$ref": "#/definitions/seqwish_options"
+        },
+        {
+            "$ref": "#/definitions/smoothxg_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
