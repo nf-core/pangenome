@@ -25,6 +25,11 @@
                         "git_sha": "8fef6dafd1ce4dd8048582746df0badd4a76685e",
                         "installed_by": ["modules"]
                     },
+                    "smoothxg": {
+                        "branch": "master",
+                        "git_sha": "1104d6756eec24f2c1db976041ea18caef194c46",
+                        "installed_by": ["modules"]
+                    },
                     "tabix/bgzip": {
                         "branch": "master",
                         "git_sha": "90294980a903ecebd99ac31d8b6c66af48fa8259",
