@@ -45,7 +45,7 @@ if (params.smoothxg_poa_params == null) {
   } else if (params.smoothxg_poa_params == "asm15") {
     smoothxg_poa_params = "-P 1,7,11,2,33,1"
   } else if (params.smoothxg_poa_params == "asm20") {
-    smoothxg_poa_params = "-P 1,4,6,2,26,1"B
+    smoothxg_poa_params = "-P 1,4,6,2,26,1"
   } else {
     smoothxg_poa_params = "-P${params.smoothxg_poa_params}"
   }
@@ -376,7 +376,7 @@ workflow PGGB {
           WFMASH_MAP(ch_fasta, fai, gzi, wfmash_prefix)
           splitApproxMappingsInChunks(WFMASH_MAP.out)
           wfmashAlign(fasta.combine(splitApproxMappingsInChunks.out.transpose(), by:0), fai, gzi)
-          seqwish(fasta.combine(wfmashAlign.out, by:0).groupTuple(by:[0,1]))
+          seqwish(fasta.combine(wfmashAlign.out, by:0).groupTuple(by:[0,1], size:params.wfmash_chunks))
         }
       }
       if (params.skip_smoothxg) {

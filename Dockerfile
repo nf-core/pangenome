@@ -1,5 +1,5 @@
-FROM ghcr.io/pangenome/pggb:20230210020215005014
-LABEL authors="Simon Heumos, Michael Heuer, Lukas Heumos, Erik Garrison, Andrea Guarracino" \
+FROM ghcr.io/pangenome/pggb:20230307002403ffe030
+LABEL authors="Simon Heumos, Michael Heuer, Lukas Heumos" \
       description="Docker image containing all software requirements for the nf-core/pangenome pipeline"
 
 # Install procps so that Nextflow can poll CPU usage and
