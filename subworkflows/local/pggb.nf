@@ -7,6 +7,7 @@ include { SEQWISH_INDUCE as SEQWISH } from '../../modules/nf-core/seqwish/induce
 include { SMOOTHXG                  } from '../../modules/nf-core/smoothxg/main'
 include { GFAFFIX                   } from '../../modules/nf-core/gfaffix/main'
 include { ODGI_BUILD                } from '../../modules/nf-core/odgi/build/main'
+include { ODGI_UNCHOP               } from '../../modules/nf-core/odgi/unchop/main'
 
 workflow PGGB {
     take:
@@ -49,6 +50,8 @@ workflow PGGB {
         } else {
             return null
         }}.filter{ it != null }
+    ODGI_UNCHOP(ch_odgi_build)
+    ch_versions = ch_versions.mix(ODGI_UNCHOP.out.versions)
     // TODO ODGI_SORT
 
     // TODO ODGI_VIEW
