@@ -43,7 +43,6 @@ workflow PGGB {
     ODGI_BUILD(ch_gfaffix.mix(ch_seqwish))
     ch_versions = ch_versions.mix(ODGI_BUILD.out.versions)
 
-    // TODO ODGI_UNCHOP
     ch_odgi_build = ODGI_BUILD.out.og.map{meta, gfa ->
         if(gfa.baseName.contains("gfaffix")) {
             return [ meta, gfa ]
