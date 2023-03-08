@@ -20,6 +20,11 @@
                         "git_sha": "ee80d14721e76e2e079103b8dcd5d57129e584ba",
                         "installed_by": ["modules"]
                     },
+                    "odgi/build": {
+                        "branch": "master",
+                        "git_sha": "b2d1e38b5ee7740c280d047b4730bb2e39a7b51f",
+                        "installed_by": ["modules"]
+                    },
                     "samtools/faidx": {
                         "branch": "master",
                         "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
