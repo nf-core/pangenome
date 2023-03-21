@@ -25,7 +25,17 @@
                         "git_sha": "b2d1e38b5ee7740c280d047b4730bb2e39a7b51f",
                         "installed_by": ["modules"]
                     },
+                    "odgi/sort": {
+                        "branch": "master",
+                        "git_sha": "b2d1e38b5ee7740c280d047b4730bb2e39a7b51f",
+                        "installed_by": ["modules"]
+                    },
                     "odgi/unchop": {
+                        "branch": "master",
+                        "git_sha": "b2d1e38b5ee7740c280d047b4730bb2e39a7b51f",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/view": {
                         "branch": "master",
                         "git_sha": "b2d1e38b5ee7740c280d047b4730bb2e39a7b51f",
                         "installed_by": ["modules"]
