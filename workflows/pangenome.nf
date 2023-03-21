@@ -97,10 +97,8 @@ workflow PANGENOME {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    // TODO remove this and the corresponding file in "$projectDir/assets/cerevisiae.pan.fa.gz.seqwish.gfa.og.stats.yaml"
     // This is just for testing
-    ch_odgi_stats = Channel.fromPath("$projectDir/assets/cerevisiae.pan.fa.gz.seqwish.gfa.og.stats.yaml", checkIfExists: true)
-    ch_multiqc_files = ch_multiqc_files.mix(ch_odgi_stats)
+    ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc)
 
     MULTIQC (
         ch_multiqc_files.collect(),

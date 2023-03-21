@@ -7,7 +7,7 @@
                 "nf-core": {
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
-                        "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c",
+                        "git_sha": "b6d4d476aee074311c89d82a69c1921bd70c8180",
                         "installed_by": ["modules"]
                     },
                     "gfaffix": {
@@ -26,6 +26,11 @@
                         "installed_by": ["modules"]
                     },
                     "odgi/sort": {
+                        "branch": "master",
+                        "git_sha": "b2d1e38b5ee7740c280d047b4730bb2e39a7b51f",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/stats": {
                         "branch": "master",
                         "git_sha": "b2d1e38b5ee7740c280d047b4730bb2e39a7b51f",
                         "installed_by": ["modules"]

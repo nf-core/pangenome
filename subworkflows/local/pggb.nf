@@ -10,6 +10,7 @@ include { ODGI_BUILD                } from '../../modules/nf-core/odgi/build/mai
 include { ODGI_UNCHOP               } from '../../modules/nf-core/odgi/unchop/main'
 include { ODGI_SORT                 } from '../../modules/nf-core/odgi/sort/main'
 include { ODGI_VIEW                 } from '../../modules/nf-core/odgi/view/main'
+include { ODGI_STATS                } from '../../modules/nf-core/odgi/stats/main'
 
 
 workflow PGGB {
@@ -63,14 +64,25 @@ workflow PGGB {
     /// TODO GRAPH_QC subworkflow START
 
     // ODGI_STATS seqwish + sorted gfaffix
-
+    ch_odgi_build_seqwish = ODGI_BUILD.out.og.map{meta, gfa ->
+        if(gfa.baseName.contains("seqwish")) {
+            return [ meta, gfa ]
+        } else {
+            return null
+        }}.filter{ it != null }
+    ODGI_STATS(ch_odgi_build_seqwish.mix(ODGI_SORT.out.sorted_graph))
+    ch_versions = ch_versions.mix(ODGI_STATS.out.versions)
     // ODGI_VIZ modes from sorted gfaffix
 
     // ODGI_Draw modes from sorted gfaffix
-    
+
     /// TODO GRAPH_QC subworkflow END
 
+    ch_stats = ODGI_STATS.out.yaml.map{meta, yaml ->
+        return yaml
+        }.collect()
+
     emit:
-    // TODO qc channel: [ [ seqwish.og.stats.yaml ], [ gfaffix.og.stats.yaml ] ] -> odgi draw and all odgi viz outputs should be going here
+    qc = ch_stats // TODO qc channel: [ [ seqwish.og.stats.yaml ], [ gfaffix.og.stats.yaml ] ] -> odgi draw and all odgi viz outputs should be going here
     versions = ch_versions   // channel: [ versions.yml ]
 }
