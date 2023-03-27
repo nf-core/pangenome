@@ -2,16 +2,21 @@
 // Run the default PanGenome Graph Builder (PGGB) pipeline
 //
 
-include { WFMASH                    } from '../../modules/nf-core/wfmash/main'
-include { SEQWISH_INDUCE as SEQWISH } from '../../modules/nf-core/seqwish/induce/main'
-include { SMOOTHXG                  } from '../../modules/nf-core/smoothxg/main'
-include { GFAFFIX                   } from '../../modules/nf-core/gfaffix/main'
-include { ODGI_BUILD                } from '../../modules/nf-core/odgi/build/main'
-include { ODGI_UNCHOP               } from '../../modules/nf-core/odgi/unchop/main'
-include { ODGI_SORT                 } from '../../modules/nf-core/odgi/sort/main'
-include { ODGI_VIEW                 } from '../../modules/nf-core/odgi/view/main'
-include { ODGI_STATS                } from '../../modules/nf-core/odgi/stats/main'
-
+include { WFMASH                        } from '../../modules/nf-core/wfmash/main'
+include { SEQWISH_INDUCE as SEQWISH     } from '../../modules/nf-core/seqwish/induce/main'
+include { SMOOTHXG                      } from '../../modules/nf-core/smoothxg/main'
+include { GFAFFIX                       } from '../../modules/nf-core/gfaffix/main'
+include { ODGI_BUILD                    } from '../../modules/nf-core/odgi/build/main'
+include { ODGI_UNCHOP                   } from '../../modules/nf-core/odgi/unchop/main'
+include { ODGI_SORT                     } from '../../modules/nf-core/odgi/sort/main'
+include { ODGI_VIEW                     } from '../../modules/nf-core/odgi/view/main'
+include { ODGI_STATS                    } from '../../modules/nf-core/odgi/stats/main'
+include { ODGI_VIZ as ODGI_VIZ_COLOR    } from '../../modules/nf-core/odgi/viz/main'
+include { ODGI_VIZ as ODGI_VIZ_POS      } from '../../modules/nf-core/odgi/viz/main'
+include { ODGI_VIZ as ODGI_VIZ_DEPTH    } from '../../modules/nf-core/odgi/viz/main'
+include { ODGI_VIZ as ODGI_VIZ_INV      } from '../../modules/nf-core/odgi/viz/main'
+include { ODGI_VIZ as ODGI_VIZ_UNCALLED } from '../../modules/nf-core/odgi/viz/main'
+include { ODGI_VIZ as ODGI_VIZ_COMPR    } from '../../modules/nf-core/odgi/viz/main'
 
 workflow PGGB {
     take:
@@ -73,16 +78,42 @@ workflow PGGB {
     ODGI_STATS(ch_odgi_build_seqwish.mix(ODGI_SORT.out.sorted_graph))
     ch_versions = ch_versions.mix(ODGI_STATS.out.versions)
     // ODGI_VIZ modes from sorted gfaffix
+    // prepare all inputs
+    ch_odgi_viz = ODGI_SORT.out.sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz" ], gfa ]}
+    ODGI_VIZ_COLOR(ch_odgi_viz)
+    ch_versions = ch_versions.mix(ODGI_VIZ_COLOR.out.versions)
+    ch_odgi_viz_pos = ODGI_SORT.out.sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz_pos" ], gfa ]}
+    ODGI_VIZ_POS(ch_odgi_viz_pos)
+    ch_versions = ch_versions.mix(ODGI_VIZ_POS.out.versions)
+    ch_odgi_viz_depth = ODGI_SORT.out.sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz_depth" ], gfa ]}
+    ODGI_VIZ_DEPTH(ch_odgi_viz_depth)
+    ch_versions = ch_versions.mix(ODGI_VIZ_DEPTH.out.versions)
+    ch_odgi_viz_inv = ODGI_SORT.out.sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz_inv" ], gfa ]}
+    ODGI_VIZ_INV(ch_odgi_viz_inv)
+    ch_versions = ch_versions.mix(ODGI_VIZ_INV.out.versions)
+    ch_odgi_viz_compr = ODGI_SORT.out.sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz_O" ], gfa ]}
+    ODGI_VIZ_COMPR(ch_odgi_viz_compr)
+    ch_versions = ch_versions.mix(ODGI_VIZ_COMPR.out.versions)
+    ch_odgi_viz_uncalled = ODGI_SORT.out.sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz_uncalled" ], gfa ]}
+    ODGI_VIZ_UNCALLED(ch_odgi_viz_uncalled)
+    ch_versions = ch_versions.mix(ODGI_VIZ_UNCALLED.out.versions)
 
     // ODGI_Draw modes from sorted gfaffix
 
     /// TODO GRAPH_QC subworkflow END
 
-    ch_stats = ODGI_STATS.out.yaml.map{meta, yaml ->
-        return yaml
-        }.collect()
+    ch_stats = ODGI_STATS.out.yaml.map{meta, yaml -> return yaml}.collect()
+
+    ch_viz = ODGI_VIZ_COLOR.out.png.map{meta, png -> return png}.collect()
+    ch_viz_pos = ODGI_VIZ_POS.out.png.map{meta, png -> return png}.collect()
+    ch_viz_depth = ODGI_VIZ_DEPTH.out.png.map{meta, png -> return png}.collect()
+    ch_viz_inv = ODGI_VIZ_INV.out.png.map{meta, png -> return png}.collect()
+    ch_viz_compr = ODGI_VIZ_COMPR.out.png.map{meta, png -> return png}.collect()
+    ch_viz_uncalled = ODGI_VIZ_UNCALLED.out.png.map{meta, png -> return png}.collect()
+
+    ch_graph_qc = ch_stats.mix(ch_viz, ch_viz_pos, ch_viz_depth, ch_viz_inv, ch_viz_compr, ch_viz_uncalled)
 
     emit:
-    qc = ch_stats // TODO qc channel: [ [ seqwish.og.stats.yaml ], [ gfaffix.og.stats.yaml ] ] -> odgi draw and all odgi viz outputs should be going here
+    qc = ch_graph_qc // TODO qc channel: [ [ seqwish.og.stats.yaml ], [ gfaffix.og.stats.yaml ] ] -> odgi draw and all odgi viz outputs should be going here
     versions = ch_versions   // channel: [ versions.yml ]
 }
