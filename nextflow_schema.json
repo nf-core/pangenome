@@ -135,7 +135,7 @@
                 },
                 "seqwish_paf": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
                 }
             }
         },
@@ -212,6 +212,18 @@
                 "smoothxg_run_global_poa": {
                     "type": "boolean",
                     "description": "Run the POA in global mode. [default: local mode]."
+                }
+            }
+        },
+        "vg_deconstruct_options": {
+            "title": "Vg Deconstruct Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "vcf_spec": {
+                    "type": "string",
+                    "default": null
                 }
             }
         },
@@ -414,6 +426,9 @@
         },
         {
             "$ref": "#/definitions/smoothxg_options"
+        },
+        {
+            "$ref": "#/definitions/vg_deconstruct_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

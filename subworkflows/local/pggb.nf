@@ -24,6 +24,7 @@ include { ODGI_DRAW as ODGI_DRAW_MULTIQC  } from '../../modules/nf-core/odgi/dra
 include { ODGI_DRAW as ODGI_DRAW_HEIGHT   } from '../../modules/nf-core/odgi/draw/main'
 
 include { SPLIT_APPROX_MAPPINGS_IN_CHUNKS } from '../../modules/local/split_approx_mappings_in_chunks/main'
+include { VG_DECONSTRUCT                  } from '../../modules/local/vg_deconstruct/main'
 
 workflow PGGB {
     take:
@@ -133,7 +134,6 @@ workflow PGGB {
 
         /// TODO GRAPH_QC subworkflow START
 
-        // ODGI_STATS seqwish + sorted gfaffix
         ch_odgi_build_seqwish = ODGI_BUILD.out.og.map{meta, gfa ->
             if(gfa.baseName.contains("seqwish")) {
                 return [ meta, gfa ]
@@ -142,7 +142,6 @@ workflow PGGB {
             }}.filter{ it != null }
         ODGI_STATS(ch_odgi_build_seqwish.mix(ODGI_SORT.out.sorted_graph))
         ch_versions = ch_versions.mix(ODGI_STATS.out.versions)
-        // ODGI_VIZ modes from sorted gfaffix
         // prepare all inputs
         ch_odgi_viz = ODGI_SORT.out.sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz" ], gfa ]}
         ODGI_VIZ_COLOR(ch_odgi_viz)
@@ -163,10 +162,8 @@ workflow PGGB {
         ODGI_VIZ_UNCALLED(ch_odgi_viz_uncalled)
         ch_versions = ch_versions.mix(ODGI_VIZ_UNCALLED.out.versions)
 
-        // ODGI_LAYOUT modes from sorted gfaffix
         ODGI_LAYOUT(ODGI_SORT.out.sorted_graph)
         ch_versions = ch_versions.mix(ODGI_LAYOUT.out.versions)
-        // ODGI_DRAW modes from sorted gfaffix
         ch_odgi_layout = ODGI_LAYOUT.out.lay.map{meta, lay -> [ lay ]}
         ODGI_DRAW_MULTIQC(ODGI_SORT.out.sorted_graph, ch_odgi_layout)
         ch_versions = ch_versions.mix(ODGI_DRAW_MULTIQC.out.versions)
@@ -187,9 +184,17 @@ workflow PGGB {
         ch_draw = ODGI_DRAW_MULTIQC.out.png.map{meta, png -> return png}.collect()
 
         ch_graph_qc = ch_stats.mix(ch_viz, ch_viz_pos, ch_viz_depth, ch_viz_inv, ch_viz_compr, ch_viz_uncalled, ch_draw)
+
+        if (params.vcf_spec != null) {
+            ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
+            VG_DECONSTRUCT(ODGI_VIEW.out.gfa.combine(ch_vcf_spec))
+            ch_graph_qc = ch_graph_qc.mix(VG_DECONSTRUCT.out.stats)
+            ch_versions = ch_versions.mix(VG_DECONSTRUCT.out.versions)
+        }
+
     }
 
     emit:
-    qc = ch_graph_qc // TODO qc channel: [ [ seqwish.og.stats.yaml ], [ gfaffix.og.stats.yaml ] ] -> odgi draw and all odgi viz outputs should be going here
+    qc = ch_graph_qc // [ seqwish.og.stats.yaml , gfaffix.og.stats.yaml, odgi_viz_multiqc.png, odgi_viz_pos_multiqc.png, odgi_viz_depth_multiqc.png, odgi_viz_inv_multiqc.png, odgi_viz_compr_multiqc.png, odgi_viz_uncalled_multiqc.png, odgi_draw_multiqc.png ]
     versions = ch_versions   // channel: [ versions.yml ]
 }
