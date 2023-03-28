@@ -96,11 +96,15 @@ workflow PGGB {
             SEQWISH(WFMASH_ALIGN.out.paf.groupTuple().join(fasta))
         }
 
-        SMOOTHXG(SEQWISH.out.gfa)
-        ch_versions = ch_versions.mix(SMOOTHXG.out.versions)
-
-        GFAFFIX(SMOOTHXG.out.gfa)
-        ch_versions = ch_versions.mix(GFAFFIX.out.versions)
+        if (params.skip_smoothxg) {
+            GFAFFIX(SEQWISH.out.gfa)
+            ch_versions = ch_versions.mix(GFAFFIX.out.versions)
+        } else {
+            SMOOTHXG(SEQWISH.out.gfa)
+            ch_versions = ch_versions.mix(SMOOTHXG.out.versions)
+            GFAFFIX(SMOOTHXG.out.gfa)
+            ch_versions = ch_versions.mix(GFAFFIX.out.versions)
+        }
 
         ch_gfaffix = GFAFFIX.out.gfa.map{meta, gfa -> [ [ id: gfa.baseName ], gfa ]}
         ch_seqwish = SEQWISH.out.gfa.map{meta, gfa -> [ [ id: gfa.baseName ], gfa ]}
