@@ -65,35 +65,41 @@ workflow PGGB {
                     ch_split_approx_mappings_in_chunks)
         }
     } else {
-        if (params.wfmash_chunks == 1) {
-            WFMASH_MAP_ALIGN(fasta,
-                    query_self,
-                    gzi,
-                    fai,
-                    [],
-                    [])
-            ch_versions = ch_versions.mix(WFMASH_MAP_ALIGN.out.versions)
-            ch_seqwish_input = WFMASH_MAP_ALIGN.out.paf.join(fasta)
-            SEQWISH(ch_seqwish_input)
-            ch_versions = ch_versions.mix(SEQWISH.out.versions)
+        if (params.seqwish_paf != null) {
+            file_fasta = file(params.input)
+            ch_combined = Channel.of([ [ id:file_fasta.getName() ], file(params.seqwish_paf), file_fasta ])
+            SEQWISH(ch_combined)
         } else {
-            WFMASH_MAP(fasta,
-                    query_self,
-                    gzi,
-                    fai,
-                    [],
-                    [])
-            ch_versions = ch_versions.mix(WFMASH_MAP.out.versions)
-            SPLIT_APPROX_MAPPINGS_IN_CHUNKS(WFMASH_MAP.out.paf)
-            ch_versions = ch_versions.mix(SPLIT_APPROX_MAPPINGS_IN_CHUNKS.out.versions)
-            ch_split_approx_mappings_in_chunks = SPLIT_APPROX_MAPPINGS_IN_CHUNKS.out.pafs.map{meta, paf -> [ paf ]}.flatten()
-            WFMASH_ALIGN(fasta,
-                    query_self,
-                    gzi,
-                    fai,
-                    [],
-                    ch_split_approx_mappings_in_chunks)
-            SEQWISH(WFMASH_ALIGN.out.paf.groupTuple().join(fasta))
+            if (params.wfmash_chunks == 1) {
+                WFMASH_MAP_ALIGN(fasta,
+                        query_self,
+                        gzi,
+                        fai,
+                        [],
+                        [])
+                ch_versions = ch_versions.mix(WFMASH_MAP_ALIGN.out.versions)
+                ch_seqwish_input = WFMASH_MAP_ALIGN.out.paf.join(fasta)
+                SEQWISH(ch_seqwish_input)
+                ch_versions = ch_versions.mix(SEQWISH.out.versions)
+            } else {
+                WFMASH_MAP(fasta,
+                        query_self,
+                        gzi,
+                        fai,
+                        [],
+                        [])
+                ch_versions = ch_versions.mix(WFMASH_MAP.out.versions)
+                SPLIT_APPROX_MAPPINGS_IN_CHUNKS(WFMASH_MAP.out.paf)
+                ch_versions = ch_versions.mix(SPLIT_APPROX_MAPPINGS_IN_CHUNKS.out.versions)
+                ch_split_approx_mappings_in_chunks = SPLIT_APPROX_MAPPINGS_IN_CHUNKS.out.pafs.map{meta, paf -> [ paf ]}.flatten()
+                WFMASH_ALIGN(fasta,
+                        query_self,
+                        gzi,
+                        fai,
+                        [],
+                        ch_split_approx_mappings_in_chunks)
+                SEQWISH(WFMASH_ALIGN.out.paf.groupTuple().join(fasta))
+            }
         }
 
         if (params.skip_smoothxg) {
