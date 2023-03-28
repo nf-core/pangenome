@@ -82,7 +82,7 @@
                     },
                     "wfmash": {
                         "branch": "master",
-                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
+                        "git_sha": "15dd47ded89b383b408e185880bcb86cdd8ad001",
                         "installed_by": ["modules"]
                     }
                 }
