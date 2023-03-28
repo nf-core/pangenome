@@ -54,7 +54,7 @@
             "properties": {
                 "wfmash_map_pct_id": {
                     "type": "number",
-                    "default": 90.0,
+                    "default": 90,
                     "description": "Percent identity in the wfmash mashmap step."
                 },
                 "wfmash_segment_length": {
@@ -126,12 +126,16 @@
                 },
                 "seqwish_sparse_factor": {
                     "type": "number",
-                    "default": 0.0,
+                    "default": 0,
                     "description": "Keep this randomly selected fraction of input matches."
                 },
                 "seqwish_temp_dir": {
                     "type": "string",
                     "default": "None"
+                },
+                "seqwish_paf": {
+                    "type": "string",
+                    "default": null
                 }
             }
         },
