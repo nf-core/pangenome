@@ -98,7 +98,7 @@ workflow PGGB {
                         fai,
                         [],
                         ch_split_approx_mappings_in_chunks)
-                SEQWISH(WFMASH_ALIGN.out.paf.groupTuple().join(fasta))
+                SEQWISH(WFMASH_ALIGN.out.paf.groupTuple(by: 0, size: params.wfmash_chunks).join(fasta))
             }
         }
 

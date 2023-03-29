@@ -39,6 +39,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { PGGB        } from '../subworkflows/local/pggb'
+include { COMMUNITY   } from '../subworkflows/local/community'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,12 +79,21 @@ workflow PANGENOME {
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    PGGB (
-        INPUT_CHECK.out.fasta,
-        INPUT_CHECK.out.fai,
-        INPUT_CHECK.out.gzi
-    )
-    ch_versions = ch_versions.mix(PGGB.out.versions)
+    if (params.communities) {
+        COMMUNITY (
+            INPUT_CHECK.out.fasta,
+            INPUT_CHECK.out.fai,
+            INPUT_CHECK.out.gzi
+        )
+        ch_versions = ch_versions.mix(COMMUNITY.out.versions)
+    } else {
+        PGGB (
+            INPUT_CHECK.out.fasta,
+            INPUT_CHECK.out.fai,
+            INPUT_CHECK.out.gzi
+        )
+        ch_versions = ch_versions.mix(PGGB.out.versions)
+    }
 
     if (params.vcf_spec != null) {
         ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
@@ -108,10 +118,14 @@ workflow PANGENOME {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc)
-    if (params.vcf_spec != null) {
-        ch_multiqc_files = ch_multiqc_files.mix(VG_DECONSTRUCT.out.stats)
+    // FIXME
+    if (!params.communities) {
+        ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc)
+        if (params.vcf_spec != null) {
+            ch_multiqc_files = ch_multiqc_files.mix(VG_DECONSTRUCT.out.stats)
+        }
     }
+
 
     MULTIQC (
         ch_multiqc_files.collect(),
