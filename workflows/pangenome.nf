@@ -52,6 +52,11 @@ include { PGGB        } from '../subworkflows/local/pggb'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
+//
+// MODULE: Locally generated modules
+//
+include { VG_DECONSTRUCT              } from '../modules/local/vg_deconstruct/main'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -80,6 +85,12 @@ workflow PANGENOME {
     )
     ch_versions = ch_versions.mix(PGGB.out.versions)
 
+    if (params.vcf_spec != null) {
+        ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
+        VG_DECONSTRUCT(PGGB.out.gfa.combine(ch_vcf_spec))
+        ch_versions = ch_versions.mix(VG_DECONSTRUCT.out.versions)
+    }
+
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
@@ -97,8 +108,10 @@ workflow PANGENOME {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    // This is just for testing
     ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc)
+    if (params.vcf_spec != null) {
+        ch_multiqc_files = ch_multiqc_files.mix(VG_DECONSTRUCT.out.stats)
+    }
 
     MULTIQC (
         ch_multiqc_files.collect(),
