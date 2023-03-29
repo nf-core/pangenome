@@ -1,3 +1,23 @@
+/*
+** PLEASE READ THIS BEFORE COMPLAINING ABOUT THIS NOT PERFECTLY NF-CORE COMPLIANT MODULE!
+**
+*** Why did you not use the official VG_DECONSTRUCT module https://github.com/nf-core/modules/tree/master/modules/nf-core/vg/deconstruct?
+*** - This official modules use vg 1.43.0, however, due to a bug https://github.com/vgteam/vg/issues/3807 in vg, I would require vg 1.40.0.
+*** - Since there is no older module version available on nf-core/modules, I also can't go back to an older commit with the version I need. So here we are.
+**
+*** Why did you chose this custom docker container and not a container from Bioconda?
+*** - The current pggb Bioconda container does not include vcfbub and vcfwave, because both these tools are currently not available on Bioconda.
+**
+*** Why did you not split up all the commands [vg deconstruct, bcftools stats, bcftools annotate, bgzip, vcfbub, vcfwave] into several modules?
+*** - Some of the tools are not available on Bioconda, so it's hard to generate proper modules.
+*** - The whole VG_DECONSTRUCT workflow is quite complex and hard to maintain. I basically copied it over from https://github.com/pangenome/pggb/blob/master/pggb#L588-L618.
+*** - The original code is still work in progress, so it could change quickly and drastically. Which would mean I have to add or delete or modify at least 7 modules just to get this to run
+*** - It is much easier to maintain like this.
+**
+** I am aware that this module is currently not fitting nf-core standards, but I think I gave good reasons why. Once the code in pggb becomes stable and all tools
+** available on Bioconda the goal is to enhance this module so that it actually fits the standards. Thanks!
+**
+*/
 process VG_DECONSTRUCT {
     tag "$meta.id"
     label 'process_medium'
