@@ -69,7 +69,7 @@ jobs:
     strategy:
       matrix:
         parameters:
-          - "--smoothxg_write_maf" --smoothxg_poa_length 100,200,300 --smoothxg_run_abpoa --smoothxg_run_global_poa"
+          - "--smoothxg_write_maf --smoothxg_poa_length 100,200,300 --smoothxg_run_abpoa --smoothxg_run_global_poa"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3
