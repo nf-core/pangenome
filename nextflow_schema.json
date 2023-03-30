@@ -223,7 +223,19 @@
             "properties": {
                 "vcf_spec": {
                     "type": "string",
-                    "default": null
+                    "default": "None"
+                }
+            }
+        },
+        "community": {
+            "title": "Community",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "communities": {
+                    "type": "string",
+                    "default": "false"
                 }
             }
         },
@@ -429,6 +441,9 @@
         },
         {
             "$ref": "#/definitions/vg_deconstruct_options"
+        },
+        {
+            "$ref": "#/definitions/community"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

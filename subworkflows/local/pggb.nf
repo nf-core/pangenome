@@ -35,6 +35,7 @@ workflow PGGB {
 
     ch_versions = Channel.empty() // we collect all versions here
     ch_graph_qc = Channel.empty() // we collect all graph quality control PNGs here
+    ch_odgi_view = Channel.empty() // we collect the final graph in GFA format here
 
     def query_self = true
     if (params.wfmash_only) {
@@ -130,6 +131,8 @@ workflow PGGB {
         ch_versions = ch_versions.mix(ODGI_SORT.out.versions)
         ODGI_VIEW(ODGI_SORT.out.sorted_graph)
         ch_versions = ch_versions.mix(ODGI_VIEW.out.versions)
+        ch_odgi_view_out = ODGI_VIEW.out.gfa
+
 
         /// TODO GRAPH_QC subworkflow START
 
@@ -187,7 +190,7 @@ workflow PGGB {
     }
 
     emit:
-    gfa = ODGI_VIEW.out.gfa
+    gfa = ch_odgi_view
     qc = ch_graph_qc // [ seqwish.og.stats.yaml , gfaffix.og.stats.yaml, odgi_viz_multiqc.png, odgi_viz_pos_multiqc.png, odgi_viz_depth_multiqc.png, odgi_viz_inv_multiqc.png, odgi_viz_compr_multiqc.png, odgi_viz_uncalled_multiqc.png, odgi_draw_multiqc.png ]
     versions = ch_versions   // channel: [ versions.yml ]
 }
