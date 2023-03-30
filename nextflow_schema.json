@@ -234,8 +234,7 @@
             "default": "",
             "properties": {
                 "communities": {
-                    "type": "string",
-                    "default": "false"
+                    "type": "boolean"
                 }
             }
         },
