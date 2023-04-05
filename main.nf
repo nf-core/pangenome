@@ -111,11 +111,11 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/pangenome --input 'data/input.fa.gz' -profile docker
+    nextflow run nf-core/pangenome --input 'data/input.fa.gz' -profile docker --n_haplotypes 12
 
     Mandatory arguments:
       --input [file]                  Path to bgzipped input FASTA (must be surrounded with quotes)
-      -- n_haplotypes [int]             Number of mappings to retain for each segment.
+      -- n_haplotypes [int]           Number of mappings to retain for each segment.
       -profile [str]                  Configuration profile to use. Can use multiple (comma separated)
                                       Available: conda, docker, singularity, test, awsbatch, <institute> and more
     PAF options:
