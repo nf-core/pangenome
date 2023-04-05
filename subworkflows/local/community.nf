@@ -4,7 +4,9 @@
 
 include { WFMASH as WFMASH_MAP_COMMUNITY  } from '../../modules/nf-core/wfmash/main'
 
-include { PAF_2_NET } from '../../modules/local/paf2net/main'
+include { PAF2NET             } from '../../modules/local/paf2net/main'
+include { NET2COMMUNITIES     } from '../../modules/local/net2communities/main'
+include { EXTRACT_COMMUNITIES } from '../../modules/local/extract_communities/main'
 
 workflow COMMUNITY {
     take:
@@ -27,8 +29,19 @@ workflow COMMUNITY {
                         [])
     ch_versions = ch_versions.mix(WFMASH_MAP_COMMUNITY.out.versions)
 
-    PAF_2_NET(WFMASH_MAP_COMMUNITY.out.paf)
-    ch_versions = ch_versions.mix(PAF_2_NET.out.versions)
+    PAF2NET(WFMASH_MAP_COMMUNITY.out.paf)
+    ch_versions = ch_versions.mix(PAF2NET.out.versions)
+
+    NET2COMMUNITIES(PAF2NET.out.txts)
+    ch_versions = ch_versions.mix(NET2COMMUNITIES.out.versions)
+
+    ch_txt_communities = fasta.combine(NET2COMMUNITIES.out.communities.flatten())
+    ch_txt_communities = ch_txt_communities.map{meta, fasta, community -> [ [ id: community.baseName.split("//.")[-1] ], fasta, community ]}
+
+    EXTRACT_COMMUNITIES(ch_txt_communities)
+    ch_versions = ch_versions.mix(EXTRACT_COMMUNITIES.out.versions)
+
+    EXTRACT_COMMUNITIES.out.community_fasta.view()
 
 /*
     WFMASH_MAP(ch_fasta, fai_path, gzi_path, wfmash_prefix)

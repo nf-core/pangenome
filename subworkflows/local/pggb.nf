@@ -131,7 +131,7 @@ workflow PGGB {
         ch_versions = ch_versions.mix(ODGI_SORT.out.versions)
         ODGI_VIEW(ODGI_SORT.out.sorted_graph)
         ch_versions = ch_versions.mix(ODGI_VIEW.out.versions)
-        ch_odgi_view_out = ODGI_VIEW.out.gfa
+        ch_odgi_view = ODGI_VIEW.out.gfa
 
 
         /// TODO GRAPH_QC subworkflow START

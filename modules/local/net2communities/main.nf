@@ -1,4 +1,4 @@
-process PAF2NET {
+process NET2COMMUNITIES {
     tag "$meta.id"
     label 'process_single'
 
@@ -8,11 +8,11 @@ process PAF2NET {
         'quay.io/biocontainers/pggb:0.5.3--hdfd78af_2' }"
 
     input:
-    tuple val(meta), path(paf)
+    tuple val(meta), path(txts)
 
     output:
-    tuple val(meta), path("*.txt"), emit: txts
-    path "versions.yml"           , emit: versions
+    path("*.community.*.txt"), emit: communities
+    path "versions.yml"                       , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -21,7 +21,12 @@ process PAF2NET {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    paf2net.py -p $paf \\
+    net2communities.py \
+    -e ${prefix}.paf.edges.list.txt \
+    -w ${prefix}.paf.edges.weights.txt \
+    -n ${prefix}.paf.vertices.id2name.txt \
+    --accurate-detection \
+    --output-prefix ${prefix} \
         $args
 
     cat <<-END_VERSIONS > versions.yml

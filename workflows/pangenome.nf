@@ -95,6 +95,7 @@ workflow PANGENOME {
         ch_versions = ch_versions.mix(PGGB.out.versions)
     }
 
+    // FIXME TAKE PGGBS OR SQUEEZE AS INPUT
     if (params.vcf_spec != null) {
         ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
         VG_DECONSTRUCT(PGGB.out.gfa.combine(ch_vcf_spec))
