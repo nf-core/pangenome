@@ -86,6 +86,13 @@ workflow PANGENOME {
             INPUT_CHECK.out.gzi
         )
         ch_versions = ch_versions.mix(COMMUNITY.out.versions)
+        ch_community_join = COMMUNITY.out.fasta_gz.join(COMMUNITY.out.gzi).join(COMMUNITY.out.fai)
+        PGGB(
+            ch_community_join.map{meta, fasta, gzi, fai -> [ meta, fasta ]},
+            ch_community_join.map{meta, fasta, gzi, fai -> [ fai ]},
+            ch_community_join.map{meta, fasta, gzi, fai -> [ gzi ]}
+        )
+        ch_versions = ch_versions.mix(PGGB.out.versions)
     } else {
         PGGB (
             INPUT_CHECK.out.fasta,
@@ -95,7 +102,7 @@ workflow PANGENOME {
         ch_versions = ch_versions.mix(PGGB.out.versions)
     }
 
-    // FIXME TAKE PGGBS OR SQUEEZE AS INPUT
+    // TODO TAKE PGGBS OR SQUEEZE AS INPUT
     if (params.vcf_spec != null) {
         ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
         VG_DECONSTRUCT(PGGB.out.gfa.combine(ch_vcf_spec))
@@ -119,7 +126,7 @@ workflow PANGENOME {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    // FIXME
+    // TODO
     if (!params.communities) {
         ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc)
         if (params.vcf_spec != null) {

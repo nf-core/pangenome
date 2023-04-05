@@ -3,6 +3,8 @@
 //
 
 include { WFMASH as WFMASH_MAP_COMMUNITY  } from '../../modules/nf-core/wfmash/main'
+include { TABIX_BGZIP                     } from '../../modules/nf-core/tabix/bgzip/main'
+include { SAMTOOLS_FAIDX                  } from '../../modules/nf-core/samtools/faidx/main.nf'
 
 include { PAF2NET             } from '../../modules/local/paf2net/main'
 include { NET2COMMUNITIES     } from '../../modules/local/net2communities/main'
@@ -41,17 +43,17 @@ workflow COMMUNITY {
     EXTRACT_COMMUNITIES(ch_txt_communities)
     ch_versions = ch_versions.mix(EXTRACT_COMMUNITIES.out.versions)
 
-    EXTRACT_COMMUNITIES.out.community_fasta.view()
+    TABIX_BGZIP(EXTRACT_COMMUNITIES.out.community_fasta)
+    ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
 
-/*
-    WFMASH_MAP(ch_fasta, fai_path, gzi_path, wfmash_prefix)
-    paf2Net(WFMASH_MAP.out)
-    net2Communities(paf2Net.out)
-    extractCommunities(fasta.combine(net2Communities.out.flatten()))
-    ch_bgzip_extract_communities = bgzip(fasta.combine(extractCommunities.out.flatten()))
-*/
+    SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
+    // gzi = SAMTOOLS_FAIDX.out.gzi.collect{it[1]}
+    // fai = SAMTOOLS_FAIDX.out.fai.collect{it[1]}
+    ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
 
     emit:
-    communities = ch_communities
+    fasta_gz = TABIX_BGZIP.out.output         // channel: [ val(meta), [ fasta.gz ] ]
+    gzi = SAMTOOLS_FAIDX.out.gzi
+    fai = SAMTOOLS_FAIDX.out.fai
     versions = ch_versions   // channel: [ versions.yml ]
 }
