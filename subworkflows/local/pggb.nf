@@ -26,6 +26,8 @@ workflow PGGB {
     ch_versions = Channel.empty()  // we collect all versions here
     ch_graph_qc = Channel.empty()  // we collect all graph quality control PNGs and graph statistics here
     ch_odgi_view = Channel.empty() // we collect the final graph in GFA format here
+    ch_odgi_build_seqwish = Channel.empty()
+    ch_sorted_graph = Channel.empty()
 
     def query_self = true
     if (params.wfmash_only) {
@@ -128,11 +130,13 @@ workflow PGGB {
             } else {
                 return null
             }}.filter{ it != null }
+
+        ch_sorted_graph = ODGI_SORT.out.sorted_graph
     }
 
     emit:
     gfa = ch_odgi_view
     seqwish = ch_odgi_build_seqwish
-    sorted_graph = ODGI_SORT.out.sorted_graph
+    sorted_graph = ch_sorted_graph
     versions = ch_versions   // channel: [ versions.yml ]
 }
