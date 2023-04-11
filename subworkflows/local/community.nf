@@ -23,11 +23,10 @@ workflow COMMUNITY {
 
     def query_self = true
 
-    WFMASH_MAP_COMMUNITY(fasta,
+    ch_wfmash_map = fasta.map{meta, fasta -> [ meta, fasta, [] ]}
+    ch_wfmash_map = ch_wfmash_map.join(gzi).join(fai)
+    WFMASH_MAP_COMMUNITY(ch_wfmash_map,
                         query_self,
-                        gzi,
-                        fai,
-                        [],
                         [])
     ch_versions = ch_versions.mix(WFMASH_MAP_COMMUNITY.out.versions)
 
@@ -47,8 +46,6 @@ workflow COMMUNITY {
     ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
 
     SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
-    // gzi = SAMTOOLS_FAIDX.out.gzi.collect{it[1]}
-    // fai = SAMTOOLS_FAIDX.out.fai.collect{it[1]}
     ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
 
     emit:

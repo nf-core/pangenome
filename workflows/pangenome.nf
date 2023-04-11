@@ -91,8 +91,8 @@ workflow PANGENOME {
         ch_community_join = COMMUNITY.out.fasta_gz.join(COMMUNITY.out.gzi).join(COMMUNITY.out.fai)
         PGGB(
             ch_community_join.map{meta, fasta, gzi, fai -> [ meta, fasta ]},
-            ch_community_join.map{meta, fasta, gzi, fai -> [ fai ]},
-            ch_community_join.map{meta, fasta, gzi, fai -> [ gzi ]}
+            ch_community_join.map{meta, fasta, gzi, fai -> [ meta, fai ]},
+            ch_community_join.map{meta, fasta, gzi, fai -> [ meta, gzi ]}
         )
         ch_versions = ch_versions.mix(PGGB.out.versions)
     } else {

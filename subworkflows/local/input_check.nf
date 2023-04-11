@@ -30,12 +30,12 @@ workflow INPUT_CHECK {
         // For now we assume it was bgzip. If not wfmash will complain instantly anyhow.
         if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
             SAMTOOLS_FAIDX(meta_fasta)
-            fai = SAMTOOLS_FAIDX.out.fai.collect{it[1]}
-            gzi = SAMTOOLS_FAIDX.out.gzi.collect{it[1]}
+            fai = SAMTOOLS_FAIDX.out.fai
+            gzi = SAMTOOLS_FAIDX.out.gzi
             ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
         } else {
-            fai = Channel.fromPath("${params.input}.fai").collect()
-            gzi = Channel.fromPath("${params.input}.gzi").collect()
+            fai = Channel.of([ [ id:fasta_file_name ], fai_path ])
+            gzi = Channel.of([ [ id:fasta_file_name ], gzi_path ])
         }
         ch_fasta = meta_fasta
     } else {
@@ -56,15 +56,15 @@ workflow INPUT_CHECK {
         TABIX_BGZIP(meta_fasta)
         ch_fasta = TABIX_BGZIP.out.output
         SAMTOOLS_FAIDX(ch_fasta)
-        gzi = SAMTOOLS_FAIDX.out.gzi.collect{it[1]}
-        fai = SAMTOOLS_FAIDX.out.fai.collect{it[1]}
+        gzi = SAMTOOLS_FAIDX.out.gzi
+        fai = SAMTOOLS_FAIDX.out.fai
         ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
         ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
     }
 
     emit:
     fasta = ch_fasta         // channel: [ val(meta), [ fasta ] ]
-    fai = fai                // channel: [ fasta.fai ]
-    gzi = gzi                // channel: [ fasta.gzi ]
+    fai = fai                // channel: [ val(meta), fasta.fai ]
+    gzi = gzi                // channel: [ val(meta), fasta.gzi ]
     versions = ch_versions   // channel: [ versions.yml ]
 }
