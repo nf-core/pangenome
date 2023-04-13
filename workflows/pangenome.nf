@@ -58,6 +58,7 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoft
 // MODULE: Locally generated modules
 //
 include { VG_DECONSTRUCT              } from '../modules/local/vg_deconstruct/main'
+include { MULTIQC_COMMUNITY           } from '../modules/local/multiqc_community/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,6 +95,11 @@ workflow PANGENOME {
             ch_community_join.map{meta, fasta, gzi, fai -> [ meta, gzi ]}
         )
         ch_versions = ch_versions.mix(PGGB.out.versions)
+        ch_multiqc_in = PGGB.out.qc.map{meta, seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw -> [ meta, [ seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw ] ]}
+        MULTIQC_COMMUNITY(ch_multiqc_in,
+                          ch_multiqc_config.toList(),
+                          ch_multiqc_custom_config.toList(),
+                          ch_multiqc_logo.toList())
     } else {
         PGGB (
             INPUT_CHECK.out.fasta,

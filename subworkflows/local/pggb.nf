@@ -126,7 +126,8 @@ workflow PGGB {
 
         ch_sorted_graph = ODGI_SORT.out.sorted_graph
 
-        ch_graph_qc = ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph)
+        ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph)
+        ch_graph_qc = ODGI_QC.out.qc
         ch_versions = ch_versions.mix(ODGI_QC.out.versions)
     }
 
