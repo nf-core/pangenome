@@ -126,12 +126,12 @@ workflow PGGB {
 
         ch_sorted_graph = ODGI_SORT.out.sorted_graph
 
-        ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph)
+        ch_graph_qc = ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph)
         ch_versions = ch_versions.mix(ODGI_QC.out.versions)
     }
 
     emit:
     gfa = ch_odgi_view
-    qc = ODGI_QC.out.qc
+    qc = ch_graph_qc
     versions = ch_versions   // channel: [ versions.yml ]
 }
