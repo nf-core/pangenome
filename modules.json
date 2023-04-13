@@ -42,7 +42,7 @@
                     },
                     "odgi/squeeze": {
                         "branch": "master",
-                        "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
+                        "git_sha": "42bf48a64eda0c0672414ac65b535c2adbe74ab1",
                         "installed_by": ["modules"]
                     },
                     "odgi/stats": {
