@@ -55,6 +55,7 @@ include { ODGI_QC     } from '../subworkflows/local/odgi_qc'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { ODGI_SQUEEZE                } from '../modules/nf-core/odgi/squeeze/main'
+include { ODGI_VIEW                   } from '../modules/nf-core/odgi/view/main'
 
 //
 // MODULE: Locally generated modules
@@ -104,6 +105,8 @@ workflow PANGENOME {
         ODGI_QC(Channel.empty(), ch_odgi_qc_in, false)
         ch_versions = ch_versions.mix(ODGI_QC.out.versions)
         ch_versions = ch_versions.mix(ODGI_SQUEEZE.out.versions)
+        ODGI_VIEW(ch_odgi_qc_in)
+        ch_versions = ch_versions.mix(ODGI_VIEW.out.versions)
         ch_multiqc_in = PGGB.out.qc.map{meta, seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw -> [ meta, [ seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw ] ]}
         MULTIQC_COMMUNITY(ch_multiqc_in,
                           ch_multiqc_config.toList(),
