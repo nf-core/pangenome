@@ -23,6 +23,7 @@ workflow PGGB {
     fasta // file: /path/to/sequences.fasta
     fai   // file: /path/to/sequences.fasta.fai
     gzi   // file: /path/to/sequences.fasta.gzi
+    community_mode // val: determines how we will build our meta identifiers of ODGI_QC
 
     main:
 
@@ -126,7 +127,7 @@ workflow PGGB {
 
         ch_sorted_graph = ODGI_SORT.out.sorted_graph
 
-        ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph)
+        ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph, community_mode)
         ch_graph_qc = ODGI_QC.out.qc
         ch_versions = ch_versions.mix(ODGI_QC.out.versions)
     }
@@ -134,5 +135,6 @@ workflow PGGB {
     emit:
     gfa = ch_odgi_view
     qc = ch_graph_qc
+    og = ch_sorted_graph
     versions = ch_versions   // channel: [ versions.yml ]
 }

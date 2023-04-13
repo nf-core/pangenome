@@ -40,6 +40,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { PGGB        } from '../subworkflows/local/pggb'
 include { COMMUNITY   } from '../subworkflows/local/community'
+include { ODGI_QC     } from '../subworkflows/local/odgi_qc'
 
 
 /*
@@ -53,6 +54,7 @@ include { COMMUNITY   } from '../subworkflows/local/community'
 //
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { ODGI_SQUEEZE                } from '../modules/nf-core/odgi/squeeze/main'
 
 //
 // MODULE: Locally generated modules
@@ -92,9 +94,16 @@ workflow PANGENOME {
         PGGB(
             ch_community_join.map{meta, fasta, gzi, fai -> [ meta, fasta ]},
             ch_community_join.map{meta, fasta, gzi, fai -> [ meta, fai ]},
-            ch_community_join.map{meta, fasta, gzi, fai -> [ meta, gzi ]}
+            ch_community_join.map{meta, fasta, gzi, fai -> [ meta, gzi ]},
+            true
         )
         ch_versions = ch_versions.mix(PGGB.out.versions)
+        ch_squeeze_in = PGGB.out.og.map{meta, og -> [ [ id:meta.id.replaceFirst(".community.*", "") ], og ]}.groupTuple(by:0)
+        ODGI_SQUEEZE(ch_squeeze_in)
+        ch_odgi_qc_in = ODGI_SQUEEZE.out.graph.map{meta, ogs -> [ [ id:meta.id + ".squeeze" ], ogs ]}
+        ODGI_QC(Channel.empty(), ch_odgi_qc_in, false)
+        ch_versions = ch_versions.mix(ODGI_QC.out.versions)
+        ch_versions = ch_versions.mix(ODGI_SQUEEZE.out.versions)
         ch_multiqc_in = PGGB.out.qc.map{meta, seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw -> [ meta, [ seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw ] ]}
         MULTIQC_COMMUNITY(ch_multiqc_in,
                           ch_multiqc_config.toList(),
@@ -104,7 +113,8 @@ workflow PANGENOME {
         PGGB (
             INPUT_CHECK.out.fasta,
             INPUT_CHECK.out.fai,
-            INPUT_CHECK.out.gzi
+            INPUT_CHECK.out.gzi,
+            false
         )
         ch_versions = ch_versions.mix(PGGB.out.versions)
     }
@@ -136,13 +146,14 @@ workflow PANGENOME {
     // TODO
     if (!params.communities) {
         if (!params.wfmash_only) {
-            ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..9]})
+            ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..8]})
         }
         if (params.vcf_spec != null) {
             ch_multiqc_files = ch_multiqc_files.mix(VG_DECONSTRUCT.out.stats)
         }
+    } else {
+        ch_multiqc_files = ch_multiqc_files.mix(ODGI_QC.out.qc.map{return it[1..8]})
     }
-
 
     MULTIQC (
         ch_multiqc_files.collect(),

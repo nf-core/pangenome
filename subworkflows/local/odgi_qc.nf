@@ -17,6 +17,7 @@ workflow ODGI_QC {
     take:
     seqwish        // file: /path/to/seqwish.og
     sorted_graph   // file: /path/to/sorted_graph.og
+    community_mode // val :  determines how to handly meta identifiers
 
     main:
 
@@ -53,14 +54,25 @@ workflow ODGI_QC {
     ODGI_DRAW_HEIGHT(sorted_graph, ch_odgi_layout)
     ch_versions = ch_versions.mix(ODGI_DRAW_HEIGHT.out.versions)
 
-    ch_graph_qc = ODGI_STATS.out.yaml.map{meta, ymls -> [ [ id: meta.id[0..-9] ], ymls ]}.groupTuple(by:0, size:2).map{meta, ymls -> [ meta, ymls[0], ymls[1] ]}
-    ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COLOR.out.png.map{meta, png -> [ [ id: meta.id[0..-13] ], png ]}, by:0)
-    ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_POS.out.png.map{meta, png -> [ [ id: meta.id[0..-17] ], png ]})
-    ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_DEPTH.out.png.map{meta, png -> [ [ id: meta.id[0..-19] ], png ]})
-    ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_INV.out.png.map{meta, png -> [ [ id: meta.id[0..-17] ], png ]})
-    ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COMPR.out.png.map{meta, png -> [ [ id: meta.id[0..-15] ], png ]})
-    ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_UNCALLED.out.png.map{meta, png -> [ [ id: meta.id[0..-22] ], png ]})
-    ch_graph_qc = ch_graph_qc.join(ODGI_DRAW_MULTIQC.out.png.map{meta, png -> [ [ id: meta.id[0..-9] ], png ]})
+    if (community_mode) {
+        ch_graph_qc = ODGI_STATS.out.yaml.map{meta, ymls -> [ [ id: meta.id.replaceFirst(".seqwish", "").replaceFirst(".gfaffix", "") ], ymls ]}.groupTuple(by:0, size:2).map{meta, ymls -> [ meta, ymls[0], ymls[1] ]}
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COLOR.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_POS.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_DEPTH.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_INV.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COMPR.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_UNCALLED.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_DRAW_MULTIQC.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
+    } else {
+        ch_graph_qc = ODGI_STATS.out.yaml
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COLOR.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_POS.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_pos", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_DEPTH.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_depth", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_INV.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_inv", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COMPR.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_O", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_UNCALLED.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_uncalled", "") ], png ]})
+        ch_graph_qc = ch_graph_qc.join(ODGI_DRAW_MULTIQC.out.png)
+    }
 
     emit:
     qc = ch_graph_qc // [ seqwish.og.stats.yaml , gfaffix.og.stats.yaml, odgi_viz_multiqc.png, odgi_viz_pos_multiqc.png, odgi_viz_depth_multiqc.png, odgi_viz_inv_multiqc.png, odgi_viz_compr_multiqc.png, odgi_viz_uncalled_multiqc.png, odgi_draw_multiqc.png ]
