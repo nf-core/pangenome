@@ -39,7 +39,6 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { PGGB        } from '../subworkflows/local/pggb'
-include { ODGI_QC     } from '../subworkflows/local/odgi_qc'
 include { COMMUNITY   } from '../subworkflows/local/community'
 
 
@@ -102,10 +101,6 @@ workflow PANGENOME {
             INPUT_CHECK.out.gzi
         )
         ch_versions = ch_versions.mix(PGGB.out.versions)
-        if (!params.wfmash_only) {
-            ODGI_QC(PGGB.out.seqwish, PGGB.out.sorted_graph)
-            ch_versions = ch_versions.mix(ODGI_QC.out.versions)
-        }
     }
 
     // TODO TAKE PGGBS OR SQUEEZE AS INPUT
@@ -135,7 +130,7 @@ workflow PANGENOME {
     // TODO
     if (!params.communities) {
         if (!params.wfmash_only) {
-            ch_multiqc_files = ch_multiqc_files.mix(ODGI_QC.out.qc)
+            ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..9]})
         }
         if (params.vcf_spec != null) {
             ch_multiqc_files = ch_multiqc_files.mix(VG_DECONSTRUCT.out.stats)

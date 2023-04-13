@@ -15,6 +15,9 @@ include { ODGI_VIEW                       } from '../../modules/nf-core/odgi/vie
 
 include { SPLIT_APPROX_MAPPINGS_IN_CHUNKS } from '../../modules/local/split_approx_mappings_in_chunks/main'
 
+include { ODGI_QC                         } from '../../subworkflows/local/odgi_qc'
+
+
 workflow PGGB {
     take:
     fasta // file: /path/to/sequences.fasta
@@ -122,11 +125,13 @@ workflow PGGB {
             }}.filter{ it != null }
 
         ch_sorted_graph = ODGI_SORT.out.sorted_graph
+
+        ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph)
+        ch_versions = ch_versions.mix(ODGI_QC.out.versions)
     }
 
     emit:
     gfa = ch_odgi_view
-    seqwish = ch_odgi_build_seqwish
-    sorted_graph = ch_sorted_graph
+    qc = ODGI_QC.out.qc
     versions = ch_versions   // channel: [ versions.yml ]
 }
