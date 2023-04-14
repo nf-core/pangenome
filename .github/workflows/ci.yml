@@ -137,6 +137,8 @@ jobs:
       matrix:
         parameters:
           - "--communities"
+          - "--communities --wfmash_chunks 2"
+          - '--communities --vcf_spec "gi|568815561:#,gi|568815567:#"'
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3

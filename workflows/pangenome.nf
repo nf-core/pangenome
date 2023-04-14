@@ -125,8 +125,14 @@ workflow PANGENOME {
     // TODO TAKE PGGBS OR SQUEEZE AS INPUT
     if (params.vcf_spec != null) {
         ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
-        VG_DECONSTRUCT(PGGB.out.gfa.combine(ch_vcf_spec))
-        ch_versions = ch_versions.mix(VG_DECONSTRUCT.out.versions)
+        if (!params.communities) {
+            VG_DECONSTRUCT(PGGB.out.gfa.combine(ch_vcf_spec))
+            ch_versions = ch_versions.mix(VG_DECONSTRUCT.out.versions)
+        } else {
+            VG_DECONSTRUCT(ODGI_VIEW.out.gfa.combine(ch_vcf_spec))
+            ch_versions = ch_versions.mix(VG_DECONSTRUCT.out.versions)
+        }
+
     }
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
@@ -151,11 +157,12 @@ workflow PANGENOME {
         if (!params.wfmash_only) {
             ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..8]})
         }
-        if (params.vcf_spec != null) {
-            ch_multiqc_files = ch_multiqc_files.mix(VG_DECONSTRUCT.out.stats)
-        }
     } else {
         ch_multiqc_files = ch_multiqc_files.mix(ODGI_QC.out.qc.map{return it[1..8]})
+    }
+
+    if (params.vcf_spec != null) {
+        ch_multiqc_files = ch_multiqc_files.mix(VG_DECONSTRUCT.out.stats)
     }
 
     MULTIQC (
