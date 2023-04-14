@@ -70,6 +70,7 @@ jobs:
       matrix:
         parameters:
           - "--smoothxg_write_maf --smoothxg_poa_length 100,200,300 --smoothxg_run_abpoa --smoothxg_run_global_poa"
+          - "----smoothxg_poa_params asm10"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3
