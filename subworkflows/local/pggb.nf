@@ -14,9 +14,7 @@ include { ODGI_SORT                       } from '../../modules/nf-core/odgi/sor
 include { ODGI_VIEW                       } from '../../modules/nf-core/odgi/view/main'
 
 include { SPLIT_APPROX_MAPPINGS_IN_CHUNKS } from '../../modules/local/split_approx_mappings_in_chunks/main'
-
 include { ODGI_QC                         } from '../../subworkflows/local/odgi_qc'
-
 
 workflow PGGB {
     take:
