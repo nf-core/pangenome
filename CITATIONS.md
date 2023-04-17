@@ -12,8 +12,39 @@
 
 - [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 
+- [GFAFFIX]()
+  > TODO
+
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
   > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+
+- [ODGI]()
+  > TODO
+
+- [PGGB](https://www.biorxiv.org/content/10.1101/2023.04.05.535718v1)
+  > Garrison E, Guarracino A, Heumos S, Villani F, Bao Z, Tattini L, Hagmann J, Vorbrugg S, Marco-Sola S, Kubica S,  Ashbrook D G, Thorell K, Rusholme-Pilcher R L, Liti G, Rudbeck E, Nahnsen S, Yang Z, Moses M N, Nobrega F L, Wu Y, Chen H, de Ligt J, Sudmant P H, Soranzo N, Colonna V, Williams R W, Prins P. Building pangenome graphs. bioRxiv. 2023.04.05.535718. doi: 10.1101/2023.04.05.535718.
+
+  > COMMUNITY PAPER TODO.
+
+  > HPRC PAPER TODO.
+
+- [SAMTOOLS]()
+  > TODO
+
+- [SEQWISH]()
+  > TODO
+
+- [SMOOTHXG]()
+  > TODO
+
+- [VCFLIB]()
+  > TODO
+
+- [VG]()
+  > TODO
+
+- [WFMASH]()
+  > TODO
 
 ## Software packaging/containerisation tools
 
