@@ -81,8 +81,7 @@ class WorkflowMain {
 
         // Check input has been provided
         if (!params.input) {
-            log.error "Please provide an input FASTA to the pipeline e.g. '--input sequences.fasta'"
-            System.exit(1)
+            error("Please provide an input FASTA to the pipeline e.g. '--input sequences.fa.gz'")
         }
     }
 }
