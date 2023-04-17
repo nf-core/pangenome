@@ -24,8 +24,7 @@ workflow INPUT_CHECK {
     fasta_file_name = fasta.getName()
 
     if (params.input.endsWith(".gz")) {
-        meta = [ id:fasta_file_name ]
-        meta_fasta = tuple(meta, fasta)
+        meta_fasta = tuple([ id:fasta_file_name ], fasta)
         // TODO We want to check, if the input file was actually compressed with bgzip with the upcoming grabix module.
         // For now we assume it was bgzip. If not WFMASH will complain instantly anyhow.
         if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of these files exist if only one does not exist
@@ -48,8 +47,7 @@ workflow INPUT_CHECK {
                 fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 4)
             }
         }
-        meta = [ id:fasta_file_name ]
-        meta_fasta = tuple(meta, fasta)
+        meta_fasta = tuple([ id:fasta_file_name ], fasta)
         TABIX_BGZIP(meta_fasta)
         ch_fasta = TABIX_BGZIP.out.output
         SAMTOOLS_FAIDX(ch_fasta)
