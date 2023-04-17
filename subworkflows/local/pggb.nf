@@ -85,7 +85,7 @@ workflow PGGB {
                 WFMASH_ALIGN(ch_wfmash_align,
                         query_self,
                         [])
-                ch_versions = ch_versions.mix(WFMASH_ALIGN.out.version)
+                ch_versions = ch_versions.mix(WFMASH_ALIGN.out.versions)
                 SEQWISH(WFMASH_ALIGN.out.paf.groupTuple(by: 0, size: params.wfmash_chunks).join(fasta))
                 ch_versions = ch_versions.mix(SEQWISH.out.versions)
             }
