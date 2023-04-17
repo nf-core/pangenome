@@ -6,10 +6,6 @@
 
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
-// Validate input parameters - This pipeline does not need a reference FASTA so we can skip this step completely for now.
-// WorkflowPangenome.initialise(params, log)
-
-// TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
@@ -122,7 +118,6 @@ workflow PANGENOME {
         ch_versions = ch_versions.mix(PGGB.out.versions)
     }
 
-    // TODO TAKE PGGBS OR SQUEEZE AS INPUT
     if (params.vcf_spec != null) {
         ch_vcf_spec = Channel.from(params.vcf_spec).splitCsv().flatten()
         if (!params.communities) {
@@ -152,7 +147,6 @@ workflow PANGENOME {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    // TODO
     if (!params.communities) {
         if (!params.wfmash_only) {
             ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..8]})

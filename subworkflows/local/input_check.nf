@@ -27,8 +27,8 @@ workflow INPUT_CHECK {
         meta = [ id:fasta_file_name ]
         meta_fasta = tuple(meta, fasta)
         // TODO We want to check, if the input file was actually compressed with bgzip with the upcoming grabix module.
-        // For now we assume it was bgzip. If not wfmash will complain instantly anyhow.
-        if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of the files exist if only one does not exist
+        // For now we assume it was bgzip. If not WFMASH will complain instantly anyhow.
+        if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of these files exist if only one does not exist
             SAMTOOLS_FAIDX(meta_fasta)
             fai = SAMTOOLS_FAIDX.out.fai
             gzi = SAMTOOLS_FAIDX.out.gzi
@@ -40,7 +40,6 @@ workflow INPUT_CHECK {
         ch_fasta = meta_fasta
     } else {
         if (params.input.endsWith("fa")) {
-            // SAMTOOLS_FAIDX(fasta.map{ it -> [[id:it[0].baseName], it] })
             // https://stackoverflow.com/questions/20954779/regular-expression-to-get-last-3-characters-of-a-string
             // ... id:get_last_three_chars(it[0]) ...
             fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 3)
