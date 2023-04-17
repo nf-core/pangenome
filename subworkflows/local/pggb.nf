@@ -55,12 +55,14 @@ workflow PGGB {
             WFMASH_ALIGN(ch_wfmash_align,
                     query_self,
                     [])
+            ch_versions = ch_versions.mix(WFMASH_ALIGN.out.versions)
         }
     } else {
         if (params.seqwish_paf != null) {
             file_fasta = file(params.input)
             ch_combined = Channel.of([ [ id:file_fasta.getName() ], file(params.seqwish_paf), file_fasta ])
             SEQWISH(ch_combined)
+            ch_versions = ch_versions.mix(SEQWISH.out.versions)
         } else {
             if (params.wfmash_chunks == 1) {
                 ch_wfmash_map_align = fasta.map{meta, fasta -> [ meta, fasta, [] ]}
@@ -85,7 +87,9 @@ workflow PGGB {
                 WFMASH_ALIGN(ch_wfmash_align,
                         query_self,
                         [])
+                ch_versions = ch_versions.mix(WFMASH_ALIGN.out.version)
                 SEQWISH(WFMASH_ALIGN.out.paf.groupTuple(by: 0, size: params.wfmash_chunks).join(fasta))
+                ch_versions = ch_versions.mix(SEQWISH.out.versions)
             }
         }
 
