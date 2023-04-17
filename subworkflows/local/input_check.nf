@@ -40,8 +40,6 @@ workflow INPUT_CHECK {
         ch_fasta = meta_fasta
     } else {
         if (params.input.endsWith("fa")) {
-            // https://stackoverflow.com/questions/20954779/regular-expression-to-get-last-3-characters-of-a-string
-            // ... id:get_last_three_chars(it[0]) ...
             fasta_file_name = fasta_file_name.substring(0, fasta_file_name.length() - 3)
         } else {
             if (params.input.endswith("fasta")) {

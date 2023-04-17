@@ -26,7 +26,7 @@ process PAF2NET {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pggb: \$(echo \" 0.5.3\")
+        pggb: \$(pggb --version 2>&1 | grep -o 'pggb .*' | cut -f2 -d ' ')
     END_VERSIONS
     """
 }

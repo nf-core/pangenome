@@ -2,7 +2,7 @@
 ** PLEASE READ THIS BEFORE COMPLAINING ABOUT THIS NOT PERFECTLY NF-CORE COMPLIANT MODULE!
 **
 *** Why did you not use the official VG_DECONSTRUCT module https://github.com/nf-core/modules/tree/master/modules/nf-core/vg/deconstruct?
-*** - This official modules use vg 1.43.0, however, due to a bug https://github.com/vgteam/vg/issues/3807 in vg, I would require vg 1.40.0.
+*** - This official module uses vg 1.43.0, however, due to a bug https://github.com/vgteam/vg/issues/3807 in vg, I would require vg 1.40.0.
 *** - Since there is no older module version available on nf-core/modules, I also can't go back to an older commit with the version I need. So here we are.
 **
 *** Why did you chose this custom docker container and not a container from Bioconda?
@@ -72,7 +72,7 @@ process VG_DECONSTRUCT {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        vg: \$(echo \" 1.40.0\")
+        pggb: \$(pggb --version 2>&1 | grep -o 'pggb .*' | cut -f2 -d ' ')
     END_VERSIONS
     """
 }
