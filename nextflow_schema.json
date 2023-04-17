@@ -212,6 +212,11 @@
                 "smoothxg_run_global_poa": {
                     "type": "boolean",
                     "description": "Run the POA in global mode. [default: local mode]."
+                },
+                "smoothxg_poa_cpus": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Number of CPUs for the potentially very memory expensive POA phase of SMOOTHXG. Default is 'task.cpus'."
                 }
             }
         },
