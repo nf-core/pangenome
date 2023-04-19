@@ -18,19 +18,21 @@
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "schema": "assets/schema_input.json",
-                    "description": "Path to input FASTA to build the pangenome graph from.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/pangenome/usage#samplesheet-input).",
+                    "description": "Path to BGZIPPED input FASTA to build the pangenome graph from.",
+                    "help_text": "A FASTA file containing the sequences to build the pangenome graph from. Each sequence can be a full chromosome, a contig, or a very long read. The FASTA file must be BGZIPPED or WFMASH won't be able to process it. If you have your sequences in FASTA format, you can run: \n\nbgzip <SEQUENCES.fa> @<THREADS> > <SEQUENCES.fa.gz>\nsamtools faidx <SEQUENCES.fa.gz>\n\nIn order to ensure the most compatible functionality, please format your sequence identifiers so that they follow the https://github.com/pangenome/PanSN-spec. \n\npattern: ^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "n_haplotypes": {
                     "type": "number",
-                    "description": "The number of haplotypes in the input FASTA."
+                    "description": "The number of haplotypes in the input FASTA.",
+                    "help_text": "The number of haplotypes that are represented in your sequences."
                 },
                 "outdir": {
                     "type": "string",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open"
+                    "fa_icon": "fas fa-folder-open",
+                    "help_text": ""
                 },
                 "email": {
                     "type": "string",
