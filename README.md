@@ -20,12 +20,20 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources.The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/pangenome/results).
 
+<p align="center">
+    <img title="Pangenome Workflow" src="docs/images/pangenome_workflow.png" width=100%>
+</p>
+
 ## Pipeline summary
 
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
+By default, the pipeline currently performs the following:
 
-1. TODO
-2. TODO
+- All versus all alignment (`WFMASH`)
+- Graph induction (`SEQWISH`)
+- Graph normalization (`SMOOTHXG`)
+- Remove redundancy (`GFAFFIX`)
+- Graph statistics and qualitative visualizations (`ODGI`)
+- Combine diagnostic information into a report (`MULTIQC`)
 
 ## Quick Start
 
@@ -36,7 +44,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 3. Download the pipeline and test it on a minimal dataset with a single command:
 
    ```bash
-   nextflow run nf-core/pangenome -profile test,YOURPROFILE --outdir <OUTDIR>
+   nextflow run nf-core/pangenome -r dev -profile test,YOURPROFILE --outdir <OUTDIR>
    ```
 
    Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
@@ -51,8 +59,13 @@ On release, automated continuous integration tests run the pipeline on a full-si
    <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
 
    ```bash
-   nextflow run nf-core/pangenome --input <BGZIPPED_FASTA> --n_haplotypes <NUM_HAPS_IN_FASTA> --outdir <OUTDIR> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+   nextflow run nf-core/pangenome -r dev --input <BGZIPPED_FASTA> --n_haplotypes <NUM_HAPS_IN_FASTA> --outdir <OUTDIR> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
+
+## Advantages over [`PGGB`](https://github.com/pangenome/pggb)
+
+This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set `--wfmash_chunks 10`.
+If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to `--wfmash_chunks 10` could be a good fit, because then you don't have to wait too long for your jobs to finish.
 
 ## Documentation
 
@@ -60,7 +73,9 @@ The nf-core/pangenome pipeline comes with documentation about the pipeline [usag
 
 ## Credits
 
-nf-core/pangenome was originally adapted from the pangenome graph builder [`pggb`](https://github.com/pangenome/pggb) pipeline by Simon Heumos, Michael Heuer.
+nf-core/pangenome was originally adapted from [PGGB](https://github.com/pangenome/pggb) by [Simon Heumos](https://github.com/subwaystation), [Michael Heuer](https://github.com/heuermh).
+
+> [Simon Heumos](https://github.com/subwaystation) is currently the sole developer.
 
 Many thanks to all who have helped out and contributed along the way, including (but not limited to)\*:
 
@@ -74,21 +89,27 @@ Many thanks to all who have helped out and contributed along the way, including 
 | [Michael Heuer](https://github.com/heuermh)                | [UC Berkeley, USA](https://rise.cs.berkeley.edu)                                                                                                                                                                                                                                                                                                                                  |
 | [Lukas Heumos](https://github.com/zethson)                 | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) <br> [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html)                                              |
 | [Simon Heumos](https://github.com/subwaystation)           | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
+| [Susanne Jodoin](https://github.com/SusiJo)                | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)                                                                                                                                                                                                    |
+| [Júlia Mir Petrol](https://github.com/mirpedrol)           | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)                                                                                                                                                                                                    |
 
 > \* Listed in alphabetical order
+
+## Acknowledgments
+
+- [QBiC](https://www.qbic.uni-tuebingen.de)
+- [deNBI](https://www.denbi.de/)
+- [Human Pangenome Reference Consortium](https://humanpangenome.org)
 
 ## Contributions and Support
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
 
-For further information or help, don't hesitate to get in touch on the [Slack `#pangenome` channel](https://nfcore.slack.com/channels/pangenome) (you can join with [this invite](https://nf-co.re/join/slack)).
+For further information or help, don't hesitate to get in touch on the [Slack `#pangenome` channel](https://nfcore.slack.com/channels/pangenome) (you can join with [this invite](https://nf-co.re/join/slack)), or contact me [Simon Heumos](mailto:simon.heumos@qbic.uni-tuebingen.de?subject=[GitHub]%20nf-core/pangenome).
 
 ## Citations
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
 <!-- If you use  nf-core/pangenome for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
-
-<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
