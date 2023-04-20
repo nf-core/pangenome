@@ -72,7 +72,7 @@
                     },
                     "seqwish/induce": {
                         "branch": "master",
-                        "git_sha": "8fef6dafd1ce4dd8048582746df0badd4a76685e",
+                        "git_sha": "836b967b3a288c8b06efd97c360b654a3f478a0e",
                         "installed_by": ["modules"]
                     },
                     "smoothxg": {
@@ -87,7 +87,7 @@
                     },
                     "wfmash": {
                         "branch": "master",
-                        "git_sha": "266738f5c73809f0ef2742b0966f276856fe1b15",
+                        "git_sha": "c8d5b17160a399fc8c3ffd056592bde48833aaed",
                         "installed_by": ["modules"]
                     }
                 }
