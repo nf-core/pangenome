@@ -92,17 +92,20 @@
                 },
                 "wfmash_no_splits": {
                     "type": "boolean",
-                    "description": "Disable splitting of input sequences during mapping."
+                    "description": "Disable splitting of input sequences during mapping.",
+                    "hidden": true
                 },
                 "wfmash_exclude_delim": {
                     "type": "string",
                     "default": "None",
-                    "description": "Skip mappings between sequences with the same name prefix before the given delimiter character. [default: all-vs-all and !self]."
+                    "description": "Skip mappings between sequences with the same name prefix before the given delimiter character. [default: all-vs-all and !self].",
+                    "hidden": true
                 },
                 "wfmash_temp_dir": {
                     "type": "string",
                     "default": "None",
-                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument."
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
+                    "hidden": true
                 },
                 "wfmash_chunks": {
                     "type": "integer",
@@ -142,7 +145,8 @@
                 "seqwish_temp_dir": {
                     "type": "string",
                     "default": "None",
-                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument."
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
+                    "hidden": true
                 },
                 "seqwish_paf": {
                     "type": "string",
@@ -164,12 +168,14 @@
                 "smoothxg_max_path_jump": {
                     "type": "integer",
                     "default": 0,
-                    "description": "Maximum path jump to include in the block."
+                    "description": "Maximum path jump to include in the block.",
+                    "hidden": true
                 },
                 "smoothxg_max_edge_jump": {
                     "type": "integer",
                     "default": 0,
-                    "description": "Maximum edge jump before a block is broken."
+                    "description": "Maximum edge jump before a block is broken.",
+                    "hidden": true
                 },
                 "smoothxg_poa_length": {
                     "type": "string",
@@ -180,12 +186,14 @@
                 "smoothxg_block_id_min": {
                     "type": "string",
                     "default": "None",
-                    "description": "Minimum edit-based identity to cluster sequences."
+                    "description": "Minimum edit-based identity to cluster sequences.",
+                    "hidden": true
                 },
                 "smoothxg_block_ratio_min": {
                     "type": "integer",
                     "default": 0,
-                    "description": "Minimum 'smallest / largest' sequence length ration to cluster in a block."
+                    "description": "Minimum 'smallest / largest' sequence length ration to cluster in a block.",
+                    "hidden": true
                 },
                 "smoothxg_pad_max_depth": {
                     "type": "integer",
@@ -210,16 +218,19 @@
                 "smoothxg_consensus_prefix": {
                     "type": "string",
                     "default": "Consensus_",
-                    "description": "Use this prefix for consensus path names."
+                    "description": "Use this prefix for consensus path names.",
+                    "hidden": true
                 },
                 "smoothxg_temp_dir": {
                     "type": "string",
                     "default": "None",
-                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument."
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
+                    "hidden": true
                 },
                 "smoothxg_keep_intermediate_files": {
                     "type": "boolean",
-                    "description": "Keep intermediate graphs during SMOOTHXG."
+                    "description": "Keep intermediate graphs during SMOOTHXG.",
+                    "hidden": true
                 },
                 "smoothxg_run_abpoa": {
                     "type": "boolean",
