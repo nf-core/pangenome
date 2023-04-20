@@ -10,7 +10,11 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "n_haplotypes", "outdir"],
+            "required": [
+                "input",
+                "n_haplotypes",
+                "outdir"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -31,8 +35,7 @@
                     "type": "string",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open",
-                    "help_text": ""
+                    "fa_icon": "fas fa-folder-open"
                 },
                 "email": {
                     "type": "string",
@@ -57,16 +60,20 @@
                 "wfmash_map_pct_id": {
                     "type": "number",
                     "default": 90,
-                    "description": "Percent identity in the wfmash mashmap step."
+                    "description": "Percent identity in the wfmash mashmap step.",
+                    "help_text": "Use `mash dist` or `mash triangle` to explore the typical level of divergence between the sequences in your input (see https://pggb.readthedocs.io/en/latest/rst/tutorials/divergence_estimation.html#divergence-estimation for more information). Convert this to an approximate percent identity and provide it as --wfmash_map_pct_id <PCT>. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
                 "wfmash_segment_length": {
                     "type": "integer",
                     "default": 5000,
-                    "description": "Segment length for mapping."
+                    "description": "Segment length for mapping.",
+                    "help_text": "Crucially, --wfmash_segment_length provides a kind of minimum alignment length filter. The `mashmap3` step in `wfmash` will only consider segments of this size. For small pangenome graphs, or where there are few repeats, --wfmash_segment_length can be set low (for example 500 when building a MHC pangenome graph). However, for larger contexts, with repeats, it can be very important to set this high (for instance 50k in the case of human genomes). A long segment length ensures that we represent long collinear regions of the input sequences in the structure of the graph. In general, this should at least be larger than transposons and other common repeats in your pangenome. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
                 "wfmash_block_length": {
                     "type": "string",
-                    "default": "wfmash_segment_length * 5"
+                    "default": "wfmash_segment_length * 5",
+                    "description": "Minimum block length filter for mapping.",
+                    "help_text": "By default, wfmash only keeps mappings with at least 5 times the size of a segment. This can be adjusted with --wfmash_block_length <BLOCK_LENGTH>."
                 },
                 "wfmash_mash_kmer": {
                     "type": "integer",
@@ -93,20 +100,23 @@
                 },
                 "wfmash_exclude_delim": {
                     "type": "string",
-                    "default": "None"
+                    "default": "None",
+                    "description": "Skip mappings between sequences with the same name prefix before the given delimiter character. [default: all-vs-all and !self]."
                 },
                 "wfmash_temp_dir": {
                     "type": "string",
-                    "default": "None"
+                    "default": "None",
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument."
                 },
                 "wfmash_chunks": {
                     "type": "integer",
                     "default": 1,
-                    "description": "The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1."
+                    "description": "The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1.",
+                    "help_text": "This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set --wfmash_chunks 10. If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to --wfmash_chunks 10 could be a good fit, because then you don't have to wait too long for your jobs to finish."
                 },
                 "wfmash_only": {
                     "type": "boolean",
-                    "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
+                    "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to run wfmash on a cluster."
                 }
             }
         },
@@ -353,7 +363,14 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email_on_fail": {
