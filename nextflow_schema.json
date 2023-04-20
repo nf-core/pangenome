@@ -174,11 +174,13 @@
                 "smoothxg_poa_length": {
                     "type": "string",
                     "default": "700,900,1100",
-                    "description": "Maximum sequence length to put int POA. Is a comma-separated list. For each integer, SMOOTHXG wil be executed once."
+                    "description": "Maximum sequence length to put int POA. Is a comma-separated list. For each integer, SMOOTHXG wil be executed once.",
+                    "help_text": "The last step in smoothxg refines the graph by running a partial order alignment (POA) across segments, so called blocks. The \"chunked\" POA process attempts to build an MSA for each collinear region in the sorted graph.\nThe length of these sub-problems greatly affects the total time and memory requirements of the pipeline, and is defined by -- smoothxg_poa_length <LEN1,LEN2,...>. Several passes of refinement can be defined by lengths >LEN1,LEN2,...>, and so on. Ideally, this target can be set above the length of transposon repeats in the pangenome, and base-level graph quality tends to improve as it is set higher. Higher values makes sense for lower-diversity pangenomes, but can require several GB of RAM per thread."
                 },
                 "smoothxg_block_id_min": {
                     "type": "string",
-                    "default": "None"
+                    "default": "None",
+                    "description": "Minimum edit-based identity to cluster sequences."
                 },
                 "smoothxg_block_ratio_min": {
                     "type": "integer",
@@ -198,7 +200,8 @@
                 "smoothxg_poa_params": {
                     "type": "string",
                     "default": "1,19,39,3,81,1",
-                    "description": "Score parameters for POA in the form of 'match,mismatch,gap1,ext1,gap2,ext2'. It may also be given as presets: 'asm5', 'asm10', 'asm15', 'asm20'. [default: 1,19,39,3,81,1 = asm5]."
+                    "description": "Score parameters for POA in the form of 'match,mismatch,gap1,ext1,gap2,ext2'. It may also be given as presets: 'asm5', 'asm10', 'asm15', 'asm20'. [default: 1,19,39,3,81,1 = asm5].",
+                    "help_text": "For details of the different asm modes, please take a look at https://pggb.readthedocs.io/en/latest/rst/optional_parameters.html#homogenizing-and-ordering-the-graph."
                 },
                 "smoothxg_write_maf": {
                     "type": "boolean",
@@ -211,7 +214,8 @@
                 },
                 "smoothxg_temp_dir": {
                     "type": "string",
-                    "default": "None"
+                    "default": "None",
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument."
                 },
                 "smoothxg_keep_intermediate_files": {
                     "type": "boolean",
