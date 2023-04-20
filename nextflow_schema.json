@@ -10,11 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input",
-                "n_haplotypes",
-                "outdir"
-            ],
+            "required": ["input", "n_haplotypes", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -29,7 +25,7 @@
                 "n_haplotypes": {
                     "type": "number",
                     "description": "The number of haplotypes in the input FASTA.",
-                    "help_text": "The number of haplotypes that are represented in your sequences."
+                    "help_text": "The constructed graph is defined by the number of mappings per segment of each genome (--n_haplotypes <N> - 1). Ideally, you should set this to equal the number of haplotypes in the pangenome. Because that's the maximum number of secondary mappings and alignments that we expect. Keep in mind that the total work of alignment is proportional to N*N, and these multimappings can be highly redundant."
                 },
                 "outdir": {
                     "type": "string",
@@ -129,12 +125,14 @@
                 "seqwish_min_match_length": {
                     "type": "integer",
                     "default": 19,
-                    "description": "Ignores exact matches below this length."
+                    "description": "Ignores exact matches below this length.",
+                    "help_text": "Graph induction with seqwish often works better when we filter very short matches out of the input alignments. In practice, these often occur in regions of low alignment quality, which are typical of areas with large INDELs and structural variations in the wfmash alignments. This underalignment is then resolved in the smoothxg step. Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.\nA setting of --seqwish_min_match_length 47 is optimal for around 5% divergence, and we suggest lowering it for higher divergence and increasing it for lower divergence. Values up to --seqwish_min_match_length 311 work well for human haplotypes. In effect, setting --seqwish_min_match_length to N means that we can tolerate a local pairwise difference rate of no more than 1/N. Thus, INDELs which may be represented by complex series of edit operations will be opened into bubbles in the induced graph, and alignment regions with very low identity will be ignored. Using affine-gapped alignment (such as with minimap2) may reduce the impact of this step by representing large indels more precisely in the input alignments. However, it remains important due to local inconsistency in alignments in low-complexity sequence."
                 },
                 "seqwish_transclose_batch": {
                     "type": "integer",
                     "default": 10000000,
-                    "description": "Number of base pairs to use for transitive closure batch."
+                    "description": "Number of base pairs to use for transitive closure batch.",
+                    "help_text": "If you run out of memory during the seqwish step, you can lower this value. It will take longer, but it will use less memory."
                 },
                 "seqwish_sparse_factor": {
                     "type": "number",
@@ -143,11 +141,13 @@
                 },
                 "seqwish_temp_dir": {
                     "type": "string",
-                    "default": "None"
+                    "default": "None",
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument."
                 },
                 "seqwish_paf": {
                     "type": "string",
-                    "default": "None"
+                    "default": "None",
+                    "description": "Input PAF file. The wfmash alignment step is skipped."
                 }
             }
         },
@@ -363,14 +363,7 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ],
+                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
                     "hidden": true
                 },
                 "email_on_fail": {
