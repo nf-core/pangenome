@@ -2,6 +2,7 @@
 // This file holds several functions specific to the workflow/pangenome.nf in the nf-core/pangenome pipeline
 //
 
+import nextflow.Nextflow
 import groovy.text.SimpleTemplateEngine
 
 class WorkflowPangenome {
@@ -11,7 +12,14 @@ class WorkflowPangenome {
     //
     public static void initialise(params, log) {
 
+<<<<<<< HEAD
         // This function is currently not in use
+=======
+
+        if (!params.fasta) {
+            Nextflow.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
+        }
+>>>>>>> nf-core-template-merge-2.8
     }
 
     //
@@ -56,5 +64,22 @@ class WorkflowPangenome {
         def description_html = engine.createTemplate(methods_text).make(meta)
 
         return description_html
+<<<<<<< HEAD
+=======
+    }
+
+    //
+    // Exit pipeline if incorrect --genome key provided
+    //
+    private static void genomeExistsError(params, log) {
+        if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
+            def error_string = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" +
+                "  Genome '${params.genome}' not found in any config files provided to the pipeline.\n" +
+                "  Currently, the available genome keys are:\n" +
+                "  ${params.genomes.keySet().join(", ")}\n" +
+                "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            Nextflow.error(error_string)
+        }
+>>>>>>> nf-core-template-merge-2.8
     }
 }
