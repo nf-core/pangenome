@@ -60,9 +60,9 @@ Each row represents a fastq file (single-end) or a pair of fastq files (paired e
 
 Now, you can run the pipeline using:
 
-   ```bash
-   nextflow run nf-core/pangenome -r dev --input <BGZIPPED_FASTA> --n_haplotypes <NUM_HAPS_IN_FASTA> --outdir <OUTDIR> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
-   ```
+```bash
+nextflow run nf-core/pangenome -r dev --input <BGZIPPED_FASTA> --n_haplotypes <NUM_HAPS_IN_FASTA> --outdir <OUTDIR> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+```
 
 ## Advantages over [`PGGB`](https://github.com/pangenome/pggb)
 

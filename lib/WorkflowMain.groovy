@@ -23,13 +23,8 @@ class WorkflowMain {
     //
     // Generate help string
     //
-<<<<<<< HEAD
     public static String help(workflow, params, log) {
         def command = "nextflow run ${workflow.manifest.name} --input sequences.fasta -profile docker"
-=======
-    public static String help(workflow, params) {
-        def command = "nextflow run ${workflow.manifest.name} --input samplesheet.csv --genome GRCh37 -profile docker"
->>>>>>> nf-core-template-merge-2.8
         def help_string = ''
         help_string += NfcoreTemplate.logo(workflow, params.monochrome_logs)
         help_string += NfcoreSchema.paramsHelp(workflow, params, command)
@@ -88,11 +83,7 @@ class WorkflowMain {
 
         // Check input has been provided
         if (!params.input) {
-<<<<<<< HEAD
             error("Please provide an input FASTA to the pipeline e.g. '--input sequences.fa.gz'")
-=======
-            Nextflow.error("Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'")
->>>>>>> nf-core-template-merge-2.8
         }
     }
 }
