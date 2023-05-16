@@ -82,7 +82,7 @@
                     "description": "Ignore the top % most-frequent kmers."
                 },
                 "wfmash_sparse_map": {
-                    "type": "string",
+                    "type": "number",
                     "default": "1.0",
                     "description": "Keep this fraction of mappings (\"auto\" for giant component heuristic)."
                 },
