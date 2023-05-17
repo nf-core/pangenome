@@ -27,7 +27,7 @@
                     },
                     "odgi/draw": {
                         "branch": "master",
-                        "git_sha": "911696ea0b62df80e900ef244d7867d177971f73",
+                        "git_sha": "b986764032c2bb042a71b4f503f8fafe3695bd39",
                         "installed_by": ["modules"]
                     },
                     "odgi/layout": {
