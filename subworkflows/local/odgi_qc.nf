@@ -48,10 +48,9 @@ workflow ODGI_QC {
 
     ODGI_LAYOUT(sorted_graph)
     ch_versions = ch_versions.mix(ODGI_LAYOUT.out.versions)
-    ch_odgi_layout = ODGI_LAYOUT.out.lay.map{meta, lay -> [ lay ]}
-    ODGI_DRAW_MULTIQC(sorted_graph, ch_odgi_layout)
+    ODGI_DRAW_MULTIQC(sorted_graph.join(ODGI_LAYOUT.out.lay))
     ch_versions = ch_versions.mix(ODGI_DRAW_MULTIQC.out.versions)
-    ODGI_DRAW_HEIGHT(sorted_graph, ch_odgi_layout)
+    ODGI_DRAW_HEIGHT(sorted_graph.join(ODGI_LAYOUT.out.lay))
     ch_versions = ch_versions.mix(ODGI_DRAW_HEIGHT.out.versions)
 
     if (community_mode) {
