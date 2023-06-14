@@ -10,26 +10,22 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input",
-                "n_haplotypes"
-            ],
+            "required": ["input", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
-                    "fa_icon": "fas fa-dna",
-                    "description": "Input FASTA file.",
-                    "help_text": "Use this to specify the location of your input FASTA file. For example:\n\n```bash\n--input 'path/to/data/input.fa.gz'\n```\n\n."
-                },
-                "n_haplotypes": {
-                    "type": "string",
-                    "default": "None",
-                    "fa_icon": "fas fa-dna"
+                    "format": "file-path",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "schema": "assets/schema_input.json",
+                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/pangenome/usage#samplesheet-input).",
+                    "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
                     "type": "string",
-                    "description": "The output directory where the results will be saved.",
-                    "default": "./results",
+                    "format": "directory-path",
+                    "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
                 },
                 "email": {
@@ -39,370 +35,48 @@
                     "help_text": "Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
                 },
-                "paf": {
+                "multiqc_title": {
                     "type": "string",
-                    "fa_icon": "fas fa-align-center",
-                    "description": "Optional input to skip the all vs. all alignment phase directly starting with seqwish."
+                    "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
+                    "fa_icon": "fas fa-file-signature"
                 }
             }
         },
-        "wfmash_options": {
-            "title": "Wfmash options",
+        "reference_genome_options": {
+            "title": "Reference genome options",
             "type": "object",
-            "fa_icon": "fas fa-align-center",
-            "description": "Options for the all versus all alignment phase.",
+            "fa_icon": "fas fa-dna",
+            "description": "Reference genome related files and options required for the workflow.",
             "properties": {
-                "wfmash_map_pct_id": {
-                    "type": "integer",
-                    "default": 90,
-                    "description": "percent identity in the wfmash mashmap step",
-                    "fa_icon": "fas fa-align-center"
-                },
-                "wfmash_segment_length": {
-                    "type": "integer",
-                    "default": 5000,
-                    "description": "segment length for mapping",
-                    "fa_icon": "fas fa-align-center"
-                },
-                "wfmash_block_length": {
-                    "type": "integer",
-                    "description": "minimum block length filter for mapping",
-                    "fa_icon": "fas fa-align-center"
-                },
-                "wfmash_mash_kmer": {
-                    "type": "integer",
-                    "description": "kmer size for mashmap",
-                    "fa_icon": "fas fa-align-center"
-                },
-                "wfmash_mash_kmer_thres": {
-                    "type": "number",
-                    "description": "ignore the top % most-frequent kmers [default: 0.001]"
-                },
-                "wfmash_merge_segments": {
-                    "type": "boolean",
-                    "description": "merge successive mappings",
-                    "fa_icon": "fas fa-align-center"
-                },
-                "wfmash_no_splits": {
-                    "type": "boolean",
-                    "description": "disable splitting of input sequences during mapping",
-                    "fa_icon": "fas fa-align-center"
-                },
-                "wfmash_exclude_delim": {
+                "genome": {
                     "type": "string",
-                    "description": "skip mappings between sequences with the same name prefix before the given delimiter character",
-                    "fa_icon": "fas fa-align-center"
+                    "description": "Name of iGenomes reference.",
+                    "fa_icon": "fas fa-book",
+                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
                 },
-                "wfmash_chunks": {
-                    "type": "integer",
-                    "default": 1,
-                    "description": "The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1."
-                },
-                "wfmash_only": {
-                    "type": "boolean",
-                    "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to use wfmash on a cluster."
-                },
-                "wfmash_sparse_map": {
+                "fasta": {
                     "type": "string",
-                    "description": "keep this fraction of mappings ('auto' for giant component heuristic) [default: 1.0]"
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                    "description": "Path to FASTA genome file.",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "fa_icon": "far fa-file-code"
                 },
-                "wfmash_temp_dir": {
+                "igenomes_base": {
                     "type": "string",
-                    "description": "directory for temporary files"
-                }
-            }
-        },
-        "seqwish_options": {
-            "title": "Seqwish options",
-            "type": "object",
-            "description": "Options for the graph induction phase.",
-            "default": "",
-            "properties": {
-                "seqwish_min_match_length": {
-                    "type": "integer",
-                    "default": 19,
-                    "description": "Ignore exact matches below this length.",
-                    "fa_icon": "fas fa-project-diagram"
-                },
-                "seqwish_transclose_batch": {
-                    "type": "integer",
-                    "default": 10000000,
-                    "description": "Number of bp to use for transitive closure batch.",
-                    "fa_icon": "fas fa-project-diagram"
-                },
-                "seqwish_sparse_factor": {
-                    "type": "integer",
-                    "default": 0,
-                    "description": "keep this randomly selected fraction of input matches [default: no sparsification]"
-                },
-                "seqwish_temp_dir": {
-                    "type": "string",
-                    "description": "directory for temporary files"
-                }
-            },
-            "fa_icon": "fas fa-project-diagram"
-        },
-        "smoothxg_options": {
-            "title": "Smoothxg options",
-            "type": "object",
-            "description": "Options for graph smoothing phase.",
-            "default": "",
-            "properties": {
-                "smoothxg_haplotypes_smooth": {
-                    "type": "string",
-                    "default": "None"
-                },
-                "smoothxg_max_path_jump": {
-                    "type": "integer",
-                    "default": 0,
-                    "description": "Maximum path jump to include in block."
-                },
-                "smoothxg_max_edge_jump": {
-                    "type": "integer",
-                    "default": 0,
-                    "description": "Maximum edge jump before breaking."
-                },
-                "smoothxg_poa_length": {
-                    "type": "string",
-                    "default": "700,900,1100",
-                    "description": "maximum sequence length to put into POA, can be a comma-separated list; for each element smoothxg will be executed once"
-                },
-                "smoothxg_consensus_prefix": {
-                    "type": "string",
-                    "default": "Consensus_",
-                    "description": "use this prefix for consensus path names"
-                },
-                "smoothxg_block_ratio_min": {
-                    "type": "number",
-                    "description": "minimum small / large length ratio to cluster in a block",
-                    "default": 0
-                },
-                "smoothxg_block_id_min": {
-                    "type": "number",
-                    "description": "Split blocks into groups connected by this identity threshold.",
-                    "fa_icon": "fas fa-percentage"
-                },
-                "smoothxg_pad_max_depth": {
-                    "type": "integer",
-                    "default": 100,
-                    "description": "path depth at which we don't pad the POA problem"
-                },
-                "smoothxg_poa_padding": {
-                    "type": "number",
-                    "default": 0.001,
-                    "description": "pad each end of each sequence in POA with N*(longest_poas_seq) bp"
-                },
-                "smoothxg_poa_params": {
-                    "type": "string",
-                    "default": "1,19,39,3,81,1",
-                    "description": "score parameters for POA in the form of match,mismatch,gap1,ext1,gap2,ext2 may also be given as presets: asm5, asm10, asm15, asm20 [default: 1,19,39,3,81,1 = asm5]",
-                    "fa_icon": "fab fa-superpowers"
-                },
-                "smoothxg_run_abpoa": {
-                    "type": "boolean",
-                    "description": "run abPOA [default: SPOA]"
-                },
-                "smoothxg_run_global_poa": {
-                    "type": "string",
-                    "description": "run the POA in global mode [default: local mode]"
-                },
-                "smoothxg_write_maf": {
-                    "type": "boolean",
-                    "description": "write MAF output representing merged POA blocks"
-                },
-                "smoothxg_keep_intermediate_files": {
-                    "type": "string",
-                    "description": "keep intermediate graphs during smoothxg step"
-                },
-                "smoothxg_temp_dir": {
-                    "type": "string",
-                    "description": "directory for temporary files"
-                },
-                "skip_smoothxg": {
-                    "type": "boolean"
-                }
-            },
-            "fa_icon": "fas fa-project-diagram"
-        },
-        "vcf_options": {
-            "title": "VCF options",
-            "type": "object",
-            "description": "Optios for vg deconstruct.",
-            "default": "false",
-            "properties": {
-                "vcf_spec": {
-                    "type": "string",
-                    "description": "specify a set of VCFs to produce with SPEC = REF:DELIM[:LEN][,REF:DELIM:[LEN]]* the paths matching ^REF are used as a reference, while the sample haplotypes are derived from path names, e.g. when DELIM=# and with '-V chm13:#', a path name HG002#1#ctg would be assigned to sample HG002 phase 1. If LEN is specified and greater than 0, the VCFs are decomposed, filtering  sites whose max allele length is greater than LEN. [default: off]"
-                }
-            }
-        },
-        "visualization_options": {
-            "title": "Visualization options",
-            "type": "object",
-            "description": "Do we want diagnostic visualizations of the built graphs?",
-            "default": "",
-            "fa_icon": "fas fa-project-diagram",
-            "properties": {
-                "no_viz": {
-                    "type": "boolean",
-                    "description": "Set if you don't want the 1D visualizations."
-                },
-                "no_layout": {
-                    "type": "boolean",
-                    "description": "Set if you don't want the computational expensive 2D layout."
-                }
-            }
-        },
-        "community_options": {
-            "title": "Community options",
-            "type": "object",
-            "description": "Options for detecting communities in the FASTA.",
-            "default": "",
-            "properties": {
-                "communities": {
-                    "type": "boolean",
-                    "description": "Detects all communities in the given FASTA and runs graph construction on all of them. Can scale in parallel across a cluster. For each community one MultiQC report will be generated. Additionally, all community graphs are squeezed into one, for which a final MultiQC report is generated. [default: OFF]",
-                    "help_text": "Detects all communities in the given FASTA and runs graph construction on all of them. Can scale in parallel across a cluster. For each community one MultiQC report will be generated. Additionally, all community graphs are squeezed into one, for which a final MultiQC report is generated. [default: OFF]"
-                }
-            }
-        },
-        "squeeze_options": {
-            "title": "Squeeze Options",
-            "type": "object",
-            "description": "Options for squeezing community graphs.",
-            "default": "",
-            "properties": {
-                "squeeze": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "This is only applied when '--communities' is true. Can be turned off, but that's not recommended. [default: ON]"
-                },
-                "squeeze_gfa": {
-                    "type": "boolean",
-                    "description": "Converts the final squeezed ODGI graph to GFAv1. [default: OFF]"
-                }
-            }
-        },
-        "generic_options": {
-            "title": "Generic options",
-            "type": "object",
-            "fa_icon": "fas fa-file-import",
-            "description": "Less common options for the pipeline, typically set in a config file.",
-            "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
-            "properties": {
-                "help": {
-                    "type": "boolean",
-                    "description": "Display help text.",
-                    "hidden": true,
-                    "fa_icon": "fas fa-question-circle"
-                },
-                "publish_dir_mode": {
-                    "type": "string",
-                    "default": "copy",
-                    "hidden": true,
-                    "description": "Method used to save pipeline results to output directory.",
-                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
-                    "fa_icon": "fas fa-copy",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ]
-                },
-                "validate_params": {
-                    "type": "boolean",
-                    "description": "Boolean whether to validate parameters against the schema at runtime",
-                    "default": true,
-                    "fa_icon": "fas fa-check-square",
+                    "format": "directory-path",
+                    "description": "Directory / URL base for iGenomes references.",
+                    "default": "s3://ngi-igenomes/igenomes",
+                    "fa_icon": "fas fa-cloud-download-alt",
                     "hidden": true
                 },
-                "email_on_fail": {
-                    "type": "string",
-                    "description": "Email address for completion summary, only when pipeline fails.",
-                    "fa_icon": "fas fa-exclamation-triangle",
-                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
-                    "hidden": true,
-                    "help_text": "This works exactly as with `--email`, except emails are only sent if the workflow is not successful."
-                },
-                "plaintext_email": {
+                "igenomes_ignore": {
                     "type": "boolean",
-                    "description": "Send plain-text email instead of HTML.",
-                    "fa_icon": "fas fa-remove-format",
+                    "description": "Do not load the iGenomes reference config.",
+                    "fa_icon": "fas fa-ban",
                     "hidden": true,
-                    "help_text": "Set to receive plain-text e-mails instead of HTML formatted."
-                },
-                "max_multiqc_email_size": {
-                    "type": "string",
-                    "description": "File size limit when attaching MultiQC reports to summary emails.",
-                    "default": "25.MB",
-                    "fa_icon": "fas fa-file-upload",
-                    "hidden": true,
-                    "help_text": "If file generated by pipeline exceeds the threshold, it will not be attached."
-                },
-                "monochrome_logs": {
-                    "type": "boolean",
-                    "description": "Do not use coloured log outputs.",
-                    "fa_icon": "fas fa-palette",
-                    "hidden": true,
-                    "help_text": "Set to disable colourful command line output and live life in monochrome."
-                },
-                "multiqc_config": {
-                    "type": "string",
-                    "description": "Custom config file to supply to MultiQC.",
-                    "fa_icon": "fas fa-cog",
-                    "hidden": true
-                },
-                "tracedir": {
-                    "type": "string",
-                    "description": "Directory to keep pipeline Nextflow logs and reports.",
-                    "default": "${params.outdir}/pipeline_info",
-                    "fa_icon": "fas fa-cogs",
-                    "hidden": true
-                },
-                "show_hidden_params": {
-                    "type": "boolean",
-                    "fa_icon": "far fa-eye-slash",
-                    "description": "Show all params when using `--help`",
-                    "hidden": true,
-                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
-                }
-            }
-        },
-        "max_job_request_options": {
-            "title": "Max job request options",
-            "type": "object",
-            "fa_icon": "fab fa-acquisitions-incorporated",
-            "description": "Set the top limit for requested resources for any single job.",
-            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
-            "properties": {
-                "max_cpus": {
-                    "type": "integer",
-                    "description": "Maximum number of CPUs that can be requested    for any single job.",
-                    "default": 16,
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
-                },
-                "max_memory": {
-                    "type": "string",
-                    "description": "Maximum amount of memory that can be requested for any single job.",
-                    "default": "128.GB",
-                    "fa_icon": "fas fa-memory",
-                    "pattern": "^[\\d\\.]+\\s*.(K|M|G|T)?B$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
-                },
-                "max_time": {
-                    "type": "string",
-                    "description": "Maximum amount of time that can be requested for any single job.",
-                    "default": "240.h",
-                    "fa_icon": "far fa-clock",
-                    "pattern": "^[\\d\\.]+\\.*(s|m|h|d)$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
+                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
                 }
             }
         },
@@ -418,20 +92,19 @@
                     "description": "Git commit id for Institutional configs.",
                     "default": "master",
                     "hidden": true,
-                    "fa_icon": "fas fa-users-cog",
-                    "help_text": "Provide git commit id for custom Institutional configs hosted at `nf-core/configs`. This was implemented for reproducibility purposes. Default: `master`.\n\n```bash\n## Download and use config file with following git commit id\n--custom_config_version d52db660777c4bf36546ddb188ec530c3ada1b96\n```"
+                    "fa_icon": "fas fa-users-cog"
                 },
                 "custom_config_base": {
                     "type": "string",
                     "description": "Base directory for Institutional configs.",
                     "default": "https://raw.githubusercontent.com/nf-core/configs/master",
                     "hidden": true,
-                    "help_text": "If you're running offline, nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell nextflow where to find them with the `custom_config_base` option. For example:\n\n```bash\n## Download and unzip the config files\ncd /path/to/my/configs\nwget https://github.com/nf-core/configs/archive/master.zip\nunzip master.zip\n\n## Run the pipeline\ncd /path/to/my/data\nnextflow run /path/to/pipeline/ --custom_config_base /path/to/my/configs/configs-master/\n```\n\n> Note that the nf-core/tools helper package has a `download` command to download all required pipeline files + singularity containers + institutional configs in one go for you, to make this process easier.",
+                    "help_text": "If you're running offline, Nextflow will not be able to fetch the institutional config files from the internet. If you don't need them, then this is not a problem. If you do need them, you should download the files from the repo and tell Nextflow where to find them with this parameter.",
                     "fa_icon": "fas fa-users-cog"
                 },
-                "hostnames": {
+                "config_profile_name": {
                     "type": "string",
-                    "description": "Institutional configs hostname.",
+                    "description": "Institutional config name.",
                     "hidden": true,
                     "fa_icon": "fas fa-users-cog"
                 },
@@ -454,6 +127,144 @@
                     "fa_icon": "fas fa-users-cog"
                 }
             }
+        },
+        "max_job_request_options": {
+            "title": "Max job request options",
+            "type": "object",
+            "fa_icon": "fab fa-acquisitions-incorporated",
+            "description": "Set the top limit for requested resources for any single job.",
+            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
+            "properties": {
+                "max_cpus": {
+                    "type": "integer",
+                    "description": "Maximum number of CPUs that can be requested for any single job.",
+                    "default": 16,
+                    "fa_icon": "fas fa-microchip",
+                    "hidden": true,
+                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
+                },
+                "max_memory": {
+                    "type": "string",
+                    "description": "Maximum amount of memory that can be requested for any single job.",
+                    "default": "128.GB",
+                    "fa_icon": "fas fa-memory",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "hidden": true,
+                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
+                },
+                "max_time": {
+                    "type": "string",
+                    "description": "Maximum amount of time that can be requested for any single job.",
+                    "default": "240.h",
+                    "fa_icon": "far fa-clock",
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
+                    "hidden": true,
+                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
+                }
+            }
+        },
+        "generic_options": {
+            "title": "Generic options",
+            "type": "object",
+            "fa_icon": "fas fa-file-import",
+            "description": "Less common options for the pipeline, typically set in a config file.",
+            "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
+            "properties": {
+                "help": {
+                    "type": "boolean",
+                    "description": "Display help text.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
+                "version": {
+                    "type": "boolean",
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "hidden": true
+                },
+                "publish_dir_mode": {
+                    "type": "string",
+                    "default": "copy",
+                    "description": "Method used to save pipeline results to output directory.",
+                    "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
+                    "fa_icon": "fas fa-copy",
+                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "hidden": true
+                },
+                "email_on_fail": {
+                    "type": "string",
+                    "description": "Email address for completion summary, only when pipeline fails.",
+                    "fa_icon": "fas fa-exclamation-triangle",
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+                    "help_text": "An email address to send a summary email to when the pipeline is completed - ONLY sent if the pipeline does not exit successfully.",
+                    "hidden": true
+                },
+                "plaintext_email": {
+                    "type": "boolean",
+                    "description": "Send plain-text email instead of HTML.",
+                    "fa_icon": "fas fa-remove-format",
+                    "hidden": true
+                },
+                "max_multiqc_email_size": {
+                    "type": "string",
+                    "description": "File size limit when attaching MultiQC reports to summary emails.",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
+                    "default": "25.MB",
+                    "fa_icon": "fas fa-file-upload",
+                    "hidden": true
+                },
+                "monochrome_logs": {
+                    "type": "boolean",
+                    "description": "Do not use coloured log outputs.",
+                    "fa_icon": "fas fa-palette",
+                    "hidden": true
+                },
+                "hook_url": {
+                    "type": "string",
+                    "description": "Incoming hook URL for messaging service",
+                    "fa_icon": "fas fa-people-group",
+                    "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
+                    "hidden": true
+                },
+                "multiqc_config": {
+                    "type": "string",
+                    "description": "Custom config file to supply to MultiQC.",
+                    "fa_icon": "fas fa-cog",
+                    "hidden": true
+                },
+                "multiqc_logo": {
+                    "type": "string",
+                    "description": "Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file",
+                    "fa_icon": "fas fa-image",
+                    "hidden": true
+                },
+                "multiqc_methods_description": {
+                    "type": "string",
+                    "description": "Custom MultiQC yaml file containing HTML including a methods description.",
+                    "fa_icon": "fas fa-cog"
+                },
+                "tracedir": {
+                    "type": "string",
+                    "description": "Directory to keep pipeline Nextflow logs and reports.",
+                    "default": "${params.outdir}/pipeline_info",
+                    "fa_icon": "fas fa-cogs",
+                    "hidden": true
+                },
+                "validate_params": {
+                    "type": "boolean",
+                    "description": "Boolean whether to validate parameters against the schema at runtime",
+                    "default": true,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "show_hidden_params": {
+                    "type": "boolean",
+                    "fa_icon": "far fa-eye-slash",
+                    "description": "Show all params when using `--help`",
+                    "hidden": true,
+                    "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
+                }
+            }
         }
     },
     "allOf": [
@@ -461,34 +272,16 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/wfmash_options"
+            "$ref": "#/definitions/reference_genome_options"
         },
         {
-            "$ref": "#/definitions/seqwish_options"
-        },
-        {
-            "$ref": "#/definitions/smoothxg_options"
-        },
-        {
-            "$ref": "#/definitions/vcf_options"
-        },
-        {
-            "$ref": "#/definitions/visualization_options"
-        },
-        {
-            "$ref": "#/definitions/community_options"
-        },
-        {
-            "$ref": "#/definitions/squeeze_options"
-        },
-        {
-            "$ref": "#/definitions/generic_options"
+            "$ref": "#/definitions/institutional_config_options"
         },
         {
             "$ref": "#/definitions/max_job_request_options"
         },
         {
-            "$ref": "#/definitions/institutional_config_options"
+            "$ref": "#/definitions/generic_options"
         }
     ]
 }

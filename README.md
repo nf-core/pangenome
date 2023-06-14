@@ -1,149 +1,86 @@
-# ![nf-core/pangenome](docs/images/nf-core-pangenome_logo.png)
+# ![nf-core/pangenome](docs/images/nf-core-pangenome_logo_light.png#gh-light-mode-only) ![nf-core/pangenome](docs/images/nf-core-pangenome_logo_dark.png#gh-dark-mode-only)
 
-[![GitHub Actions CI Status](https://github.com/nf-core/pangenome/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/pangenome/actions)
-[![GitHub Actions Linting Status](https://github.com/nf-core/pangenome/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/pangenome/actions)
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.10.0-brightgreen.svg)](https://www.nextflow.io/)
+[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/pangenome/results)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/)
-[![Docker](https://img.shields.io/docker/automated/nfcore/pangenome.svg)](https://hub.docker.com/r/nfcore/pangenome)
-[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23pangenome-4A154B?logo=slack)](https://nfcore.slack.com/channels/pangenome)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
+[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
+[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
+[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
+[![Launch on Nextflow Tower](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Nextflow%20Tower-%234256e7)](https://tower.nf/launch?pipeline=https://github.com/nf-core/pangenome)
+
+[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23pangenome-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/pangenome)[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)[![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
 
 ## Introduction
 
-> **Warning:** This pipeline is currently UNDER CONSTRUCTION. Some features may not work or not work as intended! This pipeline can only be run with Nextflow version 22.04.5 or later.
+**nf-core/pangenome** is a bioinformatics pipeline that ...
 
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
-**nf-core/pangenome** is a bioinformatics best-practise analysis pipeline for the rendering of a collection of sequences into a pangenome graph.
-Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs.
+<!-- TODO nf-core:
+   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
+   major pipeline sections and the types of output it produces. You're giving an overview to someone new
+   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
+-->
 
-The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
+<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
+     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
+<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
-## Quick Start
+1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
 
- **Warning:** The Dockerfile Github Action is not running, yet. Therefore, make sure you always have the latest image. Another caveat is that you need to clone the repository before you can execute the pipeline. Once we have an automated docker image build on `nf-core`, these inconveniences will be gone.
+## Usage
 
-1. Install [`nextflow`](https://nf-co.re/usage/installation)
+> **Note**
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how
+> to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline)
+> with `-profile test` before running the workflow on actual data.
 
-2. Install any of [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/), [`Podman`](https://podman.io/), [`Shifter`](https://nersc.gitlab.io/development/shifter/how-to-use/) or [`Charliecloud`](https://hpc.github.io/charliecloud/) for full pipeline reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
+<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
+     Explain what rows and columns represent. For instance (please edit as appropriate):
 
-3. Build the current docker image if necessary
+First, prepare a samplesheet with your input data that looks as follows:
 
-   ```bash
-   docker build --no-cache . -t nfcore/pangenome:dev
-   ```
+`samplesheet.csv`:
 
-4. Test the workflow on a minimal dataset
-
-    ```bash
-    nextflow run nf-core/pangenome -profile test,<docker/singularity/podman/shifter/charliecloud/conda/institute> --n_haplotypes 12
-    ```
-
-    [//]: # (```bash nextflow run nf-core/pangenome -profile test,<docker/singularity/conda/institute>```)
-
-    > Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
-
-5. Start running your own analysis!
-
-    ```bash
-    nextflow run nf-core/pangenome -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input "input.fa.gz" --n_haplotypes 12
-    ```
-
-Be careful, the input FASTA must have been compressed with [bgzip](http://www.htslib.org/doc/bgzip.html). See [usage docs](https://nf-co.re/pangenome/usage) for all of the available options when running the pipeline.
-
-## Examples
-
-### DRB1-3123 Pangenome Graph
-
-For an optimal workload of the computations, we can specify the resources of each process in a config file. We can call this for example `savasana.config`:
-
-```
-process {
-    withName:'wfmash|seqwish|odgiLayout|wfmashMap|wfmashAlign|vg_deconstruct|gfaffix' {
-        cpus = 4
-        memory = 4.GB
-    }
-
-    withName:'smoothxg|odgiDraw|odgiBuild' {
-        cpus = 4
-        memory = 4.GB
-    }
-
-    withName:'splitApproxMappingsInChunks|odgiStats|odgiViz|multiQC|odgiDraw' {
-        cpus = 1
-        memory = 1.GB
-    }
-}
+```csv
+sample,fastq_1,fastq_2
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
 ```
 
-Executing the pipeline using the config file:
+Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+
+-->
+
+Now, you can run the pipeline using:
+
+<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
 
 ```bash
-nextflow run nf-core/pangenome -r dev -profile docker --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz -c savasana.config --n_haplotypes 12 --wfmash_map_pct_id 70 --wfmash_segment_length 2000 --smoothxg_poa_length 2000
+nextflow run nf-core/pangenome \
+   -profile <docker/singularity/.../institute> \
+   --input samplesheet.csv \
+   --outdir <OUTDIR>
 ```
 
-## Advantages over [`pggb`](https://github.com/pangenome/pggb)
+> **Warning:**
+> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those
+> provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
+> see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
 
-This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set `--wfmash_chunks 10`.
-If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to `--wfmash_chunks 10` could be a good fit, because then you don't have to wait too long for your jobs to finish.
+For more details, please refer to the [usage documentation](https://nf-co.re/pangenome/usage) and the [parameter documentation](https://nf-co.re/pangenome/parameters).
 
-## Building a native container
+## Pipeline output
 
-It has been evaluated, that the current PGGB docker image can lead to slow performance of certain processes. 
-While a single process my run up to 10 times slower compared to a native build, performance increase of a native build is expected to be ~30% regarding a whole pipeline run. This can be critical when building very large pangenomes. The [native_image.sh](bin/native_image.sh) script can tackle this problem.
-
-### Singularity
-
-Assuming you are located in your `git` folder, where you have both the nf-core/pangenome and the PGGB repository, then just
-
-```bash
-cp pangenome/bin/native_image.sh
-./native_image.sh
-```
-
-This will generate a new folder, `pangenome_image`, in which all relevant files to build a native singularity container will be stored. After the script is finished, you can use the `pangenome-dev.img` in a pipeline:
-
-```bash
-nextflow run nf-core/pangenome -r dev - profile singularity --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz --n_haplotypes 12 -with-singularity PATH_TO/pangenome_image/pangenome-dev.img
-```
-
-### Docker
-
-If you want to build a docker image directly, just take a look at the script itself and comment out all lines that are surrounded by `#### SKIP ... ####`.
-
-Then you can also run `./native_image.sh`. You can then execute a pipeline:
-
-```bash
-nextflow run nf-core/pangenome -r dev -profile docker --input ~/git/pggb/data/HLA/DRB1-3123.fa.gz --n_haplotypes 12 -with-docker ${USER}/pangenome-dev:latest
-```
-
-## Pipeline Summary
-
-<!-- TODO nf-core: Add a brief summary of what the pipeline does and how it works -->
-
-## Documentation
-
-The nf-core/pangenome pipeline comes with documentation about the pipeline: [usage](https://nf-co.re/pangenome/usage) and [output](https://nf-co.re/pangenome/output).
-
-<!-- TODO nf-core: Add a brief overview of what the pipeline does and how it works -->
+To see the the results of a test run with a full size dataset refer to the [results](https://nf-co.re/pangenome/results) tab on the nf-core website pipeline page.
+For more details about the output files and reports, please refer to the
+[output documentation](https://nf-co.re/pangenome/output).
 
 ## Credits
 
-nf-core/pangenome was originally adapted from the pangenome graph builder [`pggb`](https://github.com/pangenome/pggb) pipeline by Simon Heumos, Michael Heuer.
+nf-core/pangenome was originally written by Simon Heumos, Michael L Heuer.
 
-Many thanks to all who have helped out and contributed along the way, including (but not limited to)\*:
+We thank the following people for their extensive assistance in the development of this pipeline:
 
-| Name                                                     | Affiliation                                                                           |
-|----------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [Philipp Ehmele](https://github.com/imipenem)            | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html)         |
-| [Gisela Gabernet](https://github.com/ggabernet)                  | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)|
-| [Erik Garrison](https://github.com/ekg)                  | [The University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)|
-| [Andrea Guarracino](https://github.com/AndreaGuarracino) | [Genomics Research Centre, Human Technopole, Milan, Italy](https://humantechnopole.it/en/)        |
-| [Friederike Hanssen](https://github.com/FriederikeHanssen) | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)        |
-| [Michael Heuer](https://github.com/heuermh)              | [UC Berkeley, USA](https://rise.cs.berkeley.edu)                                      |
-| [Lukas Heumos](https://github.com/zethson)               | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) <br> [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html) |
-| [Simon Heumos](https://github.com/subwaystation)         | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br > [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
-
-> \* Listed in alphabetical order
+<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
 ## Contributions and Support
 
@@ -153,8 +90,12 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 
 ## Citations
 
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi. -->
+<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
 <!-- If you use  nf-core/pangenome for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+
+<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
+
+An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
 You can cite the `nf-core` publication as follows:
 
@@ -163,27 +104,3 @@ You can cite the `nf-core` publication as follows:
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
 > _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
-
-In addition, references of tools and data used in this pipeline are as follows:
-
-> **ODGI: understanding pangenome graphs.**
->
-> Andrea Guarracino*, Simon Heumos*, Sven Nahnsen, Pjotr Prins & Erik Garrison.
->
-> _Bioinformatics_ 2022 Jul 01 doi: [10.1093/bioinformatics/btac308](https://doi.org/10.1093/bioinformatics/btac308).
->
-> *_contributed equally_
-
-> **Unbiased pangenome graphs**
->
-> Erik Garrison, Andrea Guarracino.
->
-> _Bioinformatics_ 2022 Nov 30 doi: [10.1093/bioinformatics/btac743](https://doi.org/10.1093/bioinformatics/btac743).
-
-<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
-
-## Attention
-
-### MultiQC Report  
-
-In the resulting MultiQC report, in the **Detailed ODGI stats table**, it says `smoothxg`. To be clear, these are the stats of the graph after polishing with `gfaffix`! Some tools were hardcoded in the ODGI MultiQC module, but hopefully this will be fixed in the future.
