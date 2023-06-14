@@ -11,3 +11,63 @@ report_section_order:
     order: -1002
 
 export_plots: true
+
+# Report section config for nice titles and descriptions
+custom_data:
+  odgi_O:
+    section_name: ODGI Compressed 1D visualization
+    description: This image shows a 1D rendering of the built pangenome graph. The graph nodes are arranged from left to right, forming the pangenome sequence. Summarization of path coverage across all paths. A heatmap color-coding from https://colorbrewer2.org/#type=diverging&scheme=RdBu&n=11 is used. Dark blue means highest coverage. Dark red means lowest coverage. The path names are placed on the left. The black lines under the paths are the links, which represent the graph topology.
+  odgi_viz:
+    section_name: ODGI 1D visualization
+    description: This image shows a 1D rendering of the built pangenome graph. The graph nodes are arranged from left to right, forming the pangenome sequence. The colored bars represent the paths versus the pangenome sequence in a binary matrix. The path names are placed on the left. The black lines under the paths are the links, which represent the graph topology.
+  odgi_viz_pos:
+    section_name: ODGI 1D visualization by path position
+    description: This shows a 1D rendering of the built pangenome graph where the paths are colored according to their nucleotide position. Light grey means a low path position, black is the highest path position.
+  odgi_viz_inv:
+    section_name: ODGI 1D visualization by path orientation
+    description: This image shows a 1D rendering of the built pangenome graph where the paths are colored by orientation. Forward is black, reverse is red.
+  odgi_viz_depth:
+    section_name: ODGI 1D visualization by node depth
+    description: This shows a 1D rendering of the built pangenome graph where the paths are colored according to path depth. Using the Spectra color palette with 4 levels of path depths, white indicates no depth, while grey, red, and yellow indicate depth 1, 2, and greater than or equal to 3, respectively.
+  odgi_viz_uncalled:
+    section_name: ODGI 1D visualization by uncalled bases
+    description: This shows a 1D rendering of the built pangenome graph where the paths are colored according to the coverage of uncalled bases. The lighter the green, the higher the 'N' content of a node is.
+  odgi_draw:
+    section_name: ODGI 2D drawing
+    description: This image shows a 2D rendering of the built pangenome graph.
+
+# Custom search patterns to find the image outputs
+sp:
+  odgi_O:
+    fn: "*O_multiqc.png"
+  odgi_draw:
+    fn: "*draw_multiqc.png"
+  odgi_viz:
+    fn: "*viz_multiqc.png"
+  odgi_viz_pos:
+    fn: "*viz_pos_multiqc.png"
+  odgi_viz_inv:
+    fn: "*viz_inv_multiqc.png"
+  odgi_viz_depth:
+    fn: "*viz_depth_multiqc.png"
+  odgi_viz_uncalled:
+    fn: "*viz_uncalled_multiqc.png"
+  testing_name:
+    fn: "*draw.png"
+ignore_images: false
+
+# Make the custom content stuff come after the ODGI module output
+module_order:
+  - odgi
+  - custom_content
+
+# Set the order that the custom content plots should come in
+custom_content:
+  order:
+    - odgi_O
+    - odgi_viz
+    - odgi_viz_pos
+    - odgi_viz_inv
+    - odgi_viz_depth
+    - odgi_viz_uncalled
+    - odgi_draw

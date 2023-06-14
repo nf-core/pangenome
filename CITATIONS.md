@@ -12,8 +12,51 @@
 
 - [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 
+  > Andrews S. FastQC: A Quality Control Tool for High Throughput Sequence Data [Online]. 2010. Available online at: http://www.bioinformatics.babraham.ac.uk/projects/fastqc/.
+
+- [GFAFFIX](https://github.com/marschall-lab/GFAffix)
+
+  > Liao W, Asri M, Ebler J, Doerr D, Haukness M, Hickey G, Lu S, Lucas J K, Monlong J, Abel H J, Buonaiuto S, Chang X H, Cheng H, Chu J, Colonna V, Eizenga J M, Feng X, Fischer C, Fulton R S, Garg S, Groza C, Guarracino A, Harvey W T, Heumos S, Howe K, Jain M, Lu T, Markello C, Martin F J, Mitchell M W, Munson K M, Mwaniki M N, Novak A M, Olsen H E, Pesout T, Porubsky D, Prins P, Sibbesen J A, Tomlinson C, Villani F, Vollger M R, Human Pangenome Reference Consortium, Bourque G, Chaisson M J P, Flicek P, Phillippy A M, Zook J M, Eichler E E,Haussler D, Jarvis E D, Miga K H, Wang T, Garrison E, Marschall T, Hall I, Li H, Paten B. A Draft Human Pangenome Reference. bioRxiv 2022.07.09.499321; doi: https://doi.org/10.1101/2022.07.09.499321.
+
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
+
   > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+
+- [ODGI](https://pubmed.ncbi.nlm.nih.gov/35552372/)
+
+  > Guarracino A, Heumos S, Nahnsen S, Prins P, Garrison E. ODGI: understanding pangenome graphs. Bioinformatics. Volume 38. Issue 13. July 2022. Pages 3319–3326. https://doi.org/10.1093/bioinformatics/btac308.
+
+- [PGGB](https://www.biorxiv.org/content/10.1101/2023.04.05.535718v1)
+
+  > Garrison E, Guarracino A, Heumos S, Villani F, Bao Z, Tattini L, Hagmann J, Vorbrugg S, Marco-Sola S, Kubica S, Ashbrook D G, Thorell K, Rusholme-Pilcher R L, Liti G, Rudbeck E, Nahnsen S, Yang Z, Moses M N, Nobrega F L, Wu Y, Chen H, de Ligt J, Sudmant P H, Soranzo N, Colonna V, Williams R W, Prins P. Building pangenome graphs. bioRxiv. 2023.04.05.535718. doi: https://doi.org/10.1101/2023.04.05.535718.
+
+  > Guarracino A, Buonaiuto S, de Lima L G, Potapova T, Rhie A, Koren S, Rubinstein B, Fischer C, Human Pangenome Reference Consortium, Gerton J L, Phillippy A M, Colonna V, Garrison E. Recombination between heterologous human acrocentric chromosomes. bioRxiv 2022.08.15.504037; doi: https://doi.org/10.1101/2022.08.15.504037
+
+  > Liao W, Asri M, Ebler J, Doerr D, Haukness M, Hickey G, Lu S, Lucas J K, Monlong J, Abel H J, Buonaiuto S, Chang X H, Cheng H, Chu J, Colonna V, Eizenga J M, Feng X, Fischer C, Fulton R S, Garg S, Groza C, Guarracino A, Harvey W T, Heumos S, Howe K, Jain M, Lu T, Markello C, Martin F J, Mitchell M W, Munson K M, Mwaniki M N, Novak A M, Olsen H E, Pesout T, Porubsky D, Prins P, Sibbesen J A, Tomlinson C, Villani F, Vollger M R, Human Pangenome Reference Consortium, Bourque G, Chaisson M J P, Flicek P, Phillippy A M, Zook J M, Eichler E E,Haussler D, Jarvis E D, Miga K H, Wang T, Garrison E, Marschall T, Hall I, Li H, Paten B. A Draft Human Pangenome Reference. bioRxiv 2022.07.09.499321; doi: https://doi.org/10.1101/2022.07.09.499321.
+
+- [SAMTOOLS](https://pubmed.ncbi.nlm.nih.gov/19505943/)
+
+  > Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R; 1000 Genome Project Data Processing Subgroup. The Sequence Alignment/Map format and SAMtools. Bioinformatics. 2009 Aug 15;25(16):2078-9. doi: 10.1093/bioinformatics/btp352. Epub 2009 Jun 8. PMID: 19505943; PMCID: PMC2723002.
+
+- [SEQWISH](https://pubmed.ncbi.nlm.nih.gov/36448683/)
+
+  > Garrison E, Guarracino A. Unbiased pangenome graphs. Bioinformatics. 2023 Jan 1;39(1):btac743. doi: 10.1093/bioinformatics/btac743. PMID: 36448683; PMCID: PMC9805579.
+
+- [SMOOTHXG](https://www.biorxiv.org/content/10.1101/2023.04.05.535718v1)
+
+  > Garrison E, Guarracino A, Heumos S, Villani F, Bao Z, Tattini L, Hagmann J, Vorbrugg S, Marco-Sola S, Kubica S, Ashbrook D G, Thorell K, Rusholme-Pilcher R L, Liti G, Rudbeck E, Nahnsen S, Yang Z, Moses M N, Nobrega F L, Wu Y, Chen H, de Ligt J, Sudmant P H, Soranzo N, Colonna V, Williams R W, Prins P. Building pangenome graphs. bioRxiv. 2023.04.05.535718. doi: https://doi.org/10.1101/2023.04.05.535718.
+
+- [VCFLIB](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009123)
+
+  > Garrison E, Kronenberg ZN, Dawson ET, Pedersen BS, Prins P (2022) A spectrum of free software tools for processing the VCF variant call format: vcflib, bio-vcf, cyvcf2, hts-nim and slivar. PLOS Computational Biology 18(5): e1009123. https://doi.org/10.1371/journal.pcbi.1009123.
+
+- [VG](https://pubmed.ncbi.nlm.nih.gov/30125266/)
+
+  > Garrison E et al. “Variation graph toolkit improves read mapping by representing genetic variation in the reference.” Nature biotechnology vol. 36,9 (2018): 875-879. doi:10.1038/nbt.4227
+
+- [WFMASH](https://github.com/waveygang/wfmash)
+
+  > Guarracino A, Mwaniki N, Marco-Sola S, Garrison E. Wfmash: whole-chromosome pairwise alignment using the hierarchical wavefront algorithm. 2023. https://github.com/waveygang/wfmash.
 
 ## Software packaging/containerisation tools
 

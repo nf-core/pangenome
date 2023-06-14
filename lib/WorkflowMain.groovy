@@ -23,8 +23,8 @@ class WorkflowMain {
     //
     // Generate help string
     //
-    public static String help(workflow, params) {
-        def command = "nextflow run ${workflow.manifest.name} --input samplesheet.csv --genome GRCh37 -profile docker"
+    public static String help(workflow, params, log) {
+        def command = "nextflow run ${workflow.manifest.name} --input sequences.fasta -profile docker"
         def help_string = ''
         help_string += NfcoreTemplate.logo(workflow, params.monochrome_logs)
         help_string += NfcoreSchema.paramsHelp(workflow, params, command)
@@ -83,18 +83,7 @@ class WorkflowMain {
 
         // Check input has been provided
         if (!params.input) {
-            Nextflow.error("Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'")
+            error("Please provide an input FASTA to the pipeline e.g. '--input sequences.fa.gz'")
         }
-    }
-    //
-    // Get attribute from genome config file e.g. fasta
-    //
-    public static Object getGenomeAttribute(params, attribute) {
-        if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
-            if (params.genomes[ params.genome ].containsKey(attribute)) {
-                return params.genomes[ params.genome ][ attribute ]
-            }
-        }
-        return null
     }
 }
