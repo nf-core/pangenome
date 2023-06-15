@@ -69,8 +69,6 @@ nextflow run nf-core/pangenome -r dev --input <BGZIPPED_FASTA> --n_haplotypes <N
 This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set `--wfmash_chunks 10`.
 If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to `--wfmash_chunks 10` could be a good fit, because then you don't have to wait too long for your jobs to finish.
 
-For more details, please refer to the [usage documentation](https://nf-co.re/pangenome/usage) and the [parameter documentation](https://nf-co.re/pangenome/parameters).
-
 > **Warning:**
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those
 > provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
