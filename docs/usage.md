@@ -44,6 +44,7 @@ bgzip -@ <THREADS> <FASTA>
 ```
 
 Use the following parameter to specify the location of the bgzipped FASTA file.
+
 ```bash
 --input <BGZIPPED_FASTA>
 ```
@@ -55,6 +56,7 @@ samtools faidx <BGZIPPED_FASTA>
 ```
 
 If the FASTA file and its indices are in the same folder, the pipeline will automatically detect them and will refrain from creating new ones.
+
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:
