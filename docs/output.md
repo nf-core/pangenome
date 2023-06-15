@@ -12,30 +12,56 @@ The directories listed below will be created in the results directory after the 
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-- [FastQC](#fastqc) - Raw read QC
-- [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
+- [Input Check](#input-check)
+  - [bgzip](#bgzip)
+  - [samtools faidx](#samtools-faidx)
+- [Community Detection](#community-detection)
+  - [paf2net](#paf2net)
+  - [net2communities](#net2communities)
+  - [extract communities](#extract-communities)
+- wfmash
+  - wfmash map communities
+  - wfmash map
+  - wfmash align
+- seqwish
+- smoothxg
+- gfaffix
+- odgi
+  - odgi build
+  - odgi stats
+  - odgi sort -> final ODGI
+  - odgi unchop
+  - odgi view -> final GFA
+  - odgi viz
+  - odgi layout
+  - odgi draw
+  - odgi squeeze
+- vg
+  - vg deconstruct
+- [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline -> final report(s)!
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
-### FastQC
+## Input Check
+
+### bgzip
+
+
+
+### samtools faidx
+
+[samtools faidx](http://www.htslib.org/doc/samtools-faidx.html) indexes or queries regions from a FASTA file.
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc/`
-  - `*_fastqc.html`: FastQC report containing quality metrics.
-  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
-
+- `samtools_faidx/`
+  - `<INPUT_FASTA>.fai`: FASTA index of the file provided via `--input`.
+  - `<INPUT_FASTA>.gzi`: Compressed FASTA index of the file provided via `--input`.
+  - `*.community.[0-9]{1,}.fa.gz.fai`: FASTA index of a community FASTA file.
+  - `*.community.[0-9]{1,}.fa.gz.gzi`: Compressed FASTA index of a community FASTA file.
 </details>
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
-
-![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
-
-![MultiQC - FastQC mean quality scores plot](images/mqc_fastqc_quality.png)
-
-![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
-
-> **NB:** The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality.
+<!-- [MultiQC - TEST](images/pangenome_workflow.png) -->
 
 ### MultiQC
 
