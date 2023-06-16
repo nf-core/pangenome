@@ -19,10 +19,11 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [paf2net](#paf2net)
   - [net2communities](#net2communities)
   - [extract communities](#extract-communities)
-- wfmash
-  - wfmash map communities
-  - wfmash map
-  - wfmash align
+- [wfmash](#wfmash)
+  - [wfmash map community](#wfmash-map-community)
+  - [wfmash map](#wfmash-map)
+  - [wfmash align](#wfmash-align)
+  - [split approx mappings in chunks](#split-approx-mappings-in-chunks)
 - seqwish
 - smoothxg
 - gfaffix
@@ -52,7 +53,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 - `tabix_bgzip/`
   - `<INPUT_FASTA>.gz`: The bgzip compressed input FASTA file.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz`: A community FASTA file. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz`: A bgzipped compressed community FASTA file. *Only appears when `--communities` is provided.*
 </details>
 
 ### samtools faidx
@@ -71,11 +72,11 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 <!-- [MultiQC - TEST](images/pangenome_workflow.png) -->
 
-## Community Detectionn
+## Community Detection
 
 ### paf2net
 
-[paf2net](https://github.com/pangenome/pggb/blob/master/scripts/paf2net.py) is Python script that projects wfmash's PAF mappings (the implied overlap and containment graph) into an edge list, a list of edge weights, and an 'id to sequence name' map.
+[paf2net](https://github.com/pangenome/pggb/blob/master/scripts/paf2net.py) is python script that projects wfmash's PAF mappings (the implied overlap and containment graph) into an edge list, a list of edge weights, and an 'id to sequence name' map.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -84,11 +85,15 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - `<INPUT_FASTA>.paf.vertices.id2name.txt`: TXT file with a mapping of vertex identifiers to sequence names. *Only appears when `--communities` is provided.*
   - `<INPUT_FASTA>.paf.edges.weights.txt`: TXT file with the weights of the edges. *Only appears when `--communities` is provided.*
   - `<INPUT_FASTA>.paf.edges.list.txt`: TXT file listing all edge connections. *Only appears when `--communities` is provided.*
+
 </details>
 
 ### net2communities
 
-[net2communities](https://github.com/pangenome/pggb/blob/master/scripts/net2communities.py) is a Python script that detects communities by applying the Leiden algorithm ([Trag et al., Nature 2019](https://www.nature.com/articles/s41598-019-41695-z)).
+[net2communities](https://github.com/pangenome/pggb/blob/master/scripts/net2communities.py) is a python script that detects communities by applying the Leiden algorithm ([Trag et al., Nature 2019](https://www.nature.com/articles/s41598-019-41695-z)).
+
+<details markdown="1">
+<summary>Output files</summary>
 
 - `net2communities/`
   - `<INPUT_FASTA>.community.[0-9](1,).txt`: TXT file with the sequence names of the community. *Only appears when `--communities` is provided.*
@@ -96,7 +101,75 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 ### extract communities
 
-### MultiQC
+[extract communities](https://github.com/nf-core/pangenome/blob/dev/modules/local/extract_communities/main.nf) is a locally modified module of [samtools faidx](#samtools-faidx). The original module only allowed for the indexing of FASTA files, but not for the extraction of single sequences.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `extract_communities/`
+  - `<INPUT_FASTA>.community.[0-9](1,).txt.fa`: A community FASTA file. *Only appears when `--communities` is provided.*
+</details>
+
+## wfmash
+
+ [wfmash](https://github.com/waveygang/wfmash) is an aligner for pangenomes based on sparse homology mapping and wavefront inception. In this pipeline it is used in various processes and ways.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `wfmash/`
+  - `<INPUT_FASTA>.paf`: PAF file containing CIGAR strings of all pairwise alignments.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.paf`: Community PAF file containing CIGAR strings of all pairwise alignments of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+### wfmash map community
+
+Here `wfmash` was applied in approximate mappping mode in order to create all-all alignments of all input sequences for their subsequent community discovery.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `wfmash_map_community/`
+  - `<INPUT_FASTA>.paf`: PAF file containing approximate mappings of all pairwise alignments.
+</details>
+
+### wfmash map
+
+Here `wfmash` was applied in approximate mappping mode in order to create all-all alignments of all input sequences. We can then split the base pair level alignment problem into several equal problem sizes with [split approx mappings in chunks](#split-approx-mappings-in-chunks).
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `wfmash_map/`
+  - `<INPUT_FASTA>.paf`: PAF file containing approximate mappings of all pairwise alignments.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.paf`: Community PAF file containing approximate mappings of all pairwise alignments of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+### split approx mappings in chunks
+
+[split approx mappings in chunks](https://github.com/waveygang/wfmash/blob/master/scripts/split_approx_mappings_in_chunks.py) is a python script that takes the approximate mappings, weighs each mapping by computing its length * (1 - estimated identity), then creates N new files where the mapping sets have a similar sum of weights.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `wfmash_map/`
+  - `<INPUT_FASTA>.paf.chunk_[0-9]{1,}.paf`: PAF file containing base level alignments of a specific chunk.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.paf.chunk_[0-9]{1,}.paf`: Community PAF file containing base level alignments of a specific chunk of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+### wfmash align
+
+Here `wfmash` was applied in base pair level alignment mode in order to refine the approximate all-all alignments of all input sequences.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `wfmash_map/`
+  - `<INPUT_FASTA>.chunk_[0-9]{1,}.paf`: PAF file containing base level alignments of a specific chunk.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.chunk_[0-9]{1,}.paf`: Community PAF file containing base level alignments of a specific chunk of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+## MultiQC
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -112,7 +185,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQC. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
 
-### Pipeline information
+## Pipeline information
 
 <details markdown="1">
 <summary>Output files</summary>
