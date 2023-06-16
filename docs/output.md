@@ -45,7 +45,15 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 ### bgzip
 
+[bgzip](http://www.htslib.org/doc/bgzip.html) compresses a file into a series of small 'BGZF' blocks in a similar manner to, and compatible with, gzip. This allows indexes to be built against the compressed file and used to retrieve portions of the data without having to decompress the entire file.
 
+<details markdown="1">
+<summary>Output files</summary>
+
+- `tabix_bgzip/`
+  - `<INPUT_FASTA>.gz`: The bgzip compressed input FASTA file.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz`: A community FASTA file. *Only appears when `--communities` is provided.*
+</details>
 
 ### samtools faidx
 
@@ -57,11 +65,36 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - `samtools_faidx/`
   - `<INPUT_FASTA>.fai`: FASTA index of the file provided via `--input`.
   - `<INPUT_FASTA>.gzi`: Compressed FASTA index of the file provided via `--input`.
-  - `*.community.[0-9]{1,}.fa.gz.fai`: FASTA index of a community FASTA file.
-  - `*.community.[0-9]{1,}.fa.gz.gzi`: Compressed FASTA index of a community FASTA file.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz.fai`: FASTA index of a community FASTA file. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz.gzi`: Compressed FASTA index of a community FASTA file. *Only appears when `--communities` is provided.*
 </details>
 
 <!-- [MultiQC - TEST](images/pangenome_workflow.png) -->
+
+## Community Detectionn
+
+### paf2net
+
+[paf2net](https://github.com/pangenome/pggb/blob/master/scripts/paf2net.py) is Python script that projects wfmash's PAF mappings (the implied overlap and containment graph) into an edge list, a list of edge weights, and an 'id to sequence name' map.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `paf2net/`
+  - `<INPUT_FASTA>.paf.vertices.id2name.txt`: TXT file with a mapping of vertex identifiers to sequence names. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.paf.edges.weights.txt`: TXT file with the weights of the edges. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.paf.edges.list.txt`: TXT file listing all edge connections. *Only appears when `--communities` is provided.*
+</details>
+
+### net2communities
+
+[net2communities](https://github.com/pangenome/pggb/blob/master/scripts/net2communities.py) is a Python script that detects communities by applying the Leiden algorithm ([Trag et al., Nature 2019](https://www.nature.com/articles/s41598-019-41695-z)).
+
+- `net2communities/`
+  - `<INPUT_FASTA>.community.[0-9](1,).txt`: TXT file with the sequence names of the community. *Only appears when `--communities` is provided.*
+</details>
+
+### extract communities
 
 ### MultiQC
 
