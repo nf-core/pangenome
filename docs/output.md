@@ -24,9 +24,9 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [wfmash map](#wfmash-map)
   - [wfmash align](#wfmash-align)
   - [split approx mappings in chunks](#split-approx-mappings-in-chunks)
-- seqwish
-- smoothxg
-- gfaffix
+- [seqwish](#seqwish)
+- [smoothxg](#smoothxg)
+- [gfaffix](#gfaffix)
 - odgi
   - odgi build
   - odgi stats
@@ -167,6 +167,44 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 - `wfmash_map/`
   - `<INPUT_FASTA>.chunk_[0-9]{1,}.paf`: PAF file containing base level alignments of a specific chunk.
   - `<INPUT_FASTA>.community.[0-9]{1,}.chunk_[0-9]{1,}.paf`: Community PAF file containing base level alignments of a specific chunk of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+## seqwish
+
+[seqwish](https://github.com/ekg/seqwish) implements a lossless conversion from pairwise alignments between sequences to a variation graph encoding the sequences and their alignments.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `seqwish/`
+  - `<INPUT_FASTA>.seqwish.gfa`: Raw pangenome graph induced from the all-versus-all alignments.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.seqwish.gfa`: Community GFA file containing the raw pangenome graph induced from the all-versus-all alignments of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+## smoothxg
+
+[smoothxg](https://github.com/pangenome/smoothxg) finds blocks of paths that are collinear within a variation graph. It applies partial order alignment to each block, yielding an acyclic variation graph. Then, to yield a "smoothed" graph, it walks the original paths to lace these subgraphs together. The resulting graph only contains cyclic or inverting structures larger than the chosen block size, and is otherwise manifold linear.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `smoothxg/`
+  - `<INPUT_FASTA>.smoothxg.gfa`: Smoothed pangenome graph in GFA format.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.smoothxg.gfa`: Community GFA file containing the smoothed pangenome graph of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+## gfaffix
+
+[gfaffix](https://github.com/marschall-lab/GFAffix) identifies walk-preserving shared affixes in variation graphs and collapses them into a non-redundant graph structure.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `gfaffix/`
+  - `<INPUT_FASTA>.gfaffix.gfa`: Non-node-redundant pangenome graph in GFA format.
+  - `<INPUT_FASTA>.gfaffix.txt`: Graph shared affixes in TSV format.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.gfa`: Community GFA file containing the non-node-redundant pangenome graph of the specific community. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.txt`: Community TSV file containing the graph shared affixes in TSV format of the specific community. *Only appears when `--communities` is provided.*
 </details>
 
 ## MultiQC
