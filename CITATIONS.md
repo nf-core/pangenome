@@ -52,7 +52,7 @@
 
 - [VG](https://pubmed.ncbi.nlm.nih.gov/30125266/)
 
-  > Garrison E et al. “Variation graph toolkit improves read mapping by representing genetic variation in the reference.” Nature biotechnology vol. 36,9 (2018): 875-879. doi: https://10.1038/nbt.4227
+  > Garrison E et al. Variation graph toolkit improves read mapping by representing genetic variation in the reference. Nature biotechnology vol. 36,9 (2018): 875-879. doi: https://10.1038/nbt.4227
 
 - [WFMASH](https://github.com/waveygang/wfmash)
 
