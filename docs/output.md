@@ -37,8 +37,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [odgi layout](#odgi-layout)
   - [odgi draw](#odgi-draw)
   - [odgi squeeze](#odgi-squeeze)
-- vg
-  - vg deconstruct
+- [vg](#vg)
+  - [vg deconstruct](#vg-deconstruct)
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline -> final report(s)!
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
@@ -213,7 +213,7 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 ### odgi build
 
-[odgi build](https://odgi.readthedocs.io/en/latest/rst/commands/odgi_build.html) constructs a ynamic succinct variation graph in ODGI format from a GFAv1.
+[odgi build](https://odgi.readthedocs.io/en/latest/rst/commands/odgi_build.html) constructs a dynamic succinct variation graph in ODGI format from a GFAv1.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -236,20 +236,124 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 </details>
 
 ### odgi sort
--> final ODGI
+
+[odgi sort](https://pangenome.github.io/odgi.github.io/rst/commands/odgi_sort.html) sorts a succinct variation graph. it offers a diverse palette of sorting algorithms to determine the node order.
+> In the pipeline itself, this is the last tool invoked before the final graph in ODGI format is written on disk.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `FINAL_ODGI/`
+  - `<INPUT_FASTA>.*.Ygs.og`: Sorted variation graph in ODGI format.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.Ygs.og`: Community ODGI file with a sorted variation graph of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+The order of the sortings:
+- `Y`: PG-SGD
+- `g`: grooming
+- `s`: topoligical sort
 
 ### odgi unchop
 
+[odgi unchop](https://pangenome.github.io/odgi.github.io/rst/commands/odgi_unchop.html) merges unitigs into single nodes.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `odgi_unchop/`
+  - `<INPUT_FASTA>.*.unchop.og`: Unchopped variation graph in ODGI format.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.unchop.og`: Community ODGI file with a unchopped variation graph of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
 ### odgi view
--> final GFA
+
+[odgi view](https://pangenome.github.io/odgi.github.io/rst/commands/odgi_view.html) can convert a graph in ODGI format to GFAv1.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `FINAL_GFA/`
+  - `<INPUT_FASTA>.*.view.og`: Final graph in GFAv1 format.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.view.og`: Final community GFAv1 file the specific community. *Only appears when `--communities` is provided.*
+</details>
 
 ### odgi viz
 
+[odgi viz](https://odgi.readthedocs.io/en/latest/rst/commands/odgi_viz.html) visualizes a variation graph in 1D.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `odgi_viz/`
+  - `<INPUT_FASTA>.gfaffix.viz_*_multiqc.png`: 1D visualization of a genome variation graph in PNG format ready to be put into a [MultiQC](#multiqc) report.
+  - `<INPUT_FASTA>.squeeze.viz_*_multiqc.png`: 1D visualization of all communities combined in one graph in PNG format ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.viz_*_multiqc.png`: 1D visualizaton of a community genome variation graph ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
+</details>
+
 ### odgi layout
+
+[odgi layout](https://pangenome.github.io/odgi.github.io/rst/commands/odgi_layout.html) uses the PG-SGD algorithm to calculate a 2D layout of a variation graph. The layout in TSV format and a corresponding GFAv1 graph from folder `FINAL_GFA` can be loaded into [waragraph](https://github.com/chfi/waragraph) for an interactive visualization.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `odgi_layout/`
+  - `<INPUT_FASTA>.gfaffix.tsv`: 2D layout in TSV format.
+  - `<INPUT_FASTA>.gfaffix.lay`: 2D layout in binary LAY format.
+  - `<INPUT_FASTA>.squeeze.tsv`: 2D layout in TSV format of all communities combined in one graph. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.squeeze.tsv`: 2D layout in binary LAY format of all communities combined in one graph. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.tsv`: 2D layout in TSV format of a community genome variation graph. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.tsv`: 2D layout in binary LAY format of a community genome variation graph. *Only appears when `--communities` is provided.*
+</details>
 
 ### odgi draw
 
+[odgi draw](https://pangenome.github.io/odgi.github.io/rst/commands/odgi_draw.html) takes a 2D graph layout in binary LAY format and a corresponding variation graph in GFAv1 or ODGI format and renders a static 2D visualization.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `odgi_draw/`
+  - `<INPUT_FASTA>.gfaffix.draw_multiqc.png`: 2D visualization of a genome variation graph in PNG format ready to be put into a [MultiQC](#multiqc) report.
+  - `<INPUT_FASTA>.gfaffix.png`: Low resolution 2D visualization of a genome variation graph in PNG format.
+  - `<INPUT_FASTA>.squeeze.draw_multiqc.png`: 2D visualization of all communities combined in one graph in PNG format ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.squeeze.png`: Low resolution 2D visualization of all communities combined in one graph in PNG format. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.draw_multiqc.png`: 2D visualizaton of a community genome variation graph ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix..png`: Low resolution 2D visualizaton of a community genome variation graph. *Only appears when `--communities` is provided.*
+</details>
+
 ### odgi squeeze
+
+[odgi squeeze](https://pangenome.github.io/odgi.github.io/rst/commands/odgi_squeeze.html) puts multiple variation graphs in one file.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `FINAL_ODGI/`
+  - `<INPUT_FASTA>.squeeze.og`: All graphs of all communities combined in one graph in ODGI format. *Only appears when `--communities` is provided.*
+</details>
+
+## vg
+
+[vg](https://github.com/vgteam/vg) is the `v`ariation `g`rah toolkit for data structures, interchange formats, alignment, genotyping, and variant calling methods of genome variation graphs.
+
+### vg deconstruct
+
+[vg deconstruct](https://github.com/vgteam/vg) outputs VCF records for snarls present in a graph relative to one or several chosen reference path(s).
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `vg_deconstruct/`
+  - `<INPUT_FASTA>.gfafix.*.vcf`: Variants in VCF format of the graph.
+  - `<INPUT_FASTA>.gfafix.*.vcf.stats`: Statistics of the variants in VCF format of the graph.
+  - `<INPUT_FASTA>.gfafix.*.decomposed.vcf`: Decomposed variants in VCF format of the graph.
+  - `<INPUT_FASTA>.gfafix.*.decomposed.vcf.stats`: Statistics of the decomposed variants in VCF format of the graph.
+  - `<INPUT_FASTA>.squeeze.*.vcf`: Variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.squeeze.*.vcf.stats`: Statistics of the variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.squeeze.*.decomposed.vcf`: Decomposed variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.squeeze.*.decomposed.vcf.stats`: Statistics of the decomposed variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
+</details>
 
 ## MultiQC
 
