@@ -26,8 +26,6 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Pipeline summary
 
-<!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
-
 - All versus all alignment (`WFMASH`)
 - Graph induction (`SEQWISH`)
 - Graph normalization (`SMOOTHXG`)
