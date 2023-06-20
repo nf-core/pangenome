@@ -18,6 +18,10 @@
 
   > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: https://10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
 
+- [NET2COMMUNITIES](https://github.com/pangenome/pggb/blob/master/scripts/net2communities.py)
+
+  > Traag, VA, Waltman, L & van Eck, NJ. From Louvain to Leiden: guaranteeing well-connected communities. Sci Rep 9, 5233 (2019). https://doi.org/10.1038/s41598-019-41695-z.
+
 - [ODGI](https://pubmed.ncbi.nlm.nih.gov/35552372/)
 
   > Guarracino A, Heumos S, Nahnsen S, Prins P, Garrison E. ODGI: understanding pangenome graphs. Bioinformatics. Volume 38. Issue 13. July 2022. Pages 3319–3326. https://doi.org/10.1093/bioinformatics/btac308.
