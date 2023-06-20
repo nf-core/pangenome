@@ -53,8 +53,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 - `tabix_bgzip/`
   - `<INPUT_FASTA>.gz`: The bgzip compressed input FASTA file.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz`: A bgzipped compressed community FASTA file. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz`: A bgzipped compressed community FASTA file. _Only appears when `--communities` is provided._
+  </details>
 
 ### samtools faidx
 
@@ -66,9 +66,9 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - `samtools_faidx/`
   - `<INPUT_FASTA>.fai`: FASTA index of the file provided via `--input`.
   - `<INPUT_FASTA>.gzi`: Compressed FASTA index of the file provided via `--input`.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz.fai`: FASTA index of a community FASTA file. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz.gzi`: Compressed FASTA index of a community FASTA file. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz.fai`: FASTA index of a community FASTA file. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.community.[0-9]{1,}.fa.gz.gzi`: Compressed FASTA index of a community FASTA file. _Only appears when `--communities` is provided._
+  </details>
 
 <!-- [MultiQC - TEST](images/pangenome_workflow.png) -->
 
@@ -82,9 +82,9 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <summary>Output files</summary>
 
 - `paf2net/`
-  - `<INPUT_FASTA>.paf.vertices.id2name.txt`: TXT file with a mapping of vertex identifiers to sequence names. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.paf.edges.weights.txt`: TXT file with the weights of the edges. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.paf.edges.list.txt`: TXT file listing all edge connections. *Only appears when `--communities` is provided.*
+  - `<INPUT_FASTA>.paf.vertices.id2name.txt`: TXT file with a mapping of vertex identifiers to sequence names. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.paf.edges.weights.txt`: TXT file with the weights of the edges. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.paf.edges.list.txt`: TXT file listing all edge connections. _Only appears when `--communities` is provided._
 
 </details>
 
@@ -96,8 +96,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <summary>Output files</summary>
 
 - `net2communities/`
-  - `<INPUT_FASTA>.community.[0-9](1,).txt`: TXT file with the sequence names of the community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9](1,).txt`: TXT file with the sequence names of the community. _Only appears when `--communities` is provided._
+  </details>
 
 ### extract communities
 
@@ -107,20 +107,20 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <summary>Output files</summary>
 
 - `extract_communities/`
-  - `<INPUT_FASTA>.community.[0-9](1,).txt.fa`: A community FASTA file. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9](1,).txt.fa`: A community FASTA file. _Only appears when `--communities` is provided._
+  </details>
 
 ## wfmash
 
- [wfmash](https://github.com/waveygang/wfmash) is an aligner for pangenomes based on sparse homology mapping and wavefront inception. In this pipeline it is used in various processes and ways.
+[wfmash](https://github.com/waveygang/wfmash) is an aligner for pangenomes based on sparse homology mapping and wavefront inception. In this pipeline it is used in various processes and ways.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `wfmash/`
   - `<INPUT_FASTA>.paf`: PAF file containing CIGAR strings of all pairwise alignments.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.paf`: Community PAF file containing CIGAR strings of all pairwise alignments of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.paf`: Community PAF file containing CIGAR strings of all pairwise alignments of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ### wfmash map community
 
@@ -131,7 +131,7 @@ Here `wfmash` was applied in approximate mappping mode in order to create all-al
 
 - `wfmash_map_community/`
   - `<INPUT_FASTA>.paf`: PAF file containing approximate mappings of all pairwise alignments.
-</details>
+  </details>
 
 ### wfmash map
 
@@ -142,20 +142,20 @@ Here `wfmash` was applied in approximate mappping mode in order to create all-al
 
 - `wfmash_map/`
   - `<INPUT_FASTA>.paf`: PAF file containing approximate mappings of all pairwise alignments.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.paf`: Community PAF file containing approximate mappings of all pairwise alignments of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.paf`: Community PAF file containing approximate mappings of all pairwise alignments of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ### split approx mappings in chunks
 
-[split approx mappings in chunks](https://github.com/waveygang/wfmash/blob/master/scripts/split_approx_mappings_in_chunks.py) is a python script that takes the approximate mappings, weighs each mapping by computing its length * (1 - estimated identity), then creates N new files where the mapping sets have a similar sum of weights.
+[split approx mappings in chunks](https://github.com/waveygang/wfmash/blob/master/scripts/split_approx_mappings_in_chunks.py) is a python script that takes the approximate mappings, weighs each mapping by computing its length \* (1 - estimated identity), then creates N new files where the mapping sets have a similar sum of weights.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `wfmash_map/`
   - `<INPUT_FASTA>.paf.chunk_[0-9]{1,}.paf`: PAF file containing base level alignments of a specific chunk.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.paf.chunk_[0-9]{1,}.paf`: Community PAF file containing base level alignments of a specific chunk of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.paf.chunk_[0-9]{1,}.paf`: Community PAF file containing base level alignments of a specific chunk of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ### wfmash align
 
@@ -166,8 +166,8 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 - `wfmash_map/`
   - `<INPUT_FASTA>.chunk_[0-9]{1,}.paf`: PAF file containing base level alignments of a specific chunk.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.chunk_[0-9]{1,}.paf`: Community PAF file containing base level alignments of a specific chunk of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.chunk_[0-9]{1,}.paf`: Community PAF file containing base level alignments of a specific chunk of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ## seqwish
 
@@ -178,8 +178,8 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 - `seqwish/`
   - `<INPUT_FASTA>.seqwish.gfa`: Raw pangenome graph induced from the all-versus-all alignments.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.seqwish.gfa`: Community GFA file containing the raw pangenome graph induced from the all-versus-all alignments of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.seqwish.gfa`: Community GFA file containing the raw pangenome graph induced from the all-versus-all alignments of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ## smoothxg
 
@@ -190,8 +190,8 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 - `smoothxg/`
   - `<INPUT_FASTA>.smoothxg.gfa`: Smoothed pangenome graph in GFA format.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.smoothxg.gfa`: Community GFA file containing the smoothed pangenome graph of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.smoothxg.gfa`: Community GFA file containing the smoothed pangenome graph of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ## gfaffix
 
@@ -203,9 +203,9 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 - `gfaffix/`
   - `<INPUT_FASTA>.gfaffix.gfa`: Non-node-redundant pangenome graph in GFA format.
   - `<INPUT_FASTA>.gfaffix.txt`: Graph shared affixes in TSV format.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.gfa`: Community GFA file containing the non-node-redundant pangenome graph of the specific community. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.txt`: Community TSV file containing the graph shared affixes in TSV format of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.gfa`: Community GFA file containing the non-node-redundant pangenome graph of the specific community. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.txt`: Community TSV file containing the graph shared affixes in TSV format of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ## odgi
 
@@ -220,8 +220,8 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 - `odgi_build/`
   - `<INPUT_FASTA>.*.og`: Graph in ODGI format.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.*.og`: Community ODGI file of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.og`: Community ODGI file of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ### odgi stats
 
@@ -232,12 +232,13 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 - `odgi_stats/`
   - `<INPUT_FASTA>.*.og.stats.yaml`: YAML file with graph metrics.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.*.og.stats.yaml`: Community YAML file with graph metrics of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.og.stats.yaml`: Community YAML file with graph metrics of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ### odgi sort
 
 [odgi sort](https://pangenome.github.io/odgi.github.io/rst/commands/odgi_sort.html) sorts a succinct variation graph. it offers a diverse palette of sorting algorithms to determine the node order.
+
 > In the pipeline itself, this is the last tool invoked before the final graph in ODGI format is written on disk.
 
 <details markdown="1">
@@ -245,10 +246,11 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 - `FINAL_ODGI/`
   - `<INPUT_FASTA>.*.Ygs.og`: Sorted variation graph in ODGI format.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.*.Ygs.og`: Community ODGI file with a sorted variation graph of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.Ygs.og`: Community ODGI file with a sorted variation graph of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 The order of the sortings:
+
 - `Y`: PG-SGD
 - `g`: grooming
 - `s`: topoligical sort
@@ -262,8 +264,8 @@ The order of the sortings:
 
 - `odgi_unchop/`
   - `<INPUT_FASTA>.*.unchop.og`: Unchopped variation graph in ODGI format.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.*.unchop.og`: Community ODGI file with a unchopped variation graph of the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.unchop.og`: Community ODGI file with a unchopped variation graph of the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ### odgi view
 
@@ -274,8 +276,8 @@ The order of the sortings:
 
 - `FINAL_GFA/`
   - `<INPUT_FASTA>.*.view.og`: Final graph in GFAv1 format.
-  - `<INPUT_FASTA>.community.[0-9]{1,}.*.view.og`: Final community GFAv1 file the specific community. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.view.og`: Final community GFAv1 file the specific community. _Only appears when `--communities` is provided._
+  </details>
 
 ### odgi viz
 
@@ -286,9 +288,9 @@ The order of the sortings:
 
 - `odgi_viz/`
   - `<INPUT_FASTA>.gfaffix.viz_*_multiqc.png`: 1D visualization of a genome variation graph in PNG format ready to be put into a [MultiQC](#multiqc) report.
-  - `<INPUT_FASTA>.squeeze.viz_*_multiqc.png`: 1D visualization of all communities combined in one graph in PNG format ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.viz_*_multiqc.png`: 1D visualizaton of a community genome variation graph ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.squeeze.viz_*_multiqc.png`: 1D visualization of all communities combined in one graph in PNG format ready to be put into a [MultiQC](#multiqc) report. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.viz_*_multiqc.png`: 1D visualizaton of a community genome variation graph ready to be put into a [MultiQC](#multiqc) report. _Only appears when `--communities` is provided._
+  </details>
 
 ### odgi layout
 
@@ -300,11 +302,11 @@ The order of the sortings:
 - `odgi_layout/`
   - `<INPUT_FASTA>.gfaffix.tsv`: 2D layout in TSV format.
   - `<INPUT_FASTA>.gfaffix.lay`: 2D layout in binary LAY format.
-  - `<INPUT_FASTA>.squeeze.tsv`: 2D layout in TSV format of all communities combined in one graph. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.squeeze.tsv`: 2D layout in binary LAY format of all communities combined in one graph. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.tsv`: 2D layout in TSV format of a community genome variation graph. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.tsv`: 2D layout in binary LAY format of a community genome variation graph. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.squeeze.tsv`: 2D layout in TSV format of all communities combined in one graph. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.squeeze.tsv`: 2D layout in binary LAY format of all communities combined in one graph. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.tsv`: 2D layout in TSV format of a community genome variation graph. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.tsv`: 2D layout in binary LAY format of a community genome variation graph. _Only appears when `--communities` is provided._
+  </details>
 
 ### odgi draw
 
@@ -316,11 +318,11 @@ The order of the sortings:
 - `odgi_draw/`
   - `<INPUT_FASTA>.gfaffix.draw_multiqc.png`: 2D visualization of a genome variation graph in PNG format ready to be put into a [MultiQC](#multiqc) report.
   - `<INPUT_FASTA>.gfaffix.png`: Low resolution 2D visualization of a genome variation graph in PNG format.
-  - `<INPUT_FASTA>.squeeze.draw_multiqc.png`: 2D visualization of all communities combined in one graph in PNG format ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.squeeze.png`: Low resolution 2D visualization of all communities combined in one graph in PNG format. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.draw_multiqc.png`: 2D visualizaton of a community genome variation graph ready to be put into a [MultiQC](#multiqc) report. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix..png`: Low resolution 2D visualizaton of a community genome variation graph. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.squeeze.draw_multiqc.png`: 2D visualization of all communities combined in one graph in PNG format ready to be put into a [MultiQC](#multiqc) report. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.squeeze.png`: Low resolution 2D visualization of all communities combined in one graph in PNG format. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.draw_multiqc.png`: 2D visualizaton of a community genome variation graph ready to be put into a [MultiQC](#multiqc) report. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix..png`: Low resolution 2D visualizaton of a community genome variation graph. _Only appears when `--communities` is provided._
+  </details>
 
 ### odgi squeeze
 
@@ -330,8 +332,8 @@ The order of the sortings:
 <summary>Output files</summary>
 
 - `FINAL_ODGI/`
-  - `<INPUT_FASTA>.squeeze.og`: All graphs of all communities combined in one graph in ODGI format. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.squeeze.og`: All graphs of all communities combined in one graph in ODGI format. _Only appears when `--communities` is provided._
+  </details>
 
 ## vg
 
@@ -349,11 +351,11 @@ The order of the sortings:
   - `<INPUT_FASTA>.gfafix.*.vcf.stats`: Statistics of the variants in VCF format of the graph.
   - `<INPUT_FASTA>.gfafix.*.decomposed.vcf`: Decomposed variants in VCF format of the graph.
   - `<INPUT_FASTA>.gfafix.*.decomposed.vcf.stats`: Statistics of the decomposed variants in VCF format of the graph.
-  - `<INPUT_FASTA>.squeeze.*.vcf`: Variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.squeeze.*.vcf.stats`: Statistics of the variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.squeeze.*.decomposed.vcf`: Decomposed variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
-  - `<INPUT_FASTA>.squeeze.*.decomposed.vcf.stats`: Statistics of the decomposed variants in VCF format of the graph containing all communities. *Only appears when `--communities` is provided.*
-</details>
+  - `<INPUT_FASTA>.squeeze.*.vcf`: Variants in VCF format of the graph containing all communities. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.squeeze.*.vcf.stats`: Statistics of the variants in VCF format of the graph containing all communities. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.squeeze.*.decomposed.vcf`: Decomposed variants in VCF format of the graph containing all communities. _Only appears when `--communities` is provided._
+  - `<INPUT_FASTA>.squeeze.*.decomposed.vcf.stats`: Statistics of the decomposed variants in VCF format of the graph containing all communities. _Only appears when `--communities` is provided._
+  </details>
 
 ## MultiQC
 
