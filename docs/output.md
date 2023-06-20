@@ -27,16 +27,16 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [seqwish](#seqwish)
 - [smoothxg](#smoothxg)
 - [gfaffix](#gfaffix)
-- odgi
-  - odgi build
-  - odgi stats
-  - odgi sort -> final ODGI
-  - odgi unchop
-  - odgi view -> final GFA
-  - odgi viz
-  - odgi layout
-  - odgi draw
-  - odgi squeeze
+- [odgi](#odgi)
+  - [odgi build](#odgi-build)
+  - [odgi stats](#odgi-stats)
+  - [odgi sort](#odgi-sort)
+  - [odgi unchop](#odgi-unchop)
+  - [odgi view](#odgi-view)
+  - [odgi viz](#odgi-viz)
+  - [odgi layout](#odgi-layout)
+  - [odgi draw](#odgi-draw)
+  - [odgi squeeze](#odgi-squeeze)
 - vg
   - vg deconstruct
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline -> final report(s)!
@@ -206,6 +206,50 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
   - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.gfa`: Community GFA file containing the non-node-redundant pangenome graph of the specific community. *Only appears when `--communities` is provided.*
   - `<INPUT_FASTA>.community.[0-9]{1,}.gfaffix.txt`: Community TSV file containing the graph shared affixes in TSV format of the specific community. *Only appears when `--communities` is provided.*
 </details>
+
+## odgi
+
+[odgi](https://github.com/pangenome/odgi) provides an efficient and succinct dynamic DNA sequence graph model, as well as a host of algorithms that allow the use of such graphs in bioinformatic analyses. In this pipeline, a huge variety of odgi's subcommands are used to process the built graphs. As a rule of thump, all files in ODGI format end with `.og`.
+
+### odgi build
+
+[odgi build](https://odgi.readthedocs.io/en/latest/rst/commands/odgi_build.html) constructs a ynamic succinct variation graph in ODGI format from a GFAv1.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `odgi_build/`
+  - `<INPUT_FASTA>.*.og`: Graph in ODGI format.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.og`: Community ODGI file of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+### odgi stats
+
+[odgi stats](https://odgi.readthedocs.io/en/latest/rst/commands/odgi_stats.html) describes various metrics of a variation graph.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `odgi_stats/`
+  - `<INPUT_FASTA>.*.og.stats.yaml`: YAML file with graph metrics.
+  - `<INPUT_FASTA>.community.[0-9]{1,}.*.og.stats.yaml`: Community YAML file with graph metrics of the specific community. *Only appears when `--communities` is provided.*
+</details>
+
+### odgi sort
+-> final ODGI
+
+### odgi unchop
+
+### odgi view
+-> final GFA
+
+### odgi viz
+
+### odgi layout
+
+### odgi draw
+
+### odgi squeeze
 
 ## MultiQC
 
