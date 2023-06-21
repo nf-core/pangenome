@@ -6,8 +6,6 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
-
 ### Pangenome sequence naming of FASTA input
 
 Reformat the sequence names in your FASTA input file according to the [PanSN-spec](https://github.com/pangenome/PanSN-spec) naming scheme to simplify the identification of samples and haplotypes in pangenomes.
