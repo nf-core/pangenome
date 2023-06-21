@@ -1,4 +1,4 @@
 repository_type: pipeline
 lint:
   files_unchanged:
-    - assets/nf-core-sarek_logo_light.png
+    - assets/nf-core-pangenome_logo_light.png
