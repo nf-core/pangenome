@@ -182,7 +182,6 @@
                 },
                 "smoothxg_block_id_min": {
                     "type": "string",
-                    "default": "None",
                     "description": "Minimum edit-based identity to cluster sequences.",
                     "hidden": true
                 },
