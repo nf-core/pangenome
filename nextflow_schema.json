@@ -147,7 +147,6 @@
                 },
                 "seqwish_paf": {
                     "type": "string",
-                    "default": "None",
                     "description": "Input PAF file. The wfmash alignment step is skipped."
                 }
             }
