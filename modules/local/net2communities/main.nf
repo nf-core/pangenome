@@ -5,7 +5,7 @@ process NET2COMMUNITIES {
     conda "bioconda::pggb=0.5.4"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/pggb:0.5.4--hdfd78af_0':
-        'quay.io/biocontainers/pggb:0.5.4--hdfd78af_0' }"
+        'biocontainers/pggb:0.5.4--hdfd78af_0' }"
 
     input:
     tuple val(meta), path(txts)
