@@ -142,7 +142,6 @@
                 },
                 "seqwish_temp_dir": {
                     "type": "string",
-                    "default": "None",
                     "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
                     "hidden": true
                 },
