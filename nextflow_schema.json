@@ -464,6 +464,22 @@
                     "default": false,
                     "hidden": true,
                     "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
+                },
+                "show_hidden_params": {
+                    "type": "boolean",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Do we want to display hidden parameters?",
+                    "default": false,
+                    "hidden": true,
+                    "help_text": "Do we want to display hidden parameters?"
+                },
+                "schema_ignore_params": {
+                    "type": "string",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Do we want to display hidden parameters?",
+                    "default": "igenomes_base",
+                    "hidden": true,
+                    "help_text": "Do we want to display hidden parameters?"
                 }
             }
         }
