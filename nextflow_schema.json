@@ -10,17 +10,21 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": ["input", "n_haplotypes", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
                     "format": "file-path",
-                    "exists": true,
-                    "mimetype": "text/csv",
-                    "pattern": "^\\S+\\.csv$",
-                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/pangenome/usage#samplesheet-input).",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                    "description": "Path to BGZIPPED input FASTA to build the pangenome graph from.",
+                    "help_text": "A FASTA file containing the sequences to build the pangenome graph from. Each sequence can be a full chromosome, a contig, or a very long read. The FASTA file must be BGZIPPED or WFMASH won't be able to process it. If you have your sequences in FASTA format, you can run: \n\nbgzip <SEQUENCES.fa> @<THREADS> > <SEQUENCES.fa.gz>\nsamtools faidx <SEQUENCES.fa.gz>\n\nIn order to ensure the most compatible functionality, please format your sequence identifiers so that they follow the https://github.com/pangenome/PanSN-spec. \n\npattern: ^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "fa_icon": "fas fa-file-csv"
+                },
+                "n_haplotypes": {
+                    "type": "number",
+                    "description": "The number of haplotypes in the input FASTA.",
+                    "help_text": "The constructed graph is defined by the number of mappings per segment of each genome (--n_haplotypes <N> - 1). Ideally, you should set this to equal the number of haplotypes in the pangenome. Because that's the maximum number of secondary mappings and alignments that we expect. Keep in mind that the total work of alignment is proportional to N*N, and these multimappings can be highly redundant."
                 },
                 "outdir": {
                     "type": "string",
@@ -42,42 +46,223 @@
                 }
             }
         },
-        "reference_genome_options": {
-            "title": "Reference genome options",
+        "wfmash_options": {
+            "title": "Wfmash Options",
             "type": "object",
-            "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
+            "description": "Options for the all versus all alignment phase.",
+            "default": "",
             "properties": {
-                "genome": {
-                    "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
+                "wfmash_map_pct_id": {
+                    "type": "number",
+                    "default": 90,
+                    "description": "Percent identity in the wfmash mashmap step.",
+                    "help_text": "Use `mash dist` or `mash triangle` to explore the typical level of divergence between the sequences in your input (see https://pggb.readthedocs.io/en/latest/rst/tutorials/divergence_estimation.html#divergence-estimation for more information). Convert this to an approximate percent identity and provide it as --wfmash_map_pct_id <PCT>. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
-                "fasta": {
-                    "type": "string",
-                    "format": "file-path",
-                    "exists": true,
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
+                "wfmash_segment_length": {
+                    "type": "integer",
+                    "default": 5000,
+                    "description": "Segment length for mapping.",
+                    "help_text": "Crucially, --wfmash_segment_length provides a kind of minimum alignment length filter. The `mashmap3` step in `wfmash` will only consider segments of this size. For small pangenome graphs, or where there are few repeats, --wfmash_segment_length can be set low (for example 500 when building a MHC pangenome graph). However, for larger contexts, with repeats, it can be very important to set this high (for instance 50k in the case of human genomes). A long segment length ensures that we represent long collinear regions of the input sequences in the structure of the graph. In general, this should at least be larger than transposons and other common repeats in your pangenome. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
-                "igenomes_base": {
+                "wfmash_block_length": {
                     "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
-                    "fa_icon": "fas fa-cloud-download-alt",
+                    "default": "wfmash_segment_length * 5",
+                    "description": "Minimum block length filter for mapping.",
+                    "help_text": "By default, wfmash only keeps mappings with at least 5 times the size of a segment. This can be adjusted with --wfmash_block_length <BLOCK_LENGTH>."
+                },
+                "wfmash_mash_kmer": {
+                    "type": "integer",
+                    "default": 19,
+                    "description": "Kmer size for mashmap."
+                },
+                "wfmash_mash_kmer_thres": {
+                    "type": "number",
+                    "default": 0.001,
+                    "description": "Ignore the top % most-frequent kmers."
+                },
+                "wfmash_sparse_map": {
+                    "type": "number",
+                    "default": "1.0",
+                    "description": "Keep this fraction of mappings (\"auto\" for giant component heuristic)."
+                },
+                "wfmash_merge_segments": {
+                    "type": "boolean",
+                    "description": "Merge successive mappings."
+                },
+                "wfmash_no_splits": {
+                    "type": "boolean",
+                    "description": "Disable splitting of input sequences during mapping.",
                     "hidden": true
                 },
-                "igenomes_ignore": {
+                "wfmash_exclude_delim": {
+                    "type": "string",
+                    "description": "Skip mappings between sequences with the same name prefix before the given delimiter character. [default: all-vs-all and !self].",
+                    "hidden": true
+                },
+                "wfmash_temp_dir": {
+                    "type": "string",
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
+                    "hidden": true
+                },
+                "wfmash_chunks": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1.",
+                    "help_text": "This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set --wfmash_chunks 10. If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to --wfmash_chunks 10 could be a good fit, because then you don't have to wait too long for your jobs to finish."
+                },
+                "wfmash_only": {
                     "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                    "description": "If this parameter is set, only the wfmash alignment step of the pipeline is executed. This option is offered for users who want to run wfmash on a cluster."
+                }
+            }
+        },
+        "seqwish_options": {
+            "title": "Seqwish Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "seqwish_min_match_length": {
+                    "type": "integer",
+                    "default": 19,
+                    "description": "Ignores exact matches below this length.",
+                    "help_text": "Graph induction with seqwish often works better when we filter very short matches out of the input alignments. In practice, these often occur in regions of low alignment quality, which are typical of areas with large INDELs and structural variations in the wfmash alignments. This underalignment is then resolved in the smoothxg step. Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.\nA setting of --seqwish_min_match_length 47 is optimal for around 5% divergence, and we suggest lowering it for higher divergence and increasing it for lower divergence. Values up to --seqwish_min_match_length 311 work well for human haplotypes. In effect, setting --seqwish_min_match_length to N means that we can tolerate a local pairwise difference rate of no more than 1/N. Thus, INDELs which may be represented by complex series of edit operations will be opened into bubbles in the induced graph, and alignment regions with very low identity will be ignored. Using affine-gapped alignment (such as with minimap2) may reduce the impact of this step by representing large indels more precisely in the input alignments. However, it remains important due to local inconsistency in alignments in low-complexity sequence."
+                },
+                "seqwish_transclose_batch": {
+                    "type": "integer",
+                    "default": 10000000,
+                    "description": "Number of base pairs to use for transitive closure batch.",
+                    "help_text": "If you run out of memory during the seqwish step, you can lower this value. It will take longer, but it will use less memory."
+                },
+                "seqwish_sparse_factor": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Keep this randomly selected fraction of input matches."
+                },
+                "seqwish_temp_dir": {
+                    "type": "string",
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
+                    "hidden": true
+                },
+                "seqwish_paf": {
+                    "type": "string",
+                    "description": "Input PAF file. The wfmash alignment step is skipped."
+                }
+            }
+        },
+        "smoothxg_options": {
+            "title": "Smoothxg options",
+            "type": "object",
+            "description": "Options for graph smoothing phase.",
+            "default": "",
+            "properties": {
+                "skip_smoothxg": {
+                    "type": "boolean",
+                    "description": "Skip the graph smoothing step of the pipeline."
+                },
+                "smoothxg_max_path_jump": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Maximum path jump to include in the block.",
+                    "hidden": true
+                },
+                "smoothxg_max_edge_jump": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Maximum edge jump before a block is broken.",
+                    "hidden": true
+                },
+                "smoothxg_poa_length": {
+                    "type": "string",
+                    "default": "700,900,1100",
+                    "description": "Maximum sequence length to put int POA. Is a comma-separated list. For each integer, SMOOTHXG wil be executed once.",
+                    "help_text": "The last step in smoothxg refines the graph by running a partial order alignment (POA) across segments, so called blocks. The \"chunked\" POA process attempts to build an MSA for each collinear region in the sorted graph.\nThe length of these sub-problems greatly affects the total time and memory requirements of the pipeline, and is defined by -- smoothxg_poa_length <LEN1,LEN2,...>. Several passes of refinement can be defined by lengths >LEN1,LEN2,...>, and so on. Ideally, this target can be set above the length of transposon repeats in the pangenome, and base-level graph quality tends to improve as it is set higher. Higher values makes sense for lower-diversity pangenomes, but can require several GB of RAM per thread."
+                },
+                "smoothxg_block_id_min": {
+                    "type": "string",
+                    "description": "Minimum edit-based identity to cluster sequences.",
+                    "hidden": true
+                },
+                "smoothxg_block_ratio_min": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Minimum 'smallest / largest' sequence length ration to cluster in a block.",
+                    "hidden": true
+                },
+                "smoothxg_pad_max_depth": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Path depth at which we don't pad the POA problem."
+                },
+                "smoothxg_poa_padding": {
+                    "type": "number",
+                    "default": 0.001,
+                    "description": "Pad each end of each seuqence in POA with 'smoothxg_poa_padding * longest_poa_seq' base pairs."
+                },
+                "smoothxg_poa_params": {
+                    "type": "string",
+                    "default": "1,19,39,3,81,1",
+                    "description": "Score parameters for POA in the form of 'match,mismatch,gap1,ext1,gap2,ext2'. It may also be given as presets: 'asm5', 'asm10', 'asm15', 'asm20'. [default: 1,19,39,3,81,1 = asm5].",
+                    "help_text": "For details of the different asm modes, please take a look at https://pggb.readthedocs.io/en/latest/rst/optional_parameters.html#homogenizing-and-ordering-the-graph."
+                },
+                "smoothxg_write_maf": {
+                    "type": "boolean",
+                    "description": "Write MAF output representing merged POA blocks."
+                },
+                "smoothxg_consensus_prefix": {
+                    "type": "string",
+                    "default": "Consensus_",
+                    "description": "Use this prefix for consensus path names.",
+                    "hidden": true
+                },
+                "smoothxg_temp_dir": {
+                    "type": "string",
+                    "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
+                    "hidden": true
+                },
+                "smoothxg_keep_intermediate_files": {
+                    "type": "boolean",
+                    "description": "Keep intermediate graphs during SMOOTHXG.",
+                    "hidden": true
+                },
+                "smoothxg_run_abpoa": {
+                    "type": "boolean",
+                    "description": "Run abPOA. [default: SPOA]."
+                },
+                "smoothxg_run_global_poa": {
+                    "type": "boolean",
+                    "description": "Run the POA in global mode. [default: local mode]."
+                },
+                "smoothxg_poa_cpus": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Number of CPUs for the potentially very memory expensive POA phase of SMOOTHXG. Default is 'task.cpus'."
+                }
+            }
+        },
+        "vg_deconstruct_options": {
+            "title": "Vg Deconstruct Options",
+            "type": "object",
+            "description": "Options for calling variants against reference(s).",
+            "default": "",
+            "properties": {
+                "vcf_spec": {
+                    "type": "string",
+                    "description": "Specify a set of VCFs to produce with --vcf_spec \"REF:DELIM[:LEN][,REF:DELIM:[LEN]]*\".",
+                    "help_text": "The paths matching ^REF are used as a reference, while the sample haplotypes are derived from path names, e.g. when DELIM=# and with '-V chm13:#', a path named HG002#1#ctg would be assigned to sample HG002 phase 1. If LEN is specified and greater than 0, the VCFs are decomposed, filtering sites whose max allele length is greater than LEN."
+                }
+            }
+        },
+        "community": {
+            "title": "Community",
+            "type": "object",
+            "description": "Options to run the partition algorithm for community detection.",
+            "default": "",
+            "properties": {
+                "communities": {
+                    "type": "boolean",
+                    "help_text": "Pangenome graphs can represent all mutual alignments of collections of sequences. However, we can't really expect to pairwise map all sequences together and obtain well separated connected components. It is likely to get a giant connected component, and probably a few smaller ones, due to incorrect mappings or false homologies. This might unnecessarily increase the computational burden, as well as complicate the downstream analyzes. Therefore, it is recommended to split up the input sequences into communities in order to find the latent structure of their mutual relationship. For example, the communities can represent the different chromosomes of the input genomes.\n<Warning> If you know in advance that your sequences present particular rearrangements (like rare chromosome translocations), you might consider skipping this step or tuning it accordingly to your biological questions.\n",
+                    "description": "Enable community detection."
                 }
             }
         },
@@ -288,7 +473,19 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/reference_genome_options"
+            "$ref": "#/definitions/wfmash_options"
+        },
+        {
+            "$ref": "#/definitions/seqwish_options"
+        },
+        {
+            "$ref": "#/definitions/smoothxg_options"
+        },
+        {
+            "$ref": "#/definitions/vg_deconstruct_options"
+        },
+        {
+            "$ref": "#/definitions/community"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
