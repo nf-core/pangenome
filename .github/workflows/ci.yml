@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         NXF_VER:
-          - "22.10.1"
+          - "23.04.0"
           - "latest-everything"
     steps:
       - name: Check out pipeline code
@@ -55,7 +55,7 @@ jobs:
       - name: Install Nextflow
         uses: nf-core/setup-nextflow@v1
         with:
-          version: "22.10.6"
+          version: "23.04.0"
 
       - name: Run pipeline with test data and vg deconstruct parameters
         run: |
@@ -78,7 +78,7 @@ jobs:
       - name: Install Nextflow
         uses: nf-core/setup-nextflow@v1
         with:
-          version: "22.10.6"
+          version: "23.04.0"
 
       - name: Run pipeline with test data and smoothxg parameters
         run: |
@@ -100,7 +100,7 @@ jobs:
       - name: Install Nextflow
         uses: nf-core/setup-nextflow@v1
         with:
-          version: "22.10.6"
+          version: "23.04.0"
 
       - name: Run pipeline with test data and wfmash_chunks parameters
         run: |
@@ -122,7 +122,7 @@ jobs:
       - name: Install Nextflow
         uses: nf-core/setup-nextflow@v1
         with:
-          version: "22.10.6"
+          version: "23.04.0"
 
       - name: Run pipeline with test data and wfmash_only parameters
         run: |
@@ -146,7 +146,7 @@ jobs:
       - name: Install Nextflow
         uses: nf-core/setup-nextflow@v1
         with:
-          version: "22.10.6"
+          version: "23.04.0"
 
       - name: Run pipeline with test data and wfmash_only parameters
         run: |
