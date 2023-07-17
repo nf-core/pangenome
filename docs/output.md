@@ -207,7 +207,7 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 ## odgi
 
-[odgi](https://github.com/pangenome/odgi) provides an efficient and succinct dynamic DNA sequence graph model, as well as a host of algorithms that allow the use of such graphs in bioinformatic analyses. In this pipeline, a huge variety of odgi's subcommands are used to process the built graphs. As a rule of thump, all files in ODGI format end with `.og`.
+[odgi](https://github.com/pangenome/odgi) provides an efficient and succinct dynamic DNA sequence graph model, as well as a host of algorithms that allow the use of such graphs in bioinformatic analyses. In this pipeline, a huge variety of odgi's subcommands are used to process the built graphs. As a rule of thumb, all files in ODGI format end with `.og`.
 
 ### odgi build
 
@@ -251,7 +251,7 @@ The order of the sortings:
 
 - `Y`: PG-SGD
 - `g`: grooming
-- `s`: topoligical sort
+- `s`: topolocigal sort
 
 ### odgi unchop
 
@@ -335,7 +335,7 @@ The order of the sortings:
 
 ## vg
 
-[vg](https://github.com/vgteam/vg) is the `v`ariation `g`rah toolkit for data structures, interchange formats, alignment, genotyping, and variant calling methods of genome variation graphs.
+[vg](https://github.com/vgteam/vg) is the `v`ariation `g`raph toolkit for data structures, interchange formats, alignment, genotyping, and variant calling methods of genome variation graphs.
 
 ### vg deconstruct
 
