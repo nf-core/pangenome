@@ -357,6 +357,12 @@ The order of the sortings:
 
 ## MultiQC
 
+In the ODGI table section of the MultiQC report, it can happen that one observes the actual sample name and `seqwish`.
+The `seqwish` sample is the graph which was produced by [seqwish](#seqwish).
+The named sample, which just contains the sample name in the name is the final graph:
+
+- [seqwish](#seqwish) -> [smoothxg](#smoothxg) -> [gfaffix](#gfaffix) -> [odgi build](odgi-build) -> [odgi unchop](#odgi-unchop) -> [odgi sort](#odgi-sort)
+
 <details markdown="1">
 <summary>Output files</summary>
 
