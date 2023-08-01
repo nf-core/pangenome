@@ -1,0 +1,4 @@
+repository_type: pipeline
+lint:
+  files_unchanged:
+    - assets/nf-core-pangenome_logo_light.png
