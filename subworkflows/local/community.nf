@@ -45,7 +45,7 @@ workflow COMMUNITY {
     TABIX_BGZIP(EXTRACT_COMMUNITIES.out.community_fasta)
     ch_versions = ch_versions.mix(TABIX_BGZIP.out.versions)
 
-    SAMTOOLS_FAIDX(TABIX_BGZIP.out.output)
+    SAMTOOLS_FAIDX(TABIX_BGZIP.out.output, [[],[]])
     ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
 
     emit:
