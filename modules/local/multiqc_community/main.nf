@@ -2,10 +2,10 @@ process MULTIQC_COMMUNITY {
     tag "$meta.id"
     label 'process_single'
 
-    conda "bioconda::multiqc=1.14"
+    conda "bioconda::multiqc=1.15"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/multiqc:1.14--pyhdfd78af_0' :
-        'biocontainers/multiqc:1.14--pyhdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/multiqc:1.15--pyhdfd78af_0' :
+        'biocontainers/multiqc:1.15--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(multiqc_files, stageAs: "?/*")
