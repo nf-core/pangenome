@@ -52,8 +52,6 @@ sp:
     fn: "*viz_depth_multiqc.png"
   odgi_viz_uncalled:
     fn: "*viz_uncalled_multiqc.png"
-  testing_name:
-    fn: "*draw.png"
 ignore_images: false
 
 # Make the custom content stuff come after the ODGI module output
