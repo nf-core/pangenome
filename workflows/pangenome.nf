@@ -159,7 +159,7 @@ workflow PANGENOME {
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     if (!params.communities) {
         if (!params.wfmash_only) {
-            ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..9]})
+            ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..8]})
         }
     } else {
         ch_multiqc_files = ch_multiqc_files.mix(ODGI_QC.out.qc.map{return it[1..8]})
