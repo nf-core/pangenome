@@ -6,8 +6,6 @@ This document describes the output produced by the pipeline. Most of the plots a
 
 The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
 
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
-
 ## Pipeline overview
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
@@ -209,7 +207,7 @@ Here `wfmash` was applied in base pair level alignment mode in order to refine t
 
 ## odgi
 
-[odgi](https://github.com/pangenome/odgi) provides an efficient and succinct dynamic DNA sequence graph model, as well as a host of algorithms that allow the use of such graphs in bioinformatic analyses. In this pipeline, a huge variety of odgi's subcommands are used to process the built graphs. As a rule of thump, all files in ODGI format end with `.og`.
+[odgi](https://github.com/pangenome/odgi) provides an efficient and succinct dynamic DNA sequence graph model, as well as a host of algorithms that allow the use of such graphs in bioinformatic analyses. In this pipeline, a huge variety of odgi's subcommands are used to process the built graphs. As a rule of thumb, all files in ODGI format end with `.og`.
 
 ### odgi build
 
@@ -253,7 +251,7 @@ The order of the sortings:
 
 - `Y`: PG-SGD
 - `g`: grooming
-- `s`: topoligical sort
+- `s`: topolocigal sort
 
 ### odgi unchop
 
@@ -337,7 +335,7 @@ The order of the sortings:
 
 ## vg
 
-[vg](https://github.com/vgteam/vg) is the `v`ariation `g`rah toolkit for data structures, interchange formats, alignment, genotyping, and variant calling methods of genome variation graphs.
+[vg](https://github.com/vgteam/vg) is the `v`ariation `g`raph toolkit for data structures, interchange formats, alignment, genotyping, and variant calling methods of genome variation graphs.
 
 ### vg deconstruct
 
@@ -358,6 +356,12 @@ The order of the sortings:
   </details>
 
 ## MultiQC
+
+In the ODGI table section of the MultiQC report, it can happen that one observes the actual sample name and `seqwish`.
+The `seqwish` sample is the graph which was produced by [seqwish](#seqwish).
+The named sample, which just contains the sample name in the name is the final graph:
+
+- [seqwish](#seqwish) -> [smoothxg](#smoothxg) -> [gfaffix](#gfaffix) -> [odgi build](odgi-build) -> [odgi unchop](#odgi-unchop) -> [odgi sort](#odgi-sort)
 
 <details markdown="1">
 <summary>Output files</summary>

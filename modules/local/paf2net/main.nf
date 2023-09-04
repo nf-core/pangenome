@@ -2,10 +2,10 @@ process PAF2NET {
     tag "$meta.id"
     label 'process_single'
 
-    conda "bioconda::pggb=0.5.3"
+    conda "bioconda::pggb=0.5.4"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/pggb:0.5.3--hdfd78af_2':
-        'quay.io/biocontainers/pggb:0.5.3--hdfd78af_2' }"
+        'https://depot.galaxyproject.org/singularity/pggb:0.5.4--hdfd78af_0':
+        'biocontainers/pggb:0.5.4--hdfd78af_0' }"
 
     input:
     tuple val(meta), path(paf)
