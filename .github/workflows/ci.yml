@@ -136,7 +136,7 @@ jobs:
     strategy:
       matrix:
         parameters:
-          - "--wfmash_sparse_map 'auto'"
+          - "--wfmash_sparse_map auto"
           - "--wfmash_sparse_map 0.5"
     steps:
       - name: Check out pipeline code

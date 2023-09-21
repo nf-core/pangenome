@@ -83,7 +83,8 @@
                 "wfmash_sparse_map": {
                     "default": "1",
                     "description": "Keep this fraction of mappings (\"auto\" for giant component heuristic).",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "(auto|[01]\\.\\d+)"
                 },
                 "wfmash_merge_segments": {
                     "type": "boolean",
