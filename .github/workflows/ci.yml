@@ -36,8 +36,141 @@ jobs:
           version: "${{ matrix.NXF_VER }}"
 
       - name: Run pipeline with test data
-        # TODO nf-core: You can customise CI pipeline run tests as required
-        # For example: adding multiple test runs with different parameters
-        # Remember that you can parallelise this by using strategy.matrix
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results
+
+  vg_deconstruct:
+    name: Run pipeline with vg deconstruct parameters
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        parameters:
+          - '--vcf_spec "gi|568815561:#,gi|568815567:#"'
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "23.04.0"
+
+      - name: Run pipeline with test data and vg deconstruct parameters
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}
+
+  smoothxg:
+    name: Run pipeline with smoothxg parameters
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        parameters:
+          - "--smoothxg_write_maf --smoothxg_poa_length 100,200,300 --smoothxg_run_abpoa --smoothxg_run_global_poa"
+          - "--smoothxg_poa_params asm10"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "23.04.0"
+
+      - name: Run pipeline with test data and smoothxg parameters
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}
+
+  wfmash_chunks:
+    name: Run pipeline with wfmash_chunks parameters
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        parameters:
+          - "--wfmash_chunks 2"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "23.04.0"
+
+      - name: Run pipeline with test data and wfmash_chunks parameters
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}
+
+  wfmash_only:
+    name: Run pipeline with wfmash_only parameters
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        parameters:
+          - "--wfmash_only"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "23.04.0"
+
+      - name: Run pipeline with test data and wfmash_only parameters
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}
+
+  wfmash_sparse_map:
+    name: Run pipeline with wfmash_sparse_map parameters
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        parameters:
+          - "--wfmash_sparse_map auto"
+          - "--wfmash_sparse_map 0.5"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "23.04.0"
+
+      - name: Run pipeline with test data and wfmash_only parameters
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}
+
+  communities:
+    name: Run pipeline with community parameters
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        parameters:
+          - "--communities"
+          - "--communities --wfmash_chunks 2"
+          - '--communities --vcf_spec "gi|568815561:#,gi|568815567:#"'
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "23.04.0"
+
+      - name: Run pipeline with test data and wfmash_only parameters
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}

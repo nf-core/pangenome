@@ -20,7 +20,6 @@ class WorkflowMain {
             "  https://github.com/${workflow.manifest.name}/blob/master/CITATIONS.md"
     }
 
-
     //
     // Validate parameters and print summary to screen
     //
@@ -46,18 +45,7 @@ class WorkflowMain {
 
         // Check input has been provided
         if (!params.input) {
-            Nextflow.error("Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'")
+            error("Please provide an input FASTA to the pipeline e.g. '--input sequences.fa.gz'")
         }
-    }
-    //
-    // Get attribute from genome config file e.g. fasta
-    //
-    public static Object getGenomeAttribute(params, attribute) {
-        if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
-            if (params.genomes[ params.genome ].containsKey(attribute)) {
-                return params.genomes[ params.genome ][ attribute ]
-            }
-        }
-        return null
     }
 }
