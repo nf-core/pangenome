@@ -174,3 +174,25 @@ jobs:
       - name: Run pipeline with test data and wfmash_only parameters
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}
+
+  metric_parameter_suffixes:
+    name: Run pipeline with metric parameter suffixes
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/pangenome') }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        parameters:
+          - "--wfmash_sequence_length 8k --wfmash_block_length 38K --seqwish_transclose_batch 9M"
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v3
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "23.04.0"
+
+      - name: Run pipeline with test data and wfmash_only parameters
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results ${{ matrix.parameters }}
