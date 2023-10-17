@@ -139,7 +139,7 @@
                 },
                 "seqwish_sparse_factor": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "description": "Keep this randomly selected fraction of input matches."
                 },
                 "seqwish_temp_dir": {
