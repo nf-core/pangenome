@@ -59,16 +59,17 @@
                     "help_text": "Use `mash dist` or `mash triangle` to explore the typical level of divergence between the sequences in your input (see https://pggb.readthedocs.io/en/latest/rst/tutorials/divergence_estimation.html#divergence-estimation for more information). Convert this to an approximate percent identity and provide it as --wfmash_map_pct_id <PCT>. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
                 "wfmash_segment_length": {
-                    "type": "integer",
-                    "default": 5000,
+                    "type": "string",
+                    "default": "5K",
                     "description": "Segment length for mapping.",
-                    "help_text": "Crucially, --wfmash_segment_length provides a kind of minimum alignment length filter. The `mashmap3` step in `wfmash` will only consider segments of this size. For small pangenome graphs, or where there are few repeats, --wfmash_segment_length can be set low (for example 500 when building a MHC pangenome graph). However, for larger contexts, with repeats, it can be very important to set this high (for instance 50k in the case of human genomes). A long segment length ensures that we represent long collinear regions of the input sequences in the structure of the graph. In general, this should at least be larger than transposons and other common repeats in your pangenome. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
+                    "help_text": "Crucially, --wfmash_segment_length provides a kind of minimum alignment length filter. The `mashmap3` step in `wfmash` will only consider segments of this size. For small pangenome graphs, or where there are few repeats, --wfmash_segment_length can be set low (for example 500 when building a MHC pangenome graph). However, for larger contexts, with repeats, it can be very important to set this high (for instance 50k in the case of human genomes). A long segment length ensures that we represent long collinear regions of the input sequences in the structure of the graph. In general, this should at least be larger than transposons and other common repeats in your pangenome. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species.",
+                    "pattern": "^([1-9]\\d*[kKmMgGtT]?|0)$"
                 },
                 "wfmash_block_length": {
                     "type": "string",
-                    "default": "wfmash_segment_length * 5",
                     "description": "Minimum block length filter for mapping.",
-                    "help_text": "By default, wfmash only keeps mappings with at least 5 times the size of a segment. This can be adjusted with --wfmash_block_length <BLOCK_LENGTH>."
+                    "help_text": "By default, wfmash only keeps mappings with at least 5 times the size of a segment. This can be adjusted with --wfmash_block_length <BLOCK_LENGTH>.",
+                    "pattern": "^([1-9]\\d*[kKmMgGtT]?|0)$"
                 },
                 "wfmash_mash_kmer": {
                     "type": "integer",
@@ -82,7 +83,7 @@
                 },
                 "wfmash_sparse_map": {
                     "type": "number",
-                    "default": "1.0",
+                    "default": 1,
                     "description": "Keep this fraction of mappings (\"auto\" for giant component heuristic)."
                 },
                 "wfmash_merge_segments": {
@@ -129,10 +130,11 @@
                     "help_text": "Graph induction with seqwish often works better when we filter very short matches out of the input alignments. In practice, these often occur in regions of low alignment quality, which are typical of areas with large INDELs and structural variations in the wfmash alignments. This underalignment is then resolved in the smoothxg step. Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.\nA setting of --seqwish_min_match_length 47 is optimal for around 5% divergence, and we suggest lowering it for higher divergence and increasing it for lower divergence. Values up to --seqwish_min_match_length 311 work well for human haplotypes. In effect, setting --seqwish_min_match_length to N means that we can tolerate a local pairwise difference rate of no more than 1/N. Thus, INDELs which may be represented by complex series of edit operations will be opened into bubbles in the induced graph, and alignment regions with very low identity will be ignored. Using affine-gapped alignment (such as with minimap2) may reduce the impact of this step by representing large indels more precisely in the input alignments. However, it remains important due to local inconsistency in alignments in low-complexity sequence."
                 },
                 "seqwish_transclose_batch": {
-                    "type": "integer",
-                    "default": 10000000,
+                    "type": "string",
+                    "default": "10M",
                     "description": "Number of base pairs to use for transitive closure batch.",
-                    "help_text": "If you run out of memory during the seqwish step, you can lower this value. It will take longer, but it will use less memory."
+                    "help_text": "If you run out of memory during the seqwish step, you can lower this value. It will take longer, but it will use less memory.",
+                    "pattern": "^([1-9]\\d*[kKmMgGtT]?|0)$"
                 },
                 "seqwish_sparse_factor": {
                     "type": "number",
@@ -360,14 +362,12 @@
                     "type": "boolean",
                     "description": "Display help text.",
                     "fa_icon": "fas fa-question-circle",
-                    "default": false,
                     "hidden": true
                 },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
                     "fa_icon": "fas fa-question-circle",
-                    "default": false,
                     "hidden": true
                 },
                 "publish_dir_mode": {
@@ -391,7 +391,6 @@
                     "type": "boolean",
                     "description": "Send plain-text email instead of HTML.",
                     "fa_icon": "fas fa-remove-format",
-                    "default": false,
                     "hidden": true
                 },
                 "max_multiqc_email_size": {
@@ -406,7 +405,6 @@
                     "type": "boolean",
                     "description": "Do not use coloured log outputs.",
                     "fa_icon": "fas fa-palette",
-                    "default": false,
                     "hidden": true
                 },
                 "hook_url": {
@@ -445,7 +443,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-eye-slash",
                     "description": "Show all params when using `--help`",
-                    "default": false,
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
@@ -453,7 +450,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters fails when an unrecognised parameter is found.",
-                    "default": false,
                     "hidden": true,
                     "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
                 },
@@ -461,7 +457,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters in lenient more.",
-                    "default": false,
                     "hidden": true,
                     "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
                 },
@@ -469,7 +464,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Do we want to display hidden parameters?",
-                    "default": false,
                     "hidden": true,
                     "help_text": "Do we want to display hidden parameters?"
                 },
