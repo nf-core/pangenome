@@ -54,7 +54,7 @@
             "properties": {
                 "wfmash_map_pct_id": {
                     "type": "number",
-                    "default": 90,
+                    "default": 90.0,
                     "description": "Percent identity in the wfmash mashmap step.",
                     "help_text": "Use `mash dist` or `mash triangle` to explore the typical level of divergence between the sequences in your input (see https://pggb.readthedocs.io/en/latest/rst/tutorials/divergence_estimation.html#divergence-estimation for more information). Convert this to an approximate percent identity and provide it as --wfmash_map_pct_id <PCT>. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
@@ -82,9 +82,10 @@
                     "description": "Ignore the top % most-frequent kmers."
                 },
                 "wfmash_sparse_map": {
-                    "type": "number",
-                    "default": 1,
-                    "description": "Keep this fraction of mappings (\"auto\" for giant component heuristic)."
+                    "default": 1.0,
+                    "description": "Keep this fraction of mappings (\"auto\" for giant component heuristic).",
+                    "type": "string",
+                    "pattern": "(auto|[01]\\.\\d+)"
                 },
                 "wfmash_merge_segments": {
                     "type": "boolean",
@@ -138,7 +139,7 @@
                 },
                 "seqwish_sparse_factor": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "description": "Keep this randomly selected fraction of input matches."
                 },
                 "seqwish_temp_dir": {

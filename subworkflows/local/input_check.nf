@@ -28,7 +28,7 @@ workflow INPUT_CHECK {
         // TODO We want to check, if the input file was actually compressed with bgzip with the upcoming grabix module.
         // For now we assume it was bgzip. If not WFMASH will complain instantly anyhow.
         if (!fai_path.exists() || !gzi_path.exists()) { // the assumption is that none of these files exist if only one does not exist
-            SAMTOOLS_FAIDX(meta_fasta)
+            SAMTOOLS_FAIDX(meta_fasta, [[],[]])
             fai = SAMTOOLS_FAIDX.out.fai
             gzi = SAMTOOLS_FAIDX.out.gzi
             ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
@@ -50,7 +50,7 @@ workflow INPUT_CHECK {
         meta_fasta = tuple([ id:fasta_file_name ], fasta)
         TABIX_BGZIP(meta_fasta)
         ch_fasta = TABIX_BGZIP.out.output
-        SAMTOOLS_FAIDX(ch_fasta)
+        SAMTOOLS_FAIDX(ch_fasta, [[],[]])
         gzi = SAMTOOLS_FAIDX.out.gzi
         fai = SAMTOOLS_FAIDX.out.fai
         ch_versions = ch_versions.mix(SAMTOOLS_FAIDX.out.versions)
