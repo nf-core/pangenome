@@ -33,7 +33,7 @@ workflow PGGB {
 
     def query_self = true
     if (params.wfmash_only) {
-        if (params.wfmash_chunks == 1) {
+        if (params.wfmash_chunks == null) {
             ch_wfmash_map_align = fasta.map{meta, fasta -> [ meta, fasta, []]}
             ch_wfmash_map_align = ch_wfmash_map_align.join(gzi).join(fai)
             WFMASH_MAP_ALIGN(ch_wfmash_map_align,
