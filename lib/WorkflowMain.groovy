@@ -11,15 +11,13 @@ class WorkflowMain {
     //
     public static String citation(workflow) {
         return "If you use ${workflow.manifest.name} for your analysis please cite:\n\n" +
-            // TODO nf-core: Add Zenodo DOI for pipeline after first release
-            //"* The pipeline\n" +
-            //"  https://doi.org/10.5281/zenodo.XXXXXXX\n\n" +
+            "* The pipeline\n" +
+            "  https://doi.org/10.5281/zenodo.8202636\n\n" +
             "* The nf-core framework\n" +
             "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
             "* Software dependencies\n" +
             "  https://github.com/${workflow.manifest.name}/blob/master/CITATIONS.md"
     }
-
 
     //
     // Validate parameters and print summary to screen
@@ -48,30 +46,7 @@ class WorkflowMain {
 
         // Check input has been provided
         if (!params.input) {
-            Nextflow.error("Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'")
-        }
-    }
-    //
-    // Get attribute from genome config file e.g. fasta
-    //
-    public static Object getGenomeAttribute(params, attribute) {
-        if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
-            if (params.genomes[ params.genome ].containsKey(attribute)) {
-                return params.genomes[ params.genome ][ attribute ]
-            }
-        }
-        return null
-    }
-
-    //
-    // Exit pipeline if --profile contains spaces
-    //
-    private static void checkProfile(profile, args, log) {
-        if (profile.endsWith(',')) {
-            Nextflow.error "Profile cannot end with a trailing comma. Please remove the comma from the end of the profile string.\nHint: A common mistake is to provide multiple values to `-profile` separated by spaces. Please use commas to separate profiles instead,e.g., `-profile docker,test`."
-        }
-        if (args[0]) {
-            log.warn "nf-core pipelines do not accept positional arguments. The positional argument `${args[0]}` has been detected.\n      Hint: A common mistake is to provide multiple values to `-profile` separated by spaces. Please use commas to separate profiles instead,e.g., `-profile docker,test`."
+            error("Please provide an input FASTA to the pipeline e.g. '--input sequences.fa.gz'")
         }
     }
 }
