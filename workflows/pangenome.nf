@@ -115,9 +115,9 @@ workflow PANGENOME {
         ch_versions = ch_versions.mix(ODGI_VIEW.out.versions)
         ch_multiqc_in = PGGB.out.qc.map{meta, seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw -> [ meta, [ seqwish, gfaffix, viz, viz_pos, viz_depth, viz_inv, viz_O, viz_uncalled, draw ] ]}
         MULTIQC_COMMUNITY(ch_multiqc_in,
-                          ch_multiqc_config.toList(),
-                          ch_multiqc_custom_config.toList(),
-                          ch_multiqc_logo.toList())
+                            ch_multiqc_config.toList(),
+                            ch_multiqc_custom_config.toList(),
+                            ch_multiqc_logo.toList())
     } else {
         PGGB (
             INPUT_CHECK.out.fasta,
@@ -192,6 +192,13 @@ workflow.onComplete {
     NfcoreTemplate.summary(workflow, params, log)
     if (params.hook_url) {
         NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
+    }
+}
+
+workflow.onError {
+    if (workflow.errorReport.contains("Process requirement exceeds available memory")) {
+        println("🛑 Default resources exceed availability 🛑 ")
+        println("💡 See here on how to configure pipeline: https://nf-co.re/docs/usage/configuration#tuning-workflow-resources 💡")
     }
 }
 
