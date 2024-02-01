@@ -1,7 +1,7 @@
-name: fastqc
+name: gfaffix
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - bioconda::fastqc=0.12.1
+  - bioconda::gfaffix=0.1.5
