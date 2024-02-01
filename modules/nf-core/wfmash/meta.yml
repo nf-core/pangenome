@@ -14,6 +14,7 @@ tools:
       tool_dev_url: https://github.com/waveygang/wfmash
       doi: 10.5281/zenodo.6949373
       licence: "['MIT']"
+
 input:
   - meta:
       type: map
@@ -43,6 +44,7 @@ input:
       type: file
       description: Optional inpute file in FASTA format specifying the query sequences as a list.
       pattern: "*.{fa,fna,fasta}"
+
 output:
   - meta:
       type: map
@@ -57,5 +59,6 @@ output:
       type: file
       description: File containing software versions
       pattern: "versions.yml"
+
 authors:
   - "@subwaystation"
