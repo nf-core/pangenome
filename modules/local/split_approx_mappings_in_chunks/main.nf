@@ -2,10 +2,10 @@ process SPLIT_APPROX_MAPPINGS_IN_CHUNKS {
     tag "$meta.id"
     label 'process_single'
 
-    conda "bioconda::pggb=0.5.4"
+    conda "bioconda::wfmash=0.12.6"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/pggb:0.5.4--hdfd78af_0':
-        'biocontainers/pggb:0.5.4--hdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/wfmash:0.12.6--h11f254b_0':
+        'biocontainers/wfmash:0.12.6--h11f254b_0' }"
 
     input:
     tuple val(meta), path(paf)
