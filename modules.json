@@ -17,7 +17,7 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "8ec825f465b9c17f9d83000022995b4f7de6fe93",
+                        "git_sha": "9e71d8519dfbfc328c078bba14d4bd4c99e39a94",
                         "installed_by": ["modules"]
                     },
                     "odgi/build": {
@@ -87,7 +87,7 @@
                     },
                     "wfmash": {
                         "branch": "master",
-                        "git_sha": "96fadda088c6e79777ba8eef939e36bb03a69c65",
+                        "git_sha": "0c49f318ec4701b891a87f25fb07b34713c90203",
                         "installed_by": ["modules"]
                     }
                 }
