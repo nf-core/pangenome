@@ -21,7 +21,7 @@ process SPLIT_APPROX_MAPPINGS_IN_CHUNKS {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    python split_approx_mappings_in_chunks.py $paf \\
+    split_approx_mappings_in_chunks.py $paf \\
         $args
 
     cat <<-END_VERSIONS > versions.yml
