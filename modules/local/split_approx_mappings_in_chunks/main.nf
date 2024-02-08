@@ -4,8 +4,8 @@ process SPLIT_APPROX_MAPPINGS_IN_CHUNKS {
 
     conda "bioconda::wfmash=0.12.6"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/wfmash:0.12.6--h11f254b_0':
-        'biocontainers/wfmash:0.12.6--h11f254b_0' }"
+        'https://depot.galaxyproject.org/singularity/wfmash:0.12.6--h11f254b_1':
+        'biocontainers/wfmash:0.12.6--h11f254b_1' }"
 
     input:
     tuple val(meta), path(paf)
