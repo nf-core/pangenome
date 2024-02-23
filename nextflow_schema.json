@@ -125,7 +125,7 @@
             "properties": {
                 "seqwish_min_match_length": {
                     "type": "integer",
-                    "default": 19,
+                    "default": 23,
                     "description": "Ignores exact matches below this length.",
                     "help_text": "Graph induction with seqwish often works better when we filter very short matches out of the input alignments. In practice, these often occur in regions of low alignment quality, which are typical of areas with large INDELs and structural variations in the wfmash alignments. This underalignment is then resolved in the smoothxg step. Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.\nA setting of --seqwish_min_match_length 47 is optimal for around 5% divergence, and we suggest lowering it for higher divergence and increasing it for lower divergence. Values up to --seqwish_min_match_length 311 work well for human haplotypes. In effect, setting --seqwish_min_match_length to N means that we can tolerate a local pairwise difference rate of no more than 1/N. Thus, INDELs which may be represented by complex series of edit operations will be opened into bubbles in the induced graph, and alignment regions with very low identity will be ignored. Using affine-gapped alignment (such as with minimap2) may reduce the impact of this step by representing large indels more precisely in the input alignments. However, it remains important due to local inconsistency in alignments in low-complexity sequence."
                 },
