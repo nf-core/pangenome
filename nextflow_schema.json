@@ -59,7 +59,7 @@
                     "help_text": "Use `mash dist` or `mash triangle` to explore the typical level of divergence between the sequences in your input (see https://pggb.readthedocs.io/en/latest/rst/tutorials/divergence_estimation.html#divergence-estimation for more information). Convert this to an approximate percent identity and provide it as --wfmash_map_pct_id <PCT>. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
                 "wfmash_segment_length": {
-                    "type": "integer",
+                    "type": "string",
                     "default": 5000,
                     "description": "Segment length for mapping.",
                     "help_text": "Crucially, --wfmash_segment_length provides a kind of minimum alignment length filter. The `mashmap3` step in `wfmash` will only consider segments of this size. For small pangenome graphs, or where there are few repeats, --wfmash_segment_length can be set low (for example 500 when building a MHC pangenome graph). However, for larger contexts, with repeats, it can be very important to set this high (for instance 50k in the case of human genomes). A long segment length ensures that we represent long collinear regions of the input sequences in the structure of the graph. In general, this should at least be larger than transposons and other common repeats in your pangenome. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species.",
@@ -130,7 +130,7 @@
                     "help_text": "Graph induction with seqwish often works better when we filter very short matches out of the input alignments. In practice, these often occur in regions of low alignment quality, which are typical of areas with large INDELs and structural variations in the wfmash alignments. This underalignment is then resolved in the smoothxg step. Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.\nA setting of --seqwish_min_match_length 47 is optimal for around 5% divergence, and we suggest lowering it for higher divergence and increasing it for lower divergence. Values up to --seqwish_min_match_length 311 work well for human haplotypes. In effect, setting --seqwish_min_match_length to N means that we can tolerate a local pairwise difference rate of no more than 1/N. Thus, INDELs which may be represented by complex series of edit operations will be opened into bubbles in the induced graph, and alignment regions with very low identity will be ignored. Using affine-gapped alignment (such as with minimap2) may reduce the impact of this step by representing large indels more precisely in the input alignments. However, it remains important due to local inconsistency in alignments in low-complexity sequence."
                 },
                 "seqwish_transclose_batch": {
-                    "type": "integer",
+                    "type": "string",
                     "default": 10000000,
                     "description": "Number of base pairs to use for transitive closure batch.",
                     "help_text": "If you run out of memory during the seqwish step, you can lower this value. It will take longer, but it will use less memory.",
