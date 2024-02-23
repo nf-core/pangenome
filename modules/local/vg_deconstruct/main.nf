@@ -65,7 +65,7 @@ process VG_DECONSTRUCT {
         #TODO: to remove when vcfwave will be bug-free
         # The TYPE info sometimes is wrong/missing
         # There are variants without the ALT allele
-        bcftools sort "$vcf_decomposed_tmp" | bcftools annotate -x INFO/TYPE \$vcf_decomposed_tmp  | awk '\$5 != "."' > \$vcf_decomposed
+        bcftools sort \$vcf_decomposed_tmp | bcftools annotate -x INFO/TYPE \$vcf_decomposed_tmp  | awk '\$5 != "."' > \$vcf_decomposed
         rm \$vcf_decomposed_tmp \$vcf.gz
         bcftools stats \$vcf_decomposed > \$vcf_decomposed.stats
     fi
