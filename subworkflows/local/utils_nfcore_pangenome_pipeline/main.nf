@@ -35,7 +35,7 @@ workflow PIPELINE_INITIALISATION {
     monochrome_logs   // boolean: Do not use coloured log outputs
     nextflow_cli_args //   array: List of positional nextflow CLI args
     outdir            //  string: The output directory where the results will be saved
-    input             //  string: Path to input samplesheet
+    input             //  string: Path to input FASTA
 
     main:
 
@@ -56,7 +56,7 @@ workflow PIPELINE_INITIALISATION {
     //
     pre_help_text = nfCoreLogo(monochrome_logs)
     post_help_text = '\n' + workflowCitation() + '\n' + dashedLine(monochrome_logs)
-    def String workflow_command = "nextflow run ${workflow.manifest.name} -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>"
+    def String workflow_command = "nextflow run ${workflow.manifest.name} -profile <docker/singularity/.../institute> --input <BGZIPPED_FASTA> --n_haplotypes <NUM_HAPS_IN_FASTA> --outdir <OUTDIR>"
     UTILS_NFVALIDATION_PLUGIN (
         help,
         workflow_command,
@@ -75,33 +75,21 @@ workflow PIPELINE_INITIALISATION {
     //
     // Custom validation for pipeline parameters
     //
-    validateInputParameters()
+    // validateInputParameters()
 
     //
     // Create channel from input file provided through params.input
     //
-    Channel
-        .fromSamplesheet("input")
-        .map {
-            meta, fastq_1, fastq_2 ->
-                if (!fastq_2) {
-                    return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-                } else {
-                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
-                }
-        }
-        .groupTuple()
-        .map {
-            validateInputSamplesheet(it)
-        }
-        .map {
-            meta, fastqs ->
-                return [ meta, fastqs.flatten() ]
-        }
-        .set { ch_samplesheet }
+    // Check mandatory parameters
+    // Maybe the schema check would be sufficient here anyhow? I don't know. The TEMPLATE is too crazy for me.
+    if (input) {
+        ch_input = file(input)
+    } else {
+        exit 1, 'Input FASTA not specified!'
+    }
 
     emit:
-    samplesheet = ch_samplesheet
+    fasta = ch_input
     versions    = ch_versions
 }
 
@@ -151,8 +139,10 @@ workflow PIPELINE_COMPLETION {
 // Check and validate pipeline parameters
 //
 def validateInputParameters() {
-    genomeExistsError()
-}//
+    // not needed in this pipeline
+    // genomeExistsError()
+}
+//
 // Validate channels from input samplesheet
 //
 def validateInputSamplesheet(input) {
@@ -177,7 +167,6 @@ def getGenomeAttribute(attribute) {
     }
     return null
 }
-
 //
 // Exit pipeline if incorrect --genome key provided
 //
@@ -190,7 +179,8 @@ def genomeExistsError() {
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         error(error_string)
     }
-}//
+}
+//
 // Generate methods description for MultiQC
 //
 def toolCitationText() {

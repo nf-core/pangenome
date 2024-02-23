@@ -21,19 +21,6 @@ include { PANGENOME  } from './workflows/pangenome'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_pangenome_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_pangenome_pipeline'
 
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_pangenome_pipeline'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GENOME PARAMETER VALUES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = getGenomeAttribute('fasta')
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -46,7 +33,7 @@ params.fasta = getGenomeAttribute('fasta')
 workflow NFCORE_PANGENOME {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    fasta // channel: fasta read in from --input
 
     main:
 
@@ -54,7 +41,7 @@ workflow NFCORE_PANGENOME {
     // WORKFLOW: Run pipeline
     //
     PANGENOME (
-        samplesheet
+        fasta
     )
 
     emit:
@@ -88,7 +75,7 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     NFCORE_PANGENOME (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.fasta
     )
 
     //
