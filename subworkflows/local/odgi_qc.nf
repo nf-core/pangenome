@@ -15,9 +15,10 @@ include { ODGI_DRAW as ODGI_DRAW_HEIGHT   } from '../../modules/nf-core/odgi/dra
 
 workflow ODGI_QC {
     take:
-    seqwish        // file: /path/to/seqwish.og
-    sorted_graph   // file: /path/to/sorted_graph.og
-    community_mode // val :  determines how to handly meta identifiers
+    seqwish          // file: /path/to/seqwish.og
+    sorted_graph     // file: /path/to/sorted_graph.og
+    community_mode   // val : determines how to handly meta identifiers
+    no_seqwish_input // val : determiens how we will sort the input for MULTIQC
 
     main:
 
@@ -63,7 +64,12 @@ workflow ODGI_QC {
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_UNCALLED.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
         ch_graph_qc = ch_graph_qc.join(ODGI_DRAW_MULTIQC.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
     } else {
-        ch_graph_qc = ODGI_STATS.out.yaml
+        //
+        if (no_seqwish_input) {
+            ch_graph_qc = ODGI_STATS.out.yaml
+        } else {
+            ch_graph_qc = ODGI_STATS.out.yaml.collect().map{seqwish_id, seqwish_qc, gfaffix_id, gfaffix_qc -> [ gfaffix_id, gfaffix_qc, seqwish_qc ]}
+        }
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COLOR.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz", "") ], png ]})
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_POS.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_pos", "") ], png ]})
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_DEPTH.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_depth", "") ], png ]})
