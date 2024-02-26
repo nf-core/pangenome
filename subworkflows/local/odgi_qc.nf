@@ -25,6 +25,7 @@ workflow ODGI_QC {
     ch_graph_qc = Channel.empty() // we collect all graph quality control PNGs here
 
     ODGI_STATS(seqwish.mix(sorted_graph))
+    ODGI_STATS.out.yaml.collect().view()
     ch_versions = ch_versions.mix(ODGI_STATS.out.versions)
     // prepare all inputs
     ch_odgi_viz = sorted_graph.map{meta, gfa -> [ [ id: meta.id + ".viz" ], gfa ]}
@@ -63,7 +64,7 @@ workflow ODGI_QC {
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_UNCALLED.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
         ch_graph_qc = ch_graph_qc.join(ODGI_DRAW_MULTIQC.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".gfaffix.*", "") ], png ]})
     } else {
-        ch_graph_qc = ODGI_STATS.out.yaml
+        ch_graph_qc = ODGI_STATS.out.yaml.collect().map{seqwish_id, seqwish_qc, gfaffix_id, gfaffix_qc -> [ gfaffix_id, gfaffix_qc, seqwish_qc ]}
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_COLOR.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz", "") ], png ]})
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_POS.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_pos", "") ], png ]})
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_DEPTH.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_depth", "") ], png ]})
@@ -72,6 +73,8 @@ workflow ODGI_QC {
         ch_graph_qc = ch_graph_qc.join(ODGI_VIZ_UNCALLED.out.png.map{meta, png -> [ [ id: meta.id.replaceFirst(".viz_uncalled", "") ], png ]})
         ch_graph_qc = ch_graph_qc.join(ODGI_DRAW_MULTIQC.out.png)
     }
+
+    ch_graph_qc.view()
 
     emit:
     qc = ch_graph_qc // [ seqwish.og.stats.yaml , gfaffix.og.stats.yaml, odgi_viz_multiqc.png, odgi_viz_pos_multiqc.png, odgi_viz_depth_multiqc.png, odgi_viz_inv_multiqc.png, odgi_viz_compr_multiqc.png, odgi_viz_uncalled_multiqc.png, odgi_draw_multiqc.png ]
