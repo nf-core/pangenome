@@ -62,6 +62,7 @@ workflow PANGENOME {
         file(params.input, checkIfExists: true)
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
 
     if (params.communities) {
         COMMUNITY (
@@ -120,7 +121,6 @@ workflow PANGENOME {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
     ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
     ch_multiqc_logo          = params.multiqc_logo   ? Channel.fromPath(params.multiqc_logo)   : Channel.empty()
     summary_params           = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
