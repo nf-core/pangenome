@@ -78,13 +78,14 @@ workflow PANGENOME {
             ch_community_join.map{meta, fasta, gzi, fai -> [ meta, fasta ]},
             ch_community_join.map{meta, fasta, gzi, fai -> [ meta, fai ]},
             ch_community_join.map{meta, fasta, gzi, fai -> [ meta, gzi ]},
-            true
+            true,
+            false
         )
         ch_versions = ch_versions.mix(PGGB.out.versions)
         ch_squeeze_in = PGGB.out.og.map{meta, og -> [ [ id:meta.id.replaceFirst(".community.*", "") ], og ]}.groupTuple(by:0)
         ODGI_SQUEEZE(ch_squeeze_in)
         ch_odgi_qc_in = ODGI_SQUEEZE.out.graph.map{meta, ogs -> [ [ id:meta.id + ".squeeze" ], ogs ]}
-        ODGI_QC(Channel.empty(), ch_odgi_qc_in, false)
+        ODGI_QC(Channel.empty(), ch_odgi_qc_in, false, true)
         ch_versions = ch_versions.mix(ODGI_QC.out.versions)
         ch_versions = ch_versions.mix(ODGI_SQUEEZE.out.versions)
         ODGI_VIEW(ch_odgi_qc_in)
@@ -99,6 +100,7 @@ workflow PANGENOME {
             INPUT_CHECK.out.fasta,
             INPUT_CHECK.out.fai,
             INPUT_CHECK.out.gzi,
+            false,
             false
         )
         ch_versions = ch_versions.mix(PGGB.out.versions)
