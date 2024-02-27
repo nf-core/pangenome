@@ -12,6 +12,7 @@ report_section_order:
 
 export_plots: true
 
+disable_version_detection: true
 # Report section config for nice titles and descriptions
 custom_data:
   odgi_O:
