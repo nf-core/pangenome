@@ -186,8 +186,24 @@ def toolCitationText() {
     // Uncomment function in methodsDescriptionText to render in MultiQC report
     def citation_text = [
             "Tools used in the workflow included:",
-            "FastQC (Andrews 2010),",
+            "NF-CORE (Ewels et al. 2020)",
+            "Nextflow (Di Tommaso et al. 2017)",
+            "GFAFFIX (Liao et al. 2023)",
             "MultiQC (Ewels et al. 2016)",
+            "NET2COMMUNITIES (Traag et al. 2019)",
+            "ODGI (Guarracino, Heumos et al. 2022; Heumos, Guarracino et al. 2023)",
+            "PGGB (Garrison, Guarracino et al. 2023; Guarracino et al. 2023; Liao et al. 2023)",
+            "SAMTOOLS (Li et al. 2009)",
+            "SEQWISH (Garrison and Guarracino 2023)",
+            "SMOOTHXG (Garrison, Guarracino et al. 2023)",
+            "VCFLIB (Garrison et al. 2022)",
+            "VG (Garrison et al. 2018)",
+            "WFMASH (Guarracino et al. 2024)",
+            "Anaconda (Anaconda Software Distribution 2016)",
+            "Bioconda (Grüning et al. 2018)",
+            "BioContainers (da Veiga Leprevost et al. 2017)",
+            "Docker (Merkel 2014)",
+            "Singularity (Kurtzer et al. 2017)",
             "."
         ].join(' ').trim()
 
@@ -199,7 +215,6 @@ def toolBibliographyText() {
     // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "<li>Author (2023) Pub name, Journal, DOI</li>" : "",
     // Uncomment function in methodsDescriptionText to render in MultiQC report
     def reference_text = [
-            "<li>Andrews S, (2010) FastQC, URL: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).</li>",
             "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics , 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>"
         ].join(' ').trim()
 

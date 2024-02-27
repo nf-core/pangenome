@@ -58,7 +58,7 @@
 
 - [WFMASH](https://github.com/waveygang/wfmash)
 
-  > Guarracino A, Mwaniki N, Marco-Sola S, Garrison E. Wfmash: whole-chromosome pairwise alignment using the hierarchical wavefront algorithm. 2023. https://github.com/waveygang/wfmash.
+  > Guarracino A, Mwaniki N, Marco-Sola S, Garrison E. Wfmash: whole-chromosome pairwise alignment using the hierarchical wavefront algorithm. 2024. https://github.com/waveygang/wfmash.
 
 ## Software packaging/containerisation tools
 
