@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 This release mostly contains updates of the respective modules. Functional updates in the following:
 
 - Added parameter `wfmash_hg_filter_ani_diff`
-- `seqwish_min_match_length` new default now is 23.
+- `seqwish_min_match_length` new default value is `23` now.
 - Fixed a bug with `wfmash_exclude_delim` where `#` was interpreted as a comment instead of a string.
 - @heringerp added functionality so that very large integer values can be written in short form: For example 5000 would become 5k.
 
