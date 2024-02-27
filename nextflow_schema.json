@@ -117,7 +117,8 @@
                 },
                 "wfmash_hg_filter_ani_diff": {
                     "type": "integer",
-                    "default": 30
+                    "default": 30,
+                    "description": "Filter out mappings unlikely to be this Average Nucleotide Identity (ANI) less than the best mapping."
                 }
             }
         },
