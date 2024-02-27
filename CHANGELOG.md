@@ -4,7 +4,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## 1.1.0 - Schmuddlweddr
 
-This release mostly contains updates of the respective modules. Functional updates in the following:
+This release mostly contains updates of the respective modules. Functional updates are the following:
 
 - Added parameter `wfmash_hg_filter_ani_diff`
 - `seqwish_min_match_length` new default value is `23` now.
