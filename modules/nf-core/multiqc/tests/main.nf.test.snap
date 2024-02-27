@@ -24,30 +24,18 @@
             "nf-test": "0.8.4",
             "nextflow": "23.10.1"
         },
-<<<<<<< HEAD
         "timestamp": "2024-02-14T09:29:28.847433492"
-=======
-        "timestamp": "2024-01-31T17:45:09.605359"
->>>>>>> dev
     },
     "multiqc_versions_config": {
         "content": [
             [
-<<<<<<< HEAD
                 "versions.yml:md5,d320d4c37e349c5588e07e7a31cd4186"
-=======
-                "versions.yml:md5,14e9a2661241abd828f4f06a7b5c222d"
->>>>>>> dev
             ]
         ],
         "meta": {
             "nf-test": "0.8.4",
             "nextflow": "23.10.1"
         },
-<<<<<<< HEAD
         "timestamp": "2024-02-14T09:29:13.223621555"
-=======
-        "timestamp": "2024-01-31T17:44:53.535994"
->>>>>>> dev
     }
 }
