@@ -98,7 +98,7 @@
                 },
                 "wfmash_exclude_delim": {
                     "type": "string",
-                    "description": "Skip mappings between sequences with the same name prefix before the given delimiter character. This can be helpful if several sequences originate from the same chromosome. It is recommended that the sequence names respect the https://github.com/pangenome/PanSN-spec."
+                    "description": "Skip mappings between sequences with the same name prefix before the given delimiter character. This can be helpful if several sequences originate from the same chromosome. It is recommended that the sequence names respect the https://github.com/pangenome/PanSN-spec. In future versions of the pipeline it will be required that the sequence names follow this specification."
                 },
                 "wfmash_temp_dir": {
                     "type": "string",
