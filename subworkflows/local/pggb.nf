@@ -22,7 +22,7 @@ workflow PGGB {
     fai   // file: /path/to/sequences.fasta.fai
     gzi   // file: /path/to/sequences.fasta.gzi
     community_mode // val: determines how we will build our meta identifiers of ODGI_QC
-    no_seqwish_input // val : determiens how we will sort the input for MULTIQC
+    no_seqwish_input // val : determines how we will sort the input for MULTIQC
 
     main:
 

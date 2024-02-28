@@ -18,7 +18,7 @@ workflow ODGI_QC {
     seqwish          // file: /path/to/seqwish.og
     sorted_graph     // file: /path/to/sorted_graph.og
     community_mode   // val : determines how to handly meta identifiers
-    no_seqwish_input // val : determiens how we will sort the input for MULTIQC
+    no_seqwish_input // val : determines how we will sort the input for MULTIQC
 
     main:
 
