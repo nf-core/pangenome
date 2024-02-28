@@ -29,7 +29,7 @@ process VG_DECONSTRUCT {
         'https://depot.galaxyproject.org/singularity/pggb:0.5.3--hdfd78af_2':
         'quay.io/biocontainers/pggb:0.5.3--hdfd78af_2' }"
 */
-    container "ghcr.io/pangenome/pggb:2023062221192542ea28"
+    container "ghcr.io/pangenome/pggb:20230819064109936a2c"
 
     input:
     tuple val(meta), path(graph), val(vcf_spec)
@@ -65,7 +65,7 @@ process VG_DECONSTRUCT {
         #TODO: to remove when vcfwave will be bug-free
         # The TYPE info sometimes is wrong/missing
         # There are variants without the ALT allele
-        bcftools annotate -x INFO/TYPE \$vcf_decomposed_tmp  | awk '\$5 != "."' > \$vcf_decomposed
+        bcftools sort \$vcf_decomposed_tmp | bcftools annotate -x INFO/TYPE \$vcf_decomposed_tmp  | awk '\$5 != "."' > \$vcf_decomposed
         rm \$vcf_decomposed_tmp \$vcf.gz
         bcftools stats \$vcf_decomposed > \$vcf_decomposed.stats
     fi

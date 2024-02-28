@@ -22,6 +22,7 @@ workflow PGGB {
     fai   // file: /path/to/sequences.fasta.fai
     gzi   // file: /path/to/sequences.fasta.gzi
     community_mode // val: determines how we will build our meta identifiers of ODGI_QC
+    no_seqwish_input // val : determines how we will sort the input for MULTIQC
 
     main:
 
@@ -129,7 +130,7 @@ workflow PGGB {
 
         ch_sorted_graph = ODGI_SORT.out.sorted_graph
 
-        ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph, community_mode)
+        ODGI_QC(ch_odgi_build_seqwish, ODGI_SORT.out.sorted_graph, community_mode, no_seqwish_input)
         ch_graph_qc = ODGI_QC.out.qc
         ch_versions = ch_versions.mix(ODGI_QC.out.versions)
     }

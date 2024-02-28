@@ -1,6 +1,12 @@
-# ![nf-core/pangenome](docs/images/nf-core-pangenome_logo_light.png#gh-light-mode-only) ![nf-core/pangenome](docs/images/nf-core-pangenome_logo_dark.png#gh-dark-mode-only)
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/nf-core-pangenome_logo_dark.png">
+    <img alt="nf-core/pangenome" src="docs/images/nf-core-pangenome_logo_light.png">
+  </picture>
+</h1>
 
-[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/pangenome/results)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.8202636-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.8202636)
+[![GitHub Actions CI Status](https://github.com/nf-core/pangenome/actions/workflows/ci.yml/badge.svg)](https://github.com/nf-core/pangenome/actions/workflows/ci.yml)
+[![GitHub Actions Linting Status](https://github.com/nf-core/pangenome/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/pangenome/actions/workflows/linting.yml)[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/pangenome/results)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.8202636-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.8202636)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A523.04.0-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -35,10 +41,8 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Usage
 
-> **Note**
-> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how
-> to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline)
-> with `-profile test` before running the workflow on actual data.
+> [!NOTE]
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
 Now, you can run the pipeline using:
 
@@ -46,9 +50,8 @@ Now, you can run the pipeline using:
 nextflow run nf-core/pangenome -r dev --input <BGZIPPED_FASTA> --n_haplotypes <NUM_HAPS_IN_FASTA> --outdir <OUTDIR> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
 ```
 
-> **Warning:**
-> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those
-> provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
+> [!WARNING]
+> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
 > see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
 
 For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/pangenome/usage) and the [parameter documentation](https://nf-co.re/pangenome/parameters).
@@ -79,6 +82,7 @@ Many thanks to all who have helped out and contributed along the way, including 
 | [Erik Garrison](https://github.com/ekg)                    | [The University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)                                                                                                                                                                                                                                                                              |
 | [Andrea Guarracino](https://github.com/AndreaGuarracino)   | [Genomics Research Centre, Human Technopole, Milan, Italy](https://humantechnopole.it/en/) <br> [The University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)                                                                                                                                                                              |
 | [Friederike Hanssen](https://github.com/FriederikeHanssen) | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
+| [Peter Heringer](https://github.com/heringerp)             | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
 | [Michael Heuer](https://github.com/heuermh)                | [Mammoth Biosciences, Inc., San Francisco, CA, USA](https://mammoth.bio)                                                                                                                                                                                                                                                                                                          |
 | [Lukas Heumos](https://github.com/zethson)                 | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) <br> [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html)                                              |
 | [Simon Heumos](https://github.com/subwaystation)           | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
@@ -101,8 +105,9 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 
 ## Citations
 
-<!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use  nf-core/pangenome for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+<!-- If you use nf-core/pangenome for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+
+If you use nf-core/pangenome for your analysis, please cite it using the following doi: [10.5281/zenodo.8202636](https://doi.org/10.5281/zenodo.8202636)
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 

@@ -26,6 +26,8 @@
 
   > Guarracino A, Heumos S, Nahnsen S, Prins P, Garrison E. ODGI: understanding pangenome graphs. Bioinformatics. Volume 38. Issue 13. July 2022. Pages 3319–3326. https://doi.org/10.1093/bioinformatics/btac308.
 
+  > Heumos S, Guarracino A, Schmelzle J N M, Li J, Zhang Z, Nahnsen S, Prins P, Garrison E. Pangenome graph layout by Path-Guided Stochastic Gradient Descent. bioRxiv. https://www.biorxiv.org/content/10.1101/2023.09.22.558964v1.
+
 - [PGGB](https://www.biorxiv.org/content/10.1101/2023.04.05.535718v1)
 
   > Garrison E, Guarracino A, Heumos S, Villani F, Bao Z, Tattini L, Hagmann J, Vorbrugg S, Marco-Sola S, Kubica S, Ashbrook D G, Thorell K, Rusholme-Pilcher R L, Liti G, Rudbeck E, Nahnsen S, Yang Z, Moses M N, Nobrega F L, Wu Y, Chen H, de Ligt J, Sudmant P H, Soranzo N, Colonna V, Williams R W, Prins P. Building pangenome graphs. bioRxiv. 2023.04.05.535718. doi: https://doi.org/10.1101/2023.04.05.535718.
@@ -52,11 +54,11 @@
 
 - [VG](https://pubmed.ncbi.nlm.nih.gov/30125266/)
 
-  > Garrison E et al. Variation graph toolkit improves read mapping by representing genetic variation in the reference. Nature biotechnology vol. 36,9 (2018): 875-879. doi: https://10.1038/nbt.4227
+  > Garrison E et al. Variation graph toolkit improves read mapping by representing genetic variation in the reference. Nature biotechnology vol. 36,9 (2018): 875-879. doi: https://10.1038/nbt.4227.
 
 - [WFMASH](https://github.com/waveygang/wfmash)
 
-  > Guarracino A, Mwaniki N, Marco-Sola S, Garrison E. Wfmash: whole-chromosome pairwise alignment using the hierarchical wavefront algorithm. 2023. https://github.com/waveygang/wfmash.
+  > Guarracino A, Mwaniki N, Marco-Sola S, Garrison E. Wfmash: whole-chromosome pairwise alignment using the hierarchical wavefront algorithm. 2024. https://github.com/waveygang/wfmash.
 
 ## Software packaging/containerisation tools
 
