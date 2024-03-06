@@ -5,14 +5,84 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
-                    "fastqc": {
+                    "gfaffix": {
                         "branch": "master",
-                        "git_sha": "f4ae1d942bd50c5c0b9bd2de1393ce38315ba57c",
+                        "git_sha": "c10d9fe2fb278db19840b150cc6b06d7e87960b5",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "b7ebe95761cd389603f9cc0e0dc384c0f663815a",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/build": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/draw": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/layout": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/sort": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/squeeze": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/stats": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/unchop": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/view": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "odgi/viz": {
+                        "branch": "master",
+                        "git_sha": "a474115d309422f44bdd66e04a0926f3ac6aff47",
+                        "installed_by": ["modules"]
+                    },
+                    "samtools/faidx": {
+                        "branch": "master",
+                        "git_sha": "f4596fe0bdc096cf53ec4497e83defdb3a94ff62",
+                        "installed_by": ["modules"]
+                    },
+                    "seqwish/induce": {
+                        "branch": "master",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "installed_by": ["modules"]
+                    },
+                    "smoothxg": {
+                        "branch": "master",
+                        "git_sha": "bd863b09cc7ef834dd62d5fd687e941cac2daf64",
+                        "installed_by": ["modules"]
+                    },
+                    "tabix/bgzip": {
+                        "branch": "master",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "installed_by": ["modules"]
+                    },
+                    "wfmash": {
+                        "branch": "master",
+                        "git_sha": "0c49f318ec4701b891a87f25fb07b34713c90203",
                         "installed_by": ["modules"]
                     }
                 }
