@@ -132,7 +132,7 @@ workflow PANGENOME {
     ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
     if (!params.communities) {
         if (!params.wfmash_only) {
-            ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..8]})
+            ch_multiqc_files = ch_multiqc_files.mix(PGGB.out.qc.map{return it[1..9]})
         }
     } else {
         ch_multiqc_files = ch_multiqc_files.mix(ODGI_QC.out.qc.map{return it[1..8]})
