@@ -121,7 +121,7 @@ workflow PIPELINE_COMPLETION {
 */
 
 //
-// Function to validate channels from input samplesheet
+// Validate channels from input samplesheet
 //
 def validateInputSamplesheet(input) {
     def (metas, fastqs) = input[1..2]
