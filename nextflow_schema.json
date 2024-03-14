@@ -260,7 +260,7 @@
             "properties": {
                 "vcf_spec": {
                     "type": "string",
-                    "description": "Specify a set of VCFs to produce with --vcf_spec \"REF[:LEN][,REF[:LEN]]*\".",
+                    "description": "Specify a set of VCFs to produce with `--vcf_spec \"REF[:LEN][,REF[:LEN]]*\"`.",
                     "help_text": "The paths matching `^REF` are used as a reference, while the sample haplotypes are derived from path names, e.g. when `DELIM=#` and with `-V chm13`, a path named HG002#1#ctg would be assigned to sample HG002 phase 1. If `LEN` is specified and greater than 0, the VCFs are decomposed, filtering sites whose max allele length is greater than `LEN`."
                 }
             }
