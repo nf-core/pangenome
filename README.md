@@ -16,6 +16,8 @@
 
 [![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23pangenome-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/pangenome)[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)[![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
 
+> WARNING: Version 1.1.0 does contain some known bugs. It is recommended to directly use version 1.1.1. For details please take a look at [CHANGELOG.md](CHANGELOG.md).
+
 ## Introduction
 
 **nf-core/pangenome** is a bioinformatics best-practice analysis pipeline for pangenome graph construction. The pipeline renders a collection of sequences into a pangenome graph. Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs.
