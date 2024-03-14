@@ -10,6 +10,7 @@ This release fixes some important bugs:
 - To complement the issue above, there is a new parameter `wfmash_n_mappings` with default `1`.
 - `bcftools` in the `VG_DECONSTRUCT` module was updated to the most recent version `1.19` to prevent errors like `corrupted size vs. prev_size`.
 - Fixed some problems with the delimiter in `VG_DECONSTRUCT` so that the parameters given by `--vcf-spec` are now applied correctly.
+- Updated to nf-core template version 2.13.1
 
 ## 1.1.0 - Schmuddlweddr
 
