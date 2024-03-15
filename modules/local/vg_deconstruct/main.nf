@@ -29,7 +29,7 @@ process VG_DECONSTRUCT {
         'https://depot.galaxyproject.org/singularity/pggb:0.5.3--hdfd78af_2':
         'quay.io/biocontainers/pggb:0.5.3--hdfd78af_2' }"
 */
-    container "ghcr.io/pangenome/pggb:20230819064109936a2c"
+    container "ghcr.io/pangenome/pggb:20240313103308d2dc38"
 
     input:
     tuple val(meta), path(graph), val(vcf_spec)
@@ -47,16 +47,20 @@ process VG_DECONSTRUCT {
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     ref=\$(echo "$vcf_spec" | cut -f 1 -d:)
-    delim=\$(echo "$vcf_spec" | cut -f 2 -d:)
-    pop_length=\$(echo "$vcf_spec" | cut -f 3 -d:)
+    if [[ "$vcf_spec" == *":"* ]]; then
+        pop_length=\$(echo "$vcf_spec" | cut -f 2 -d:)
+    else
+        pop_length=""
+    fi
 
     if [[ -z \$pop_length ]]; then
         pop_length=0
     fi
 
     vcf="${graph}".\$(echo \$ref | tr '/|' '_').vcf
-    vg deconstruct -P \$ref -H \$delim -e -a -t "${task.cpus}" "${graph}" > \$vcf
+    vg deconstruct -P \$ref -H "#" -e -a -t "${task.cpus}" "${graph}" > \$vcf
     bcftools stats \$vcf > \$vcf.stats
+
     if [[ \$pop_length -gt 0 ]]; then
         vcf_decomposed=${graph}.final.\$(echo \$ref | tr '/|' '_').decomposed.vcf
         vcf_decomposed_tmp=\$vcf_decomposed.tmp.vcf
@@ -65,7 +69,7 @@ process VG_DECONSTRUCT {
         #TODO: to remove when vcfwave will be bug-free
         # The TYPE info sometimes is wrong/missing
         # There are variants without the ALT allele
-        bcftools sort \$vcf_decomposed_tmp | bcftools annotate -x INFO/TYPE \$vcf_decomposed_tmp  | awk '\$5 != "."' > \$vcf_decomposed
+        bcftools sort \$vcf_decomposed_tmp | bcftools annotate -x INFO/TYPE | awk '\$5 != "."' > \$vcf_decomposed
         rm \$vcf_decomposed_tmp \$vcf.gz
         bcftools stats \$vcf_decomposed > \$vcf_decomposed.stats
     fi

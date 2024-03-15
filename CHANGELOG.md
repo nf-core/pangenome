@@ -2,6 +2,16 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.1 - LATÜRNICH
+
+This release fixes some important bugs:
+
+- Per default, we set the number of mappings in `wfmash` to `1`. Previously, this was set to the given number of haplotypes.
+- To complement the issue above, there is a new parameter `wfmash_n_mappings` with default `1`.
+- `bcftools` in the `VG_DECONSTRUCT` module was updated to the most recent version `1.19` to prevent errors like `corrupted size vs. prev_size`.
+- Fixed some problems with the delimiter in `VG_DECONSTRUCT` so that the parameters given by `--vcf-spec` are now applied correctly.
+- Updated to nf-core template version 2.13.1
+
 ## 1.1.0 - Schmuddlweddr
 
 This release mostly contains updates of the respective modules. Functional updates are the following:
