@@ -2,6 +2,8 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.2.0dev - marsupial
+
 ## 1.1.2 - canguro
 
 This release reverts the `wfmash` tool version to 0.10.4, because the current releases are unstable, not documented, and I don't understand how to set the parameters properly.
