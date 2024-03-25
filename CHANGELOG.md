@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ## 1.1.2 - canguro
 
 This release reverts the `wfmash` tool version to 0.10.4, because the current releases are unstable, not documented, and I don't understand how to set the parameters properly.
-It is currently unclear, when a new _stable_ release will become available. People like @baozg or @AndreaGuarracino are evaluating.
+It is currently unclear, when a new _stable_ release will become available. @baozg or @AndreaGuarracino are evaluating.
 
 - Per default, we set the number of mappings in `wfmash` to `--n_haplotypes - 1`. Previously, this was set to `1`.
 - Deactivated parameter `wfmash_hg_filter_ani_diff`, because the older `wfmash` version does not support it.
