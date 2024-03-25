@@ -122,8 +122,8 @@
                 },
                 "wfmash_n_mappings": {
                     "type": "integer",
-                    "default": 1,
-                    "description": "Number of mappings for each segment."
+                    "default": null,
+                    "description": "Number of mappings for each segment. [defualt: n_haplotypes - 1]."
                 }
             }
         },
