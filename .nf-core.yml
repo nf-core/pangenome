@@ -1,2 +1,22 @@
+bump_version: null
+lint:
+  files_unchanged:
+    - assets/nf-core-pangenome_logo_light.png
+nf_core_version: 3.0.0
+org_path: null
 repository_type: pipeline
-nf_core_version: "2.14.1"
+template:
+  author: Simon Heumos, Michael L Heuer
+  description: The pangenome graph construction pipeline renders a collection of sequences
+    into a pangenome graph. Its goal is to build a graph that is locally directed
+    and acyclic while preserving large-scale variation. Maintaining local linearity
+    is important for interpretation, visualization, mapping, comparative genomics,
+    and reuse of pangenome graphs
+  force: false
+  is_nfcore: true
+  name: pangenome
+  org: nf-core
+  outdir: .
+  skip_features: null
+  version: 1.2.0dev
+update: null
