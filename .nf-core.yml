@@ -1,4 +1,7 @@
 lint:
+  files_exist:
+    - assets/schema_input.json
+    - conf/igenomes.config
   files_unchanged:
     - assets/nf-core-pangenome_logo_light.png
 nf_core_version: 3.1.1
