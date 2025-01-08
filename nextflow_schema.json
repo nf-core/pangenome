@@ -451,19 +451,19 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
-            "$ref": "#/defs/wfmash_options"
+            "$ref": "#/$defs/wfmash_options"
         },
         {
-            "$ref": "#/defs/seqwish_options"
+            "$ref": "#/$defs/seqwish_options"
         },
         {
-            "$ref": "#/defs/smoothxg_options"
+            "$ref": "#/$defs/smoothxg_options"
         },
         {
-            "$ref": "#/defs/vg_deconstruct_options"
+            "$ref": "#/$defs/vg_deconstruct_options"
         },
         {
-            "$ref": "#/defs/community"
+            "$ref": "#/$defs/community"
         },
         {
             "$ref": "#/$defs/institutional_config_options"
