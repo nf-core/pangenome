@@ -97,10 +97,10 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2
         with:
-          version: "23.04.0"
+          version: "24.04.2"
 
       - name: Run pipeline with test data and vg deconstruct parameters
         run: |
@@ -120,10 +120,10 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2
         with:
-          version: "23.04.0"
+          version: "24.04.2"
 
       - name: Run pipeline with test data and smoothxg parameters
         run: |
@@ -142,10 +142,10 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2
         with:
-          version: "23.04.0"
+          version: "24.04.2"
 
       - name: Run pipeline with test data and wfmash_chunks parameters
         run: |
@@ -164,10 +164,10 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2
         with:
-          version: "23.04.0"
+          version: "24.04.2"
 
       - name: Run pipeline with test data and wfmash_only parameters
         run: |
@@ -187,10 +187,10 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2
         with:
-          version: "23.04.0"
+          version: "24.04.2"
 
       - name: Run pipeline with test data and wfmash_only parameters
         run: |
@@ -211,10 +211,10 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2
         with:
-          version: "23.04.0"
+          version: "24.04.2"
 
       - name: Run pipeline with test data and wfmash_only parameters
         run: |
@@ -233,10 +233,10 @@ jobs:
       - name: Check out pipeline code
         uses: actions/checkout@v3
 
-      - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2
         with:
-          version: "23.04.0"
+          version: "24.04.2"
 
       - name: Run pipeline with test data and wfmash_only parameters
         run: |
