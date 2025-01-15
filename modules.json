@@ -72,7 +72,7 @@
                     },
                     "smoothxg": {
                         "branch": "master",
-                        "git_sha": "bd863b09cc7ef834dd62d5fd687e941cac2daf64",
+                        "git_sha": "84d99db18e47b5081c54c767d96ea6c4ca992a6c",
                         "installed_by": ["modules"]
                     },
                     "tabix/bgzip": {
