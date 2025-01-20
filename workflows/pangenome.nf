@@ -41,11 +41,11 @@ include { ODGI_VIEW                   } from '../modules/nf-core/odgi/view/main'
 // MODULE: Locally generated modules
 //
 include { VG_DECONSTRUCT              } from '../modules/local/vg_deconstruct/main'
-// the original MULTIQC module does not accept meta.id as an input, but we need this 
+// the original MULTIQC module does not accept meta.id as an input, but we need this
 // to create a folder named meta.id for each community
-// also we put the output in an extra folder, so the output channels had to be adjusted, 
+// also we put the output in an extra folder, so the output channels had to be adjusted,
 // too
-include { MULTIQC_COMMUNITY           } from '../modules/local/multiqc_community/main' 
+include { MULTIQC_COMMUNITY           } from '../modules/local/multiqc_community/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,6 +68,11 @@ workflow PANGENOME {
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
     ch_multiqc_config        = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
+
+    ch_multiqc_config = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
+    ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true) : Channel.empty()
+
+
     ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
     ch_multiqc_logo          = params.multiqc_logo   ? Channel.fromPath(params.multiqc_logo)   : Channel.empty()
 
