@@ -1,6 +1,8 @@
 lint:
   files_unchanged:
     - assets/nf-core-pangenome_logo_light.png
+    - docs/images/nf-core-pangenome_logo_light.png
+    - docs/images/nf-core-pangenome_logo_dark.png
 nf_core_version: 3.1.1
 repository_type: pipeline
 template:
