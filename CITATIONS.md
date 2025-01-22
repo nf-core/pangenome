@@ -14,7 +14,6 @@
 
   > Liao W, Asri M, Ebler J, Doerr D, Haukness M, Hickey G, Lu S, Lucas J K, Monlong J, Abel H J, Buonaiuto S, Chang X H, Cheng H, Chu J, Colonna V, Eizenga J M, Feng X, Fischer C, Fulton R S, Garg S, Groza C, Guarracino A, Harvey W T, Heumos S, Howe K, Jain M, Lu T, Markello C, Martin F J, Mitchell M W, Munson K M, Mwaniki M N, Novak A M, Olsen H E, Pesout T, Porubsky D, Prins P, Sibbesen J A, Tomlinson C, Villani F, Vollger M R, Human Pangenome Reference Consortium, Bourque G, Chaisson M J P, Flicek P, Phillippy A M, Zook J M, Eichler E E,Haussler D, Jarvis E D, Miga K H, Wang T, Garrison E, Marschall T, Hall I, Li H, Paten B. A Draft Human Pangenome Reference. Nature 617, 312–324 (2023). https://doi.org/10.1038/s41586-023-05896-x.
 
-
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
 
   > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: https://10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
