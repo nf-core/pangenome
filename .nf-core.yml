@@ -3,7 +3,7 @@ lint:
     - assets/nf-core-pangenome_logo_light.png
     - docs/images/nf-core-pangenome_logo_light.png
     - docs/images/nf-core-pangenome_logo_dark.png
-nf_core_version: 3.1.1
+nf_core_version: 3.1.2
 repository_type: pipeline
 template:
   author: Simon Heumos, Michael L Heuer
@@ -17,7 +17,7 @@ template:
   name: pangenome
   org: nf-core
   outdir: .
-  version: 1.2.0dev
   skip_features:
     - fastqc
     - igenomes
+  version: 1.2.0dev
