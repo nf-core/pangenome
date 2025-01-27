@@ -1,7 +1,9 @@
 lint:
   files_unchanged:
     - assets/nf-core-pangenome_logo_light.png
-nf_core_version: 3.1.2
+    - docs/images/nf-core-pangenome_logo_light.png
+    - docs/images/nf-core-pangenome_logo_dark.png
+nf_core_version: 3.2.0
 repository_type: pipeline
 template:
   author: Simon Heumos, Michael L Heuer
