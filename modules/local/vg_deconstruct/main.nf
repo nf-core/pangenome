@@ -29,7 +29,7 @@ process VG_DECONSTRUCT {
         'https://depot.galaxyproject.org/singularity/pggb:0.5.3--hdfd78af_2':
         'quay.io/biocontainers/pggb:0.5.3--hdfd78af_2' }"
 */
-    container "ghcr.io/pangenome/pggb:20240313103308d2dc38"
+    container "ghcr.io/pangenome/pggb:20250105182606ca7510"
 
     input:
     tuple val(meta), path(graph), val(vcf_spec)
