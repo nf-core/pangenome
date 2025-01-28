@@ -15,34 +15,28 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { PANGENOME  } from './workflows/pangenome'
+include { PANGENOME               } from './workflows/pangenome'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_pangenome_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_pangenome_pipeline'
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    NAMED WORKFLOWS FOR PIPELINE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
 
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
 workflow NFCORE_PANGENOME {
 
-    take:
-    samplesheet // channel: samplesheet read in from --input
-
     main:
 
-    //
-    // WORKFLOW: Run pipeline
-    //
-    PANGENOME (
-        samplesheet
-    )
+    ch_versions = Channel.empty()
+
+    PANGENOME ()
+
+    ch_versions = ch_versions.mix(PANGENOME.out.versions)
+
     emit:
     multiqc_report = PANGENOME.out.multiqc_report // channel: /path/to/multiqc_report.html
+    versions       = ch_versions                  // channel: [version1, version2, ...]
 }
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -60,16 +54,11 @@ workflow {
         params.validate_params,
         params.monochrome_logs,
         args,
-        params.outdir,
-        params.input
+        params.outdir
     )
 
-    //
-    // WORKFLOW: Run main workflow
-    //
-    NFCORE_PANGENOME (
-        PIPELINE_INITIALISATION.out.samplesheet
-    )
+    NFCORE_PANGENOME ()
+
     //
     // SUBWORKFLOW: Run completion tasks
     //
