@@ -2,6 +2,18 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.3 - marsupial
+
+This release brings several template updates up to 3.2.0 and a number of tool updates.
+
+- Templete updates to 3.2.0 @heuermh @subwaystation
+- Bump odgi to 0.9.0 @heuermh @subwaystation
+- Bump MultiQC to 1.27 @heuermh @subwaystation
+- Bump local MultiQC to 1.27 @subwaystation @heuermh
+- Bump vg to 1.62 @subwaystation @heuermh
+- Bump smoothxg to 0.8.0 @heuermh @subwaystation
+- Refactor authors list of contributors @heuermh @subwaystation @Zethson @AndreaGuarracino @mirpedrol @FriederikeHanssen
+
 ## 1.1.2 - canguro
 
 This release reverts the `wfmash` tool version to 0.10.4, because the current releases are unstable, not documented, and I don't understand how to set the parameters properly.
