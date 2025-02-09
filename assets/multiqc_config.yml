@@ -76,16 +76,16 @@ ignore_images: false
 
 # Make the custom content stuff come after the ODGI module output
 module_order:
-- odgi
-- custom_content
+  - odgi
+  - custom_content
 
 # Set the order that the custom content plots should come in
 custom_content:
   order:
-  - odgi_O
-  - odgi_viz
-  - odgi_viz_pos
-  - odgi_viz_inv
-  - odgi_viz_depth
-  - odgi_viz_uncalled
-  - odgi_draw
+    - odgi_O
+    - odgi_viz
+    - odgi_viz_pos
+    - odgi_viz_inv
+    - odgi_viz_depth
+    - odgi_viz_uncalled
+    - odgi_draw
