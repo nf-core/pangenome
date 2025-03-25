@@ -227,7 +227,6 @@
                 "smoothxg_poa_params": {
                     "type": "string",
                     "default": "1,19,39,3,81,1",
-                    "pattern": "^(\\d+,\\d+,\\d+,\\d+,\\d+,\\d+|asm(5|10|15|20)$",
                     "description": "Score parameters for POA in the form of 'match,mismatch,gap1,ext1,gap2,ext2'. It may also be given as presets: 'asm5', 'asm10', 'asm15', 'asm20'. [default: 1,19,39,3,81,1 = asm5].",
                     "help_text": "For details of the different asm modes, please take a look at https://pggb.readthedocs.io/en/latest/rst/optional_parameters.html#homogenizing-and-ordering-the-graph."
                 },
