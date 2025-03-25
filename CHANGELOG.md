@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## 1.2.0dev - Lettagschwätz
 
+- Updates the input validation of the pipeline to be more strict. This should prevent errors downstream in the pipeline @nvnieuwk
+
 ## 1.1.3 - marsupial
 
 This release brings several template updates up to 3.2.0 and a number of tool updates.
