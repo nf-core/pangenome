@@ -1,0 +1,43 @@
+name: "net2communities"
+description: It detects communities by applying the Leiden algorithm (Trag et al., 2018).
+keywords:
+  - alignment
+  - pangenome graph
+  - mapping
+  - network to communities
+tools:
+  - "pggb":
+      description: "PanGenome Graph Builder"
+      homepage: "https://github.com/pangenome/pggb"
+      documentation: "https://pggb.readthedocs.io/en/latest/"
+      tool_dev_url: "https://github.com/pangenome/paggb"
+      licence: "['MIT']"
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - txts:
+      type: files
+      description: Output of the PAF2NET script.
+      pattern: "*.{txt}"
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - txts:
+      type: files
+      description: TXT files containing the sequence name of each community.
+      pattern: "*.{txt}"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+
+authors:
+  - "@subwaystation"

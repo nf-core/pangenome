@@ -1,0 +1,43 @@
+name: "paf2net"
+description: It projects wfmash's PAF mappings (the implied overlap and containment graph) into an edge list, a list of edge weights, and an 'id to sequence name' map.
+keywords:
+  - alignment
+  - pangenome graph
+  - mapping
+  - PAF to network
+tools:
+  - "pggb":
+      description: "PanGenome Graph Builder"
+      homepage: "https://github.com/pangenome/pggb"
+      documentation: "https://pggb.readthedocs.io/en/latest/"
+      tool_dev_url: "https://github.com/pangenome/paggb"
+      licence: "['MIT']"
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - paf:
+      type: file
+      description: Approximate alignments in PAF format.
+      pattern: "*.{paf}"
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - txts:
+      type: files
+      description: TXT files containing the input PAF as a network description.
+      pattern: "*.{txt}"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+
+authors:
+  - "@subwaystation"
