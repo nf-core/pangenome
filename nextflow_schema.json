@@ -15,6 +15,7 @@
                 "input": {
                     "type": "string",
                     "format": "file-path",
+                    "exists": true,
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to BGZIPPED input FASTA to build the pangenome graph from.",
@@ -22,7 +23,8 @@
                     "fa_icon": "fas fa-file-csv"
                 },
                 "n_haplotypes": {
-                    "type": "number",
+                    "type": "integer",
+                    "minimum": 1,
                     "description": "The number of haplotypes in the input FASTA.",
                     "help_text": "The constructed graph is defined by the number of mappings per segment of each genome (--n_haplotypes <N> - 1). Ideally, you should set this to equal the number of haplotypes in the pangenome. Because that's the maximum number of secondary mappings and alignments that we expect. Keep in mind that the total work of alignment is proportional to N*N, and these multimappings can be highly redundant."
                 },
@@ -59,14 +61,14 @@
                     "help_text": "Use `mash dist` or `mash triangle` to explore the typical level of divergence between the sequences in your input (see https://pggb.readthedocs.io/en/latest/rst/tutorials/divergence_estimation.html#divergence-estimation for more information). Convert this to an approximate percent identity and provide it as --wfmash_map_pct_id <PCT>. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species."
                 },
                 "wfmash_segment_length": {
-                    "type": "string",
-                    "default": "5000",
+                    "type": ["string", "integer"],
+                    "default": 5000,
                     "description": "Segment length for mapping.",
                     "help_text": "Crucially, --wfmash_segment_length provides a kind of minimum alignment length filter. The `mashmap3` step in `wfmash` will only consider segments of this size. For small pangenome graphs, or where there are few repeats, --wfmash_segment_length can be set low (for example 500 when building a MHC pangenome graph). However, for larger contexts, with repeats, it can be very important to set this high (for instance 50k in the case of human genomes). A long segment length ensures that we represent long collinear regions of the input sequences in the structure of the graph. In general, this should at least be larger than transposons and other common repeats in your pangenome. A list of examples can be found at https://github.com/pangenome/pggb#example-builds-for-diverse-species.",
                     "pattern": "^([1-9]\\d*[kKmMgGtT]?|0)$"
                 },
                 "wfmash_block_length": {
-                    "type": "string",
+                    "type": ["string", "integer"],
                     "description": "Minimum block length filter for mapping.",
                     "help_text": "By default, wfmash only keeps mappings with at least 5 times the size of a segment. This can be adjusted with --wfmash_block_length <BLOCK_LENGTH>.",
                     "pattern": "^([1-9]\\d*[kKmMgGtT]?|0)$"
@@ -82,9 +84,9 @@
                     "description": "Ignore the top % most-frequent kmers."
                 },
                 "wfmash_sparse_map": {
+                    "type": ["string", "number"],
                     "default": "1.0",
                     "description": "Keep this fraction of mappings (`auto` for giant component heuristic).",
-                    "type": "string",
                     "pattern": "(auto|[01]\\.\\d+)"
                 },
                 "wfmash_merge_segments": {
@@ -102,11 +104,13 @@
                 },
                 "wfmash_temp_dir": {
                     "type": "string",
+                    "format": "directory-path",
                     "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
                     "hidden": true
                 },
                 "wfmash_chunks": {
                     "type": "integer",
+                    "minimum": 1,
                     "default": 1,
                     "description": "The number of files to generate from the approximate wfmash mappings to scale across a whole cluster. It is recommended to set this to the number of available nodes. If only one machine is available, leave it at 1.",
                     "help_text": "This Nextflow pipeline version's major advantage is that it can distribute the usually computationally heavy all versus all alignment step across a whole cluster. It is capable of splitting the initial approximate alignments into problems of equal size. The base-level alignments are then distributed across several processes. Assuming you have a cluster with 10 nodes and you are the only one using it, we would recommend to set --wfmash_chunks 10. If you have a cluster with 20 nodes, but you have to share it with others, maybe setting it to --wfmash_chunks 10 could be a good fit, because then you don't have to wait too long for your jobs to finish."
@@ -118,10 +122,12 @@
                 "wfmash_hg_filter_ani_diff": {
                     "type": "integer",
                     "default": 30,
+                    "minimum": 0,
                     "description": "Filter out mappings unlikely to be this Average Nucleotide Identity (ANI) less than the best mapping."
                 },
                 "wfmash_n_mappings": {
                     "type": "integer",
+                    "minimum": 1,
                     "description": "Number of mappings for each segment. [default: `n_haplotypes - 1`]."
                 }
             }
@@ -135,28 +141,35 @@
                 "seqwish_min_match_length": {
                     "type": "integer",
                     "default": 23,
+                    "minimum": 1,
                     "description": "Ignores exact matches below this length.",
                     "help_text": "Graph induction with seqwish often works better when we filter very short matches out of the input alignments. In practice, these often occur in regions of low alignment quality, which are typical of areas with large INDELs and structural variations in the wfmash alignments. This underalignment is then resolved in the smoothxg step. Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.\nA setting of --seqwish_min_match_length 47 is optimal for around 5% divergence, and we suggest lowering it for higher divergence and increasing it for lower divergence. Values up to --seqwish_min_match_length 311 work well for human haplotypes. In effect, setting --seqwish_min_match_length to N means that we can tolerate a local pairwise difference rate of no more than 1/N. Thus, INDELs which may be represented by complex series of edit operations will be opened into bubbles in the induced graph, and alignment regions with very low identity will be ignored. Using affine-gapped alignment (such as with minimap2) may reduce the impact of this step by representing large indels more precisely in the input alignments. However, it remains important due to local inconsistency in alignments in low-complexity sequence."
                 },
                 "seqwish_transclose_batch": {
-                    "type": "string",
-                    "default": "10000000",
+                    "type": ["string", "integer"],
+                    "default": 10000000,
+                    "minimum": 0,
                     "description": "Number of base pairs to use for transitive closure batch.",
                     "help_text": "If you run out of memory during the seqwish step, you can lower this value. It will take longer, but it will use less memory.",
                     "pattern": "^([1-9]\\d*[kKmMgGtT]?|0)$"
                 },
                 "seqwish_sparse_factor": {
                     "type": "number",
+                    "minimum": 0,
                     "default": 0,
                     "description": "Keep this randomly selected fraction of input matches."
                 },
                 "seqwish_temp_dir": {
                     "type": "string",
+                    "format": "directory-path",
                     "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
                     "hidden": true
                 },
                 "seqwish_paf": {
                     "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.paf(\\.gz)?$",
                     "description": "Input PAF file. The wfmash alignment step is skipped."
                 }
             }
@@ -174,40 +187,41 @@
                 "smoothxg_max_path_jump": {
                     "type": "integer",
                     "default": 0,
+                    "minimum": 0,
                     "description": "Maximum path jump to include in the block.",
                     "hidden": true
                 },
                 "smoothxg_max_edge_jump": {
                     "type": "integer",
                     "default": 0,
+                    "minimum": 0,
                     "description": "Maximum edge jump before a block is broken.",
                     "hidden": true
                 },
                 "smoothxg_poa_length": {
                     "type": "string",
                     "default": "700,900,1100",
+                    "pattern": "^[\\d,]+$",
                     "description": "Maximum sequence length to put int POA. Is a comma-separated list. For each integer, SMOOTHXG wil be executed once.",
                     "help_text": "The last step in smoothxg refines the graph by running a partial order alignment (POA) across segments, so called blocks. The \"chunked\" POA process attempts to build an MSA for each collinear region in the sorted graph.\nThe length of these sub-problems greatly affects the total time and memory requirements of the pipeline, and is defined by -- smoothxg_poa_length <LEN1,LEN2,...>. Several passes of refinement can be defined by lengths >LEN1,LEN2,...>, and so on. Ideally, this target can be set above the length of transposon repeats in the pangenome, and base-level graph quality tends to improve as it is set higher. Higher values makes sense for lower-diversity pangenomes, but can require several GB of RAM per thread."
-                },
-                "smoothxg_block_id_min": {
-                    "type": "string",
-                    "description": "Minimum edit-based identity to cluster sequences.",
-                    "hidden": true
                 },
                 "smoothxg_block_ratio_min": {
                     "type": "integer",
                     "default": 0,
+                    "minimum": 0,
                     "description": "Minimum 'smallest / largest' sequence length ration to cluster in a block.",
                     "hidden": true
                 },
                 "smoothxg_pad_max_depth": {
                     "type": "integer",
                     "default": 100,
+                    "minimum": 0,
                     "description": "Path depth at which we don't pad the POA problem."
                 },
                 "smoothxg_poa_padding": {
                     "type": "number",
                     "default": 0.001,
+                    "minimum": 0,
                     "description": "Pad each end of each seuqence in POA with 'smoothxg_poa_padding * longest_poa_seq' base pairs."
                 },
                 "smoothxg_poa_params": {
@@ -228,6 +242,7 @@
                 },
                 "smoothxg_temp_dir": {
                     "type": "string",
+                    "format": "directory-path",
                     "description": "Set the directory where temporary files should be stored. Since everything runs in containers, we don't usually set this argument.",
                     "hidden": true
                 },
@@ -247,6 +262,7 @@
                 "smoothxg_poa_cpus": {
                     "type": "integer",
                     "default": 0,
+                    "minimum": 0,
                     "description": "Number of CPUs for the potentially very memory expensive POA phase of SMOOTHXG. Default is 'task.cpus'."
                 }
             }
