@@ -66,9 +66,7 @@ For more details about the output files and reports, please refer to the
 
 ## Credits
 
-nf-core/pangenome was originally adapted from [PGGB](https://github.com/pangenome/pggb) by [Simon Heumos](https://github.com/subwaystation), [Michael Heuer](https://github.com/heuermh).
-
-> [Simon Heumos](https://github.com/subwaystation) is currently the sole developer.
+nf-core/pangenome was originally adapted from [PGGB](https://github.com/pangenome/pggb) by [Simon Heumos](https://github.com/subwaystation) and [Michael Heuer](https://github.com/heuermh).
 
 Many thanks to all who have helped out and contributed along the way, including (but not limited to)\*:
 
@@ -80,7 +78,8 @@ Many thanks to all who have helped out and contributed along the way, including 
 | [Andrea Guarracino](https://github.com/AndreaGuarracino)   | [University of Tennessee Health Science Center, Memphis, Tennessee, TN, USA](https://uthsc.edu/)                                                                                                                                                                                                                                                                                  |
 | [Friederike Hanssen](https://github.com/FriederikeHanssen) | [Seqera](https://seqera/io)                                                                                                                                                                                                                                                                                                                                                       |
 | [Peter Heringer](https://github.com/heringerp)             | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
-| [Michael Heuer](https://github.com/heuermh)                | [Mammoth Biosciences, Inc., San Francisco, CA, USA](https://mammoth.bio)                                                                                                                                                                                                                                                                                                          |
+| [Michael Heuer](https://github.com/heuermh)                | [Network.bio, New York, NY, USA](https://network.bio/)                                                                                                                                                                                                                                                                                                                            |
+| [YUXIN NING](https://github.com/ningyuxin1999)             | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)                                                                                                                                                                                                    |
 | [Lukas Heumos](https://github.com/zethson)                 | [Institute of Computational Biology, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/icb/index.html) <br> [Institute of Lung Biology and Disease and Comprehensive Pneumology Center, Helmholtz Zentrum München, Munich, Germany](https://www.helmholtz-muenchen.de/ilbd/the-institute/cpc/index.html)                                              |
 | [Simon Heumos](https://github.com/subwaystation)           | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/) <br> [Biomedical Data Science, Department of Computer Science, University of Tübingen, Germany](https://uni-tuebingen.de/en/faculties/faculty-of-science/departments/computer-science/department/) |
 | [Susanne Jodoin](https://github.com/SusiJo)                | [Quantitative Biology Center (QBiC) Tübingen, University of Tübingen, Germany](https://uni-tuebingen.de/en/research/research-infrastructure/quantitative-biology-center-qbic/)                                                                                                                                                                                                    |
@@ -98,7 +97,7 @@ Many thanks to all who have helped out and contributed along the way, including 
 
 If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
 
-For further information or help, don't hesitate to get in touch on the [Slack `#pangenome` channel](https://nfcore.slack.com/channels/pangenome) (you can join with [this invite](https://nf-co.re/join/slack)), or contact me [Simon Heumos](mailto:simon.heumos@qbic.uni-tuebingen.de?subject=[GitHub]%20nf-core/pangenome).
+For further information or help, don't hesitate to get in touch on the [Slack `#pangenome` channel](https://nfcore.slack.com/channels/pangenome) (you can join with [this invite](https://nf-co.re/join/slack)).
 
 ## Citations
 
