@@ -3,15 +3,15 @@ lint:
     - assets/nf-core-pangenome_logo_light.png
     - docs/images/nf-core-pangenome_logo_light.png
     - docs/images/nf-core-pangenome_logo_dark.png
+    - .github/workflows/branch.yml
+    - .github/workflows/linting.yml
+  files_exist:
+    - .github/workflows/linting_comment.yml
 nf_core_version: 3.2.0
 repository_type: pipeline
 template:
   author: Simon Heumos, Michael L Heuer
-  description: The pangenome graph construction pipeline renders a collection of sequences
-    into a pangenome graph. Its goal is to build a graph that is locally directed
-    and acyclic while preserving large-scale variation. Maintaining local linearity
-    is important for interpretation, visualization, mapping, comparative genomics,
-    and reuse of pangenome graphs
+  description: The pangenome graph construction pipeline renders a collection of sequences into a pangenome graph. Its goal is to build a graph that is locally directed and acyclic while preserving large-scale variation. Maintaining local linearity is important for interpretation, visualization, mapping, comparative genomics, and reuse of pangenome graphs
   force: false
   is_nfcore: true
   name: pangenome
